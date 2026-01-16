@@ -27,4 +27,24 @@ public final class Constants {
     public static final double ROTATION_MULTIPLIER = 0.5;
     public static final double DEADBAND = 0.3;
   }
+
+    public static final class IntakeConstants
+  {
+    //placeholder ids
+    public static final int intakemotorID = 7;
+    public static final int intakeactivatorID = 8;
+  }
+
+  public static class OI {
+
+    //xbox button ids
+    public static final int kdriverControllerButton1 = 1;
+    public static final int kdriverControllerButton2 = 2;
+    public static final int kdriverControllerButton3 = 3;
+    public static final int kdriverControllerButton4 = 4;
+    public static final int kdriverControllerButton5 = 5;
+    public static final int kdriverControllerButton6 = 6;
+    public static final int kdriverControllerButton7 = 7;
+    public static final int kdriverControllerButton8 = 8;
+  }
 }
