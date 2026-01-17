@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.intake.IntakeCommand;
+import frc.robot.commands.intake.OuttakeCommand;
 import frc.robot.commands.intake.SetIntakeActivator;
 import frc.robot.commands.intake.UnsetIntakeActivator;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -40,6 +41,7 @@ public class RobotContainer {
 
     //Intake Commands
     private final IntakeCommand runIntake = new IntakeCommand(m_intake, 0.5);
+    private final OuttakeCommand runOuttake = new OuttakeCommand(m_intake, 0.5);
     private final SetIntakeActivator setIntakePos = new SetIntakeActivator(m_intake, 0.5);
     private final UnsetIntakeActivator unsetIntakePos = new UnsetIntakeActivator(m_intake, 0.5);
     private final UnsetIntakeActivator stopIntake = new UnsetIntakeActivator(m_intake, 0);
@@ -70,10 +72,16 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        //Right Bumper: Spins the intake wheel when the setup is at the ending position
-        driverController.rightBumper().onTrue(runIntake);
+        //Left Trigger: Spins the intake wheel when the setup is at the ending position
+        driverController.leftTrigger().onTrue(runIntake);
+        
+        //Left Bumper: Spins the intake wheel backwards when the setup is at the ending position
+        driverController.leftBumper().onTrue(runOuttake);
 
-        //Left Bumper: Sets intake setup to intake position, or starting position depending on where it is
+
+        //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
+
+        /*
         if (intakeAtStartingPos) {
             driverController.leftBumper().onTrue(setIntakePos);
         } else if (intakeAtEndingPos) {
@@ -81,7 +89,8 @@ public class RobotContainer {
         } else {
             driverController.leftBumper().onTrue(stopIntake);
         }
-            
+        */
+
     }
 
     public void periodic() {
