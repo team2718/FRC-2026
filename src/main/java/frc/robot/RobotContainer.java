@@ -71,7 +71,7 @@ public class RobotContainer {
     private void configureBindings() {
 
         //Right Bumper: Spins the intake wheel when the setup is at the ending position
-        driverController.rightBumper().onTrue(runIntake);;
+        driverController.rightBumper().onTrue(runIntake);
 
         //Left Bumper: Sets intake setup to intake position, or starting position depending on where it is
         if (intakeAtStartingPos) {
