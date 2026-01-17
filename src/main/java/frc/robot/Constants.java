@@ -23,7 +23,7 @@ public final class Constants {
   public static class OperatorConstants {
     // Operator constants, borrowed from the basketball robot's code
     public static final int kDriverControllerPort = 0;
-    public static final double SPEED_MULTIPLIER = 0.5;
+    public static final double SPEED_MULTIPLIER = 0.2;
     public static final double ROTATION_MULTIPLIER = 0.5;
     public static final double DEADBAND = 0.3;
   }
