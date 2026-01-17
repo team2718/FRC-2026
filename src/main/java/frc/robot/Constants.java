@@ -34,7 +34,7 @@ public final class Constants {
     public static final int intakemotorID = 7;
     public static final int intakeactivatorID = 8;
   }
-
+  /*
   public static class OI {
 
     //xbox button ids
@@ -47,4 +47,5 @@ public final class Constants {
     public static final int kdriverControllerButton7 = 7;
     public static final int kdriverControllerButton8 = 8;
   }
+  */
 }

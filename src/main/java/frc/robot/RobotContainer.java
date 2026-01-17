@@ -9,21 +9,20 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.intake.IntakeCommand;
 import frc.robot.commands.intake.SetIntakeActivator;
 import frc.robot.commands.intake.UnsetIntakeActivator;
-import frc.robot.commands.intake.SetIntakeActivator;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj.XboxController;
+//import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+//import edu.wpi.first.wpilibj2.command.button.POVButton;
+//import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
 
-    XboxController driverController = new XboxController(0);
-
+    CommandXboxController driverController = new CommandXboxController(0);
+    /*
     private final JoystickButton driverXboxButtonB = new JoystickButton(driverController, Constants.OI.kdriverControllerButton2);
     private final JoystickButton driverXboxleftbumper = new JoystickButton(driverController, Constants.OI.kdriverControllerButton5);
     private final JoystickButton driverXboxrightbumper = new JoystickButton(driverController, Constants.OI.kdriverControllerButton6);
@@ -33,7 +32,7 @@ public class RobotContainer {
     private final JoystickButton driverXboxButtonMinus = new JoystickButton(driverController, Constants.OI.kdriverControllerButton7);
     private final JoystickButton driverXboxButtonPlus = new JoystickButton(driverController, Constants.OI.kdriverControllerButton8);
     private final POVButton driverXboxDpad = new POVButton(driverController, 0);
-
+    */
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
@@ -72,15 +71,15 @@ public class RobotContainer {
     private void configureBindings() {
 
         //Right Bumper: Spins the intake wheel when the setup is at the ending position
-        driverXboxrightbumper.onTrue(runIntake);
+        driverController.rightBumper().onTrue(runIntake);;
 
         //Left Bumper: Sets intake setup to intake position, or starting position depending on where it is
         if (intakeAtStartingPos) {
-            driverXboxleftbumper.onTrue(setIntakePos);
+            driverController.leftBumper().onTrue(setIntakePos);
         } else if (intakeAtEndingPos) {
-            driverXboxleftbumper.onTrue(unsetIntakePos);
+            driverController.leftBumper().onTrue(unsetIntakePos);
         } else {
-            driverXboxleftbumper.onTrue(stopIntake);
+            driverController.leftBumper().onTrue(stopIntake);
         }
             
     }
