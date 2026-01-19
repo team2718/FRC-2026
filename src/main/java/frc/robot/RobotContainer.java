@@ -10,26 +10,35 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
 
-    XboxController driverController = new XboxController(0);
+    CommandXboxController driverController = new CommandXboxController(0);
 
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
-    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerve.getSwerveDrive(),
+    SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
             () -> driverController.getLeftY() * -1,
             () -> driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
-            .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER);
+            .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
+            .robotRelative(true)
+            .allianceRelativeControl(false);
+
+    SwerveInputStream driveDirectAngleFieldRelative = driveAngularVelocityRobotRelative.copy()
+            .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+            .headingWhile(true)
+            .robotRelative(false)
+            .allianceRelativeControl(true);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
-            
+
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
+        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
 
         autoChooser.setDefaultOption("An Auto", "An Auto");
         autoChooser.addOption("Another Auto", "Another Auto");
@@ -41,7 +50,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-      return swerve.getAutonomousCommand(autoChooser.getSelected());
+        return swerve.getAutonomousCommand(autoChooser.getSelected());
     }
 
 }
