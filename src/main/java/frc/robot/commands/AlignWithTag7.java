@@ -35,11 +35,13 @@ public class AlignWithTag7  extends Command{
 
         double xSpeed = -distFromTag7X * 5.0;
         double ySpeed = -distFromTag7Y * 5.0;
+        double turnSpeed = -angleFromTag7 * 0.05;
 
         xSpeed = clamp(-0.8, 0.8, xSpeed);
         ySpeed = clamp(-0.8, 0.8, ySpeed);
+        turnSpeed = clamp(-0.8, 0.8, turnSpeed);
 
-        swerve.driveFieldOriented(new ChassisSpeeds(xSpeed, ySpeed,0));
+        swerve.driveFieldOriented(new ChassisSpeeds(xSpeed, ySpeed,turnSpeed));
     }
     
 }
