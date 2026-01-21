@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.turret.TurretShoot;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -17,6 +19,10 @@ public class RobotContainer {
 
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
+
+    private final TurretSubsystem m_turret = new TurretSubsystem();
+
+    private final TurretShoot shoot = new TurretShoot(m_turret, 0.5);
 
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerve.getSwerveDrive(),
             () -> driverController.getLeftY() * -1,

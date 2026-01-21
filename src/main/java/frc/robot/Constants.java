@@ -27,4 +27,11 @@ public final class Constants {
     public static final double ROTATION_MULTIPLIER = 0.5;
     public static final double DEADBAND = 0.3;
   }
+
+  public static final class TurretConstants
+  {
+    //placeholder ids
+    public static final int turretshooterID = 9;
+    public static final int turretspinnerID = 10;
+  }
 }
