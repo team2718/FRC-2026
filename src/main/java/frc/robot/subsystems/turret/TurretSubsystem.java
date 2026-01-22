@@ -1,6 +1,7 @@
 package frc.robot.subsystems.turret;
 
-    import com.revrobotics.spark.SparkLowLevel;
+    import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkParameters;
 
@@ -29,9 +30,19 @@ public TurretSubsystem() {
 }
 
 
-//sets activator speed foreward
+//sets speed of the shooter
 public void setShooterSpeed(double power) {
     turretshooter.set(power);
+}
+
+//sets rotational speed of the turret
+public void setTurretSpin(double power) {
+    turretspinner.set(power);
+}
+
+//returns the current rotational position of the turret
+public double getTurretPosition() {
+    return turretspinner.getEncoder().getPosition();
 }
 
 @Override
