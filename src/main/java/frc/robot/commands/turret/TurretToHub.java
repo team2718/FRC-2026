@@ -20,10 +20,8 @@ public class TurretToHub extends Command {
     //Spins the turret to position 180 (placeholder) when activated
     @Override
     public void execute() {
-        if (shooter.getTurretPosition() < 175) {
-            shooter.setTurretSpin(speed);
-        } else if (shooter.getTurretPosition() > 185) {
-            shooter.setTurretSpin(-speed);
+        if (shooter.getTurretPosition() >= 0 && shooter.getTurretPosition() <= 360) {
+            shooter.setTurretSpin(speed * (180 - shooter.getTurretPosition())); //180 = desired angle
         } else {
             shooter.setTurretSpin(0);
         }
