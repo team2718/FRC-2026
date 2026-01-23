@@ -66,6 +66,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     swerveDrive.setHeadingCorrection(true);
 
+    swerveDrive.setCosineCompensator(true);
+
     // setupPathPlanner();
 
     // Stop the default odometry thread since we will be handling odometry manually
