@@ -34,7 +34,6 @@ public class RobotContainer {
     private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
     private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
 
-    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerve.getSwerveDrive(),
     VisionSubsystem vision = new VisionSubsystem();
 
     SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
