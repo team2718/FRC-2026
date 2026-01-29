@@ -1,67 +1,62 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.intake.IntakeCommand;
-import frc.robot.commands.intake.OuttakeCommand;
-import frc.robot.commands.intake.SetIntakeActivator;
-import frc.robot.commands.intake.UnsetIntakeActivator;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.commands.turret.TurretShoot;
+import frc.robot.commands.turret.TurretToHub;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-//import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-//import edu.wpi.first.wpilibj2.command.button.POVButton;
-//import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
 
+    //XboxController driverController = new XboxController(0);
+
     CommandXboxController driverController = new CommandXboxController(0);
-    /*
-    private final JoystickButton driverXboxButtonB = new JoystickButton(driverController, Constants.OI.kdriverControllerButton2);
-    private final JoystickButton driverXboxleftbumper = new JoystickButton(driverController, Constants.OI.kdriverControllerButton5);
-    private final JoystickButton driverXboxrightbumper = new JoystickButton(driverController, Constants.OI.kdriverControllerButton6);
-    private final JoystickButton driverXboxButtonA = new JoystickButton(driverController, Constants.OI.kdriverControllerButton1);
-    private final JoystickButton driverXboxButtonY = new JoystickButton(driverController, Constants.OI.kdriverControllerButton4);
-    private final JoystickButton driverXboxButtonX = new JoystickButton(driverController, Constants.OI.kdriverControllerButton3);
-    private final JoystickButton driverXboxButtonMinus = new JoystickButton(driverController, Constants.OI.kdriverControllerButton7);
-    private final JoystickButton driverXboxButtonPlus = new JoystickButton(driverController, Constants.OI.kdriverControllerButton8);
-    private final POVButton driverXboxDpad = new POVButton(driverController, 0);
-    */
+
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
-    private final IntakeSubsystem m_intake = new IntakeSubsystem();
+    private final TurretSubsystem m_turret = new TurretSubsystem();
 
-    //Intake Commands
-    private final IntakeCommand runIntake = new IntakeCommand(m_intake, 0.5);
-    private final OuttakeCommand runOuttake = new OuttakeCommand(m_intake, 0.5);
-    private final SetIntakeActivator setIntakePos = new SetIntakeActivator(m_intake, 0.5);
-    private final UnsetIntakeActivator unsetIntakePos = new UnsetIntakeActivator(m_intake, 0.5);
-    private final UnsetIntakeActivator stopIntake = new UnsetIntakeActivator(m_intake, 0);
+    private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
+    private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
 
+    VisionSubsystem vision = new VisionSubsystem();
 
-    private final boolean intakeAtEndingPos = m_intake.getActivatorPosition() > 117;
-    private final boolean intakeAtStartingPos = m_intake.getActivatorPosition() < 3;
-
-    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerve.getSwerveDrive(),
+    SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
             () -> driverController.getLeftY() * -1,
             () -> driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
-            .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER);
+            .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
+            .allianceRelativeControl(false)
+            .robotRelative(false);
+
+    SwerveInputStream driveDirectAngleFieldRelative = driveAngularVelocityRobotRelative.copy()
+            .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+            .headingWhile(true)
+            .robotRelative(false)
+            .allianceRelativeControl(true);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
-            
+
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.drive(driveAngularVelocity));
+        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
+
+        driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
 
         autoChooser.setDefaultOption("An Auto", "An Auto");
         autoChooser.addOption("Another Auto", "Another Auto");
@@ -93,12 +88,23 @@ public class RobotContainer {
 
     }
 
+     private void configureBindings() {
+
+        //Right Trigger: Spins the shooter wheel while holding down
+        driverController.rightTrigger().onTrue(turretShoot);
+        
+        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified)
+        driverController.leftBumper().onTrue(turretToHub);
+
+    }
+
     public void periodic() {
         swerve.getSwerveDrive().updateOdometry();
+        vision.updatePoseFromTags(swerve.getSwerveDrive());
     }
 
     public Command getAutonomousCommand() {
-      return swerve.getAutonomousCommand(autoChooser.getSelected());
+        return swerve.getAutonomousCommand(autoChooser.getSelected());
     }
 
 }
