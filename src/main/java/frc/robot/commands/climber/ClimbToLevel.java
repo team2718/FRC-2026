@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.climber;
 
 import frc.robot.Constants;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -56,4 +56,15 @@ public final class ClimbToLevel extends Command {
             }    
         }
     }
+
+    @Override
+    public boolean isFinished() {
+        return (
+            climber.getDesiredLevel() == 0 ||
+            (climber.getDesiredLevel() == 1 && climber.getRobotElevation() >= Constants.ClimberConstants.L1_ELEVATION) ||
+            (climber.getDesiredLevel() == 2 && climber.getRobotElevation() >= Constants.ClimberConstants.L2_ELEVATION) ||
+            (climber.getDesiredLevel() == 3 && climber.getRobotElevation() >= Constants.ClimberConstants.L3_ELEVATION)
+        );
+    }
+
 }
