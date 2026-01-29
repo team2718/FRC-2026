@@ -10,8 +10,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.turret.TurretShoot;
+import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.turret.TurretSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -19,11 +22,19 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
 
+    //XboxController driverController = new XboxController(0);
+
     CommandXboxController driverController = new CommandXboxController(0);
 
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
+    private final TurretSubsystem m_turret = new TurretSubsystem();
+
+    private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
+    private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
+
+    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(swerve.getSwerveDrive(),
     VisionSubsystem vision = new VisionSubsystem();
 
     SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
@@ -52,6 +63,16 @@ public class RobotContainer {
         autoChooser.setDefaultOption("An Auto", "An Auto");
         autoChooser.addOption("Another Auto", "Another Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
+    }
+
+     private void configureBindings() {
+
+        //Right Trigger: Spins the shooter wheel while holding down
+        driverController.rightTrigger().onTrue(turretShoot);
+        
+        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified)
+        driverController.leftBumper().onTrue(turretToHub);
+
     }
 
     public void periodic() {
