@@ -67,4 +67,8 @@ public final class ClimbToLevel extends Command {
         );
     }
 
+    @Override
+    public void end(boolean interuppted) {
+        climber.setClimbMotor(0);
+    }
 }
