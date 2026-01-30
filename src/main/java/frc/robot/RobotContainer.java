@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.AlignWithHubFront;
+import frc.robot.commands.AlignWithTag7;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.intake.RunOuttake;
 import frc.robot.commands.turret.TurretShoot;
@@ -69,7 +71,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
-        driverController.b().whileTrue(new AlignWithTag7(swerve));
+        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
     }
 
     private void configureBindings() {

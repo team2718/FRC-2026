@@ -1,17 +1,35 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import swervelib.SwerveInputStream;
+import frc.robot.subsystems.SwerveSubsystem;
 
 public class AlignWithHubFront  extends Command{
 
+    public static double getWrappedAngleDifference(double source, double target) {
+        double diff = (target - source) % 360;
+
+        if (diff > 180) {
+            diff -= 360;
+        }
+        else if (diff <= -180) {
+            diff += 360;
+        }
+
+        return diff;
+    }
+
     SwerveSubsystem swerve;
+    SwerveInputStream swerveInput;
+    private final Translation2d hubCenterLocation = new Translation2d(11.92, 4.03);
     
 
-    public AlignWithHubFront(SwerveSubsystem swerve) {
+    public AlignWithHubFront(SwerveSubsystem swerve, SwerveInputStream swerveInput) {
         this.swerve = swerve;
+        this.swerveInput = swerveInput;
         addRequirements(swerve);
 
     }
@@ -29,27 +47,13 @@ public class AlignWithHubFront  extends Command{
 
     @Override
     public void execute() {
-        double distFromTag9X = swerve.getPose().getTranslation().getX() - VisionSubsystem.fieldLayout.getTagPose(9).get().getX();
-        double distFromTag9Y = swerve.getPose().getTranslation().getY() - VisionSubsystem.fieldLayout.getTagPose(9).get().getY();
-        double angleFromTag9 = swerve.getPose().getRotation().getDegrees() - 0.0; // 0.0 is the desired angle
+        double angleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
 
-        double distFromTag10X = swerve.getPose().getTranslation().getX() - VisionSubsystem.fieldLayout.getTagPose(10).get().getX();
-        double distFromTag10Y = swerve.getPose().getTranslation().getY() - VisionSubsystem.fieldLayout.getTagPose(10).get().getY();
-        double angleFromTag10 = swerve.getPose().getRotation().getDegrees() - 0.0; // 0.0 is the desired angle
+        double turnSpeed = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), angleFromTag9) * 0.05;
 
-        //double xSpeed = -distFromTag9X * 5.0;
-        //double ySpeed = -distFromTag9Y * 5.0;
-        //double turnSpeed = -angleFromTag9 * 0.05;
-
-        double xSpeed = -distFromTag10X * 5.0;
-        double ySpeed = -distFromTag10Y * 5.0;
-        double turnSpeed = -angleFromTag10 * 0.05;
-
-        xSpeed = clamp(-0.8, 0.8, xSpeed);
-        ySpeed = clamp(-0.8, 0.8, ySpeed);
         turnSpeed = clamp(-0.8, 0.8, turnSpeed);
 
-        swerve.driveFieldOriented(new ChassisSpeeds(xSpeed, ySpeed,turnSpeed));
+        swerve.driveFieldOriented(new ChassisSpeeds(swerveInput.get().vxMetersPerSecond, swerveInput.get().vyMetersPerSecond, turnSpeed));
     }
     
 }
