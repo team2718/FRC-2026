@@ -69,6 +69,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
+        driverController.b().whileTrue(new AlignWithTag7(swerve));
     }
 
     private void configureBindings() {
