@@ -9,10 +9,13 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.intake.RunIntake;
+import frc.robot.commands.intake.RunOuttake;
 import frc.robot.commands.turret.TurretShoot;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.turret.TurretSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,9 +32,12 @@ public class RobotContainer {
             "swerve"));
 
     private final TurretSubsystem m_turret = new TurretSubsystem();
+    private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
     private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
     private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
+    private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
+    private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
     VisionSubsystem vision = new VisionSubsystem();
 
@@ -73,7 +79,11 @@ public class RobotContainer {
         //Left Bumper: Spins the intake wheel backwards when the setup is at the ending position
         driverController.leftBumper().onTrue(runOuttake);
 
-
+        //Right Trigger: Spins the shooter wheel while holding down
+        driverController.rightTrigger().onTrue(turretShoot);
+        
+        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified)
+        driverController.rightBumper().onTrue(turretToHub);
         //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
         /*
@@ -88,16 +98,7 @@ public class RobotContainer {
 
     }
 
-     private void configureBindings() {
-
-        //Right Trigger: Spins the shooter wheel while holding down
-        driverController.rightTrigger().onTrue(turretShoot);
-        
-        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified)
-        driverController.leftBumper().onTrue(turretToHub);
-
-    }
-
+    
     public void periodic() {
         swerve.getSwerveDrive().updateOdometry();
         vision.updatePoseFromTags(swerve.getSwerveDrive());

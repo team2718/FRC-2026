@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class ClimberSubsystem extends ExampleSubsystem {
+public class ClimberSubsystem {
     // Fields
     private final SparkMax climbMotor;
     private SparkMaxConfig climbMotorConfig;

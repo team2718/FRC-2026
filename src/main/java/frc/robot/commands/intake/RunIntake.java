@@ -3,12 +3,12 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
-public class IntakeCommand extends Command {
+public class RunIntake extends Command {
     private final IntakeSubsystem intake;
     // private final LEDSubsystem LEDs;
     private double speed;
 
-    public IntakeCommand(IntakeSubsystem intake,  double speed) {
+    public RunIntake(IntakeSubsystem intake,  double speed) {
         this.intake = intake;
       
         this.speed = speed;
@@ -32,11 +32,11 @@ public class IntakeCommand extends Command {
         
     }
 
-@Override
-public void end(boolean interuppted) {
-    intake.setSpeed(0);
-    intake.setActivatorSpeed(0);
-}
+    @Override
+    public void end(boolean interuppted) {
+        intake.setSpeed(0);
+        intake.setActivatorSpeed(0);
+    }
 
     @Override
     public boolean isFinished() {
