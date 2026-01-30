@@ -1,14 +1,11 @@
 package frc.robot.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -25,18 +22,15 @@ import frc.robot.subsystems.VisionSubsystem;
 
 public class Camera {
 
-  private final PhotonCamera camera;
+  private static final double maxAmbiguity = 0.25;
+  private static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
+  private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
+  private final PhotonCamera camera;
   private final Transform3d robotToCamTransform;
   private final PhotonPoseEstimator poseEstimator;
-
-  private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 4);
-
-  private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
-
   private final Alert connectedAlert;
-
-  public Matrix<N3, N1> curStdDevs;
+  private Matrix<N3, N1> curStdDevs = singleTagStdDevs;
 
   public Camera(String name, Rotation3d robotToCamRotation, Translation3d robotToCamTranslation) {
     camera = new PhotonCamera(name);
@@ -45,10 +39,7 @@ public class Camera {
 
     robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
-    poseEstimator = new PhotonPoseEstimator(VisionSubsystem.fieldLayout,
-        PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        robotToCamTransform);
-    poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    poseEstimator = new PhotonPoseEstimator(VisionSubsystem.fieldLayout, robotToCamTransform);
   }
 
   /**
@@ -73,32 +64,30 @@ public class Camera {
   }
 
   /**
-   * Update the latest results, cached with a maximum refresh rate of 1req/15ms.
-   * Sorts the list by timestamp.
+   * Attempts to produce a global robot pose estimate from the camera's unread
+   * vision results.
+   *
+   * @return an {@code Optional<EstimatedRobotPose>} containing the last
+   *         successful pose estimate
+   *         produced from the processed results, or {@code Optional.empty()} if
+   *         no valid estimate
+   *         could be produced.
    */
   private Optional<EstimatedRobotPose> estimateGlobalPose() {
     List<PhotonPipelineResult> resultsList = camera.getAllUnreadResults();
-    List<PhotonPipelineResult> goodResults = new ArrayList<PhotonPipelineResult>();
 
-    // Remove high ambiguity results
-    if (!resultsList.isEmpty()) {
-      for (PhotonPipelineResult result : resultsList) {
-        if (!result.hasTargets()) {
-          continue;
-        }
-        if (result.getBestTarget().poseAmbiguity < 0.10) {
-          goodResults.add(result);
-        }
-      }
-    }
+    // Remove any results that have no targets or are high ambiguity
+    resultsList.removeIf(result -> (!result.hasTargets() || result.getBestTarget().getPoseAmbiguity() >= maxAmbiguity));
 
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
-    for (var result : goodResults) {
-      PhotonTrackedTarget bestTarget = result.getBestTarget();
-      if (bestTarget != null && bestTarget.poseAmbiguity > 0.10) {
-        continue;
+    for (var result : resultsList) {
+      // Start with multi-tag estimation
+      visionEst = poseEstimator.estimateCoprocMultiTagPose(result);
+
+      // Fallback to lowest-ambiguity single-tag estimation
+      if (visionEst.isEmpty()) {
+        visionEst = poseEstimator.estimateLowestAmbiguityPose(result);
       }
-      visionEst = poseEstimator.update(result);
 
       updateEstimationStdDevs(visionEst, result.getTargets());
     }
@@ -110,8 +99,12 @@ public class Camera {
 
   /**
    * Calculates new standard deviations This algorithm is a heuristic that creates
-   * dynamic standard deviations based
-   * on number of tags, estimation strategy, and distance from the tags.
+   * dynamic standard
+   * deviations based on number of tags, estimation strategy, and distance from
+   * the tags.
+   * 
+   * From
+   * https://github.com/PhotonVision/photonvision/blob/77457219c72dfa1891e7fc35e22d7d908d0f05ae/photonlib-java-examples/poseest/src/main/java/frc/robot/Vision.java#L118C1-L165C6
    *
    * @param estimatedPose The estimated pose to guess standard deviations for.
    * @param targets       All targets in this camera frame
@@ -132,9 +125,8 @@ public class Camera {
       // average-distance metric
       for (var tgt : targets) {
         var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-        if (tagPose.isEmpty()) {
+        if (tagPose.isEmpty())
           continue;
-        }
         numTags++;
         avgDist += tagPose
             .get()
@@ -150,15 +142,13 @@ public class Camera {
         // One or more tags visible, run the full heuristic.
         avgDist /= numTags;
         // Decrease std devs if multiple targets are visible
-        if (numTags > 1) {
+        if (numTags > 1)
           estStdDevs = multiTagStdDevs;
-        }
         // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4) {
+        if (numTags == 1 && avgDist > 4)
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        } else {
+        else
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        }
         curStdDevs = estStdDevs;
       }
     }

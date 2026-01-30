@@ -1,23 +1,12 @@
 package frc.robot;
 
 import java.io.File;
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
-
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AlignWithHubFront;
-import frc.robot.commands.AlignWithTag7;
-import frc.robot.commands.intake.RunIntake;
-import frc.robot.commands.intake.RunOuttake;
-import frc.robot.commands.turret.TurretShoot;
-import frc.robot.commands.turret.TurretToHub;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -104,7 +93,7 @@ public class RobotContainer {
     
     public void periodic() {
         swerve.getSwerveDrive().updateOdometry();
-        vision.updatePoseFromTags(swerve.getSwerveDrive());
+        vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
     }
 
     public Command getAutonomousCommand() {

@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.FeetPerSecond;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearVelocity;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -18,7 +20,7 @@ public final class Constants {
 
   // Constants, copied from the basketball robot's code
   public static final boolean COMPETITION_MODE = false;
-  public static final double MAX_SPEED = Units.feetToMeters(14.0);
+  public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(14.0);
 
   public static class OperatorConstants {
     // Operator constants, borrowed from the basketball robot's code

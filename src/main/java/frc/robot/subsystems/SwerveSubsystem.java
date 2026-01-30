@@ -4,7 +4,10 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import java.io.File;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -24,12 +27,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import java.io.File;
-import java.util.function.Supplier;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
-import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -59,50 +59,24 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     try {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED);
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED.in(MetersPerSecond));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
-    swerveDrive.setHeadingCorrection(true);
-
+    swerveDrive.setHeadingCorrection(false);
     swerveDrive.setCosineCompensator(true);
 
-    // setupPathPlanner();
+    // TODO: test this later (see https://docs.yagsl.com/overview/our-features/angular-velocity-compensation)
+    // swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
 
     // Stop the default odometry thread since we will be handling odometry manually
     // when using vision.
     swerveDrive.stopOdometryThread();
   }
 
-  /**
-   * Construct the swerve drive.
-   *
-   * @param driveCfg      SwerveDriveConfiguration for the swerve.
-   * @param controllerCfg Swerve Controller.
-   */
-  public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
-    swerveDrive = new SwerveDrive(driveCfg,
-        controllerCfg,
-        Constants.MAX_SPEED,
-        new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
-            Rotation2d.fromDegrees(0)));
-  }
-
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-  }
-
-  @Override
-  public void periodic() {
-    // When vision is enabled we must manually update odometry in SwerveDrive
-    // if (visionDriveTest) {
-    // swerveDrive.updateOdometry();
-    // }
-  }
-
-  @Override
-  public void simulationPeriodic() {
   }
 
   /**
@@ -348,7 +322,7 @@ public class SwerveSubsystem extends SubsystemBase {
         headingX,
         headingY,
         getHeading().getRadians(),
-        Constants.MAX_SPEED);
+        Constants.MAX_SPEED.in(MetersPerSecond));
   }
 
   /**
@@ -368,7 +342,7 @@ public class SwerveSubsystem extends SubsystemBase {
         scaledInputs.getY(),
         angle.getRadians(),
         getHeading().getRadians(),
-        Constants.MAX_SPEED);
+        Constants.MAX_SPEED.in(MetersPerSecond));
   }
 
   /**
