@@ -21,4 +21,9 @@ public class ExtendHook extends Command {
     public boolean isFinished() {
         return (climber.getHookElevation() >= Constants.ClimberConstants.BAR1_ELEVATION);
     }
+
+    @Override
+    public void end(boolean interuppted) {
+        climber.setClimbMotor(0);
+    }
 }

@@ -1,7 +1,7 @@
 package frc.robot.commands.turret;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.turret.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class TurretShoot extends Command {
     private final TurretSubsystem shooter;

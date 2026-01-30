@@ -21,4 +21,9 @@ public class RetractHook extends Command {
     public boolean isFinished() {
         return (climber.getHookElevation() <= 0.1);
     }
+
+    @Override
+    public void end(boolean interuppted) {
+        climber.setClimbMotor(0);
+    }
 }
