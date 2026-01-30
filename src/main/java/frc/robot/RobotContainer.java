@@ -31,13 +31,13 @@ public class RobotContainer {
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
-    private final TurretSubsystem m_turret = new TurretSubsystem();
-    private final IntakeSubsystem m_intake = new IntakeSubsystem();
+    // private final TurretSubsystem m_turret = new TurretSubsystem();
+    // private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
-    private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
-    private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
-    private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
-    private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
+    // private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
+    // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
+    // private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
+    // private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
     VisionSubsystem vision = new VisionSubsystem();
 
@@ -74,16 +74,16 @@ public class RobotContainer {
     private void configureBindings() {
 
         //Left Trigger: Spins the intake wheel when the setup is at the ending position
-        driverController.leftTrigger().onTrue(runIntake);
+        // driverController.leftTrigger().onTrue(runIntake);
         
         //Left Bumper: Spins the intake wheel backwards when the setup is at the ending position
-        driverController.leftBumper().onTrue(runOuttake);
+        // driverController.leftBumper().onTrue(runOuttake);
 
         //Right Trigger: Spins the shooter wheel while holding down
-        driverController.rightTrigger().onTrue(turretShoot);
+        // driverController.rightTrigger().onTrue(turretShoot);
         
         //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified)
-        driverController.rightBumper().onTrue(turretToHub);
+        // driverController.rightBumper().onTrue(turretToHub);
         //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
         /*
