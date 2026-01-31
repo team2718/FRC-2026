@@ -47,6 +47,11 @@ public final class Constants {
     public static final double CLIMBER_P = 0.03;
   }
 
+    public static final class IndexerConstants
+  {
+    //placeolder ids
+    public static final int indexermotorID = 21;
+  }
 
     public static final class IntakeConstants
   {

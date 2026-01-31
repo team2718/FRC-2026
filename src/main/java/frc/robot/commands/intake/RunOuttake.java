@@ -24,7 +24,7 @@ public class RunOuttake extends Command {
         Otherwise, the intake wheel cannot activate*/
 
         if (intake.atEndPosition()) {
-            intake.SetIntakeSpeed(-speed);
+            intake.setbackSpeed(speed);
         } else {
             intake.SetIntakeSpeed(0);
         }
