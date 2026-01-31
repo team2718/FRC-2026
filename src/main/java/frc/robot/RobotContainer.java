@@ -5,7 +5,10 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
+//import frc.robot.commands.turret.TurretShoot;
+//import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.AlignWithHubFront;
+//import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
@@ -74,8 +77,8 @@ public class RobotContainer {
         //Right Trigger: Spins the shooter wheel while holding down
         // driverController.rightTrigger().onTrue(turretShoot);
         
-        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified)
-        // driverController.rightBumper().onTrue(turretToHub);
+        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified) and setting the hood
+        //driverController.rightBumper().onTrue(turretToHub);
         //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
         /*
