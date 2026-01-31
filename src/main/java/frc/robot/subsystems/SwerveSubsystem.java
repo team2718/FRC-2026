@@ -66,7 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     swerveDrive.setHeadingCorrection(false);
-    swerveDrive.setCosineCompensator(true);
+    swerveDrive.setCosineCompensator(false);
 
     // TODO: test this later (see https://docs.yagsl.com/overview/our-features/angular-velocity-compensation)
     // swerveDrive.setAngularVelocityCompensation(true, true, 0.1);

@@ -2,8 +2,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -49,9 +49,11 @@ public class AlignWithHubFront  extends Command{
     public void execute() {
         double angleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
 
-        double turnSpeed = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), angleFromTag9) * 0.05;
+        double turnSpeed = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), angleFromTag9) * 0.1;
 
-        turnSpeed = clamp(-0.8, 0.8, turnSpeed);
+        SmartDashboard.putNumber("test/Angle Error", getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), angleFromTag9));
+
+        turnSpeed = clamp(-2, 2, turnSpeed);
 
         swerve.driveFieldOriented(new ChassisSpeeds(swerveInput.get().vxMetersPerSecond, swerveInput.get().vyMetersPerSecond, turnSpeed));
     }

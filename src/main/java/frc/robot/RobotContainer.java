@@ -32,26 +32,20 @@ public class RobotContainer {
 
     VisionSubsystem vision = new VisionSubsystem();
 
-    SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
+    SwerveInputStream driveAngularVelocityFieldRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
             () -> driverController.getLeftY() * -1,
             () -> driverController.getLeftX() * -1)
             .withControllerRotationAxis(() -> driverController.getRightX() * -1)
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
             .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
-            .allianceRelativeControl(false)
+            .allianceRelativeControl(true)
             .robotRelative(false);
-
-    SwerveInputStream driveDirectAngleFieldRelative = driveAngularVelocityRobotRelative.copy()
-            .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
-            .headingWhile(true)
-            .robotRelative(false)
-            .allianceRelativeControl(true);
-
+            
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
+        swerve.setDefaultCommand(swerve.driveFieldOriented(driveAngularVelocityFieldRelative));
 
         driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
 
@@ -60,7 +54,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
-        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
+        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityFieldRelative));
     }
 
     private void configureBindings() {
