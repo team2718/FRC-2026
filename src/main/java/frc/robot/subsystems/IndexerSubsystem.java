@@ -1,7 +1,11 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkParameters;
 
 import frc.robot.Constants;
@@ -22,6 +26,13 @@ public class IndexerSubsystem extends SubsystemBase{
 
 public IndexerSubsystem() {
     indexermotor = new SparkMax(Constants.IndexerConstants.indexermotorID, SparkLowLevel.MotorType.kBrushless);
+
+    SparkMaxConfig indexerconfig = new SparkMaxConfig();
+    indexerconfig.inverted(false);
+    indexerconfig.smartCurrentLimit(20);
+    indexerconfig.idleMode(IdleMode.kCoast);
+
+    indexermotor.configure(indexerconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 }
 
 
