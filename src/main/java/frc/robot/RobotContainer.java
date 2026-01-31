@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AlignWithHubFront;
+import frc.robot.commands.intake.RunIntake;
+import frc.robot.commands.intake.RunOuttake;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
@@ -23,12 +26,12 @@ public class RobotContainer {
             "swerve"));
 
     // private final TurretSubsystem m_turret = new TurretSubsystem();
-    // private final IntakeSubsystem m_intake = new IntakeSubsystem();
+    private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
     // private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
     // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
-    // private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
-    // private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
+    private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
+    private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
     VisionSubsystem vision = new VisionSubsystem();
 
@@ -66,10 +69,10 @@ public class RobotContainer {
     private void configureBindings() {
 
         //Left Trigger: Spins the intake wheel when the setup is at the ending position
-        // driverController.leftTrigger().onTrue(runIntake);
+        driverController.leftTrigger().onTrue(runIntake);
         
         //Left Bumper: Spins the intake wheel backwards when the setup is at the ending position
-        // driverController.leftBumper().onTrue(runOuttake);
+        driverController.leftBumper().onTrue(runOuttake);
 
         //Right Trigger: Spins the shooter wheel while holding down
         // driverController.rightTrigger().onTrue(turretShoot);

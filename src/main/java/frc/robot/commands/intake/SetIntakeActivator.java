@@ -8,10 +8,14 @@ public class SetIntakeActivator extends Command {
     // private final LEDSubsystem LEDs;
     private double speed;
 
+    private double targetPosition;
+
     public SetIntakeActivator(IntakeSubsystem intake,  double speed) {
         this.intake = intake;
       
         this.speed = speed;
+
+        targetPosition = 120;
     }
 
     @Override
