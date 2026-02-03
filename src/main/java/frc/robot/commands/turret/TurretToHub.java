@@ -13,6 +13,9 @@ public class TurretToHub extends Command {
     private double targetTurretPosition;
     private double targetHoodPosition;
 
+    private double turretDistanceToRobotCenter = 0.5;
+    private double turretDegreeFromRobotCenter = 40;
+
     SwerveSubsystem swerve;
     private final Translation2d hubCenterLocation = new Translation2d(11.92, 4.03);
 
@@ -23,18 +26,27 @@ public class TurretToHub extends Command {
 
         this.swerve = swerve;
 
-        double angleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
+        double robotAngleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
 
-        double distanceToTag9 = Math.sqrt(Math.abs(swerve.getPose().getX() - hubCenterLocation.getX()) + Math.abs(swerve.getPose().getY() - hubCenterLocation.getY()));
+        double robotDistanceToTag9 = Math.sqrt(Math.abs(swerve.getPose().getX() - hubCenterLocation.getX()) + Math.abs(swerve.getPose().getY() - hubCenterLocation.getY()));
+
+
+        //Calculates the position of the turret on the field by taking the turret's distance and angle (relative to the where the robot's facing) from the center point of the robot
+        double turretPositionX = swerve.getPose().getX() + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() + turretDegreeFromRobotCenter) * turretDistanceToRobotCenter;
+        double turretPositionY = swerve.getPose().getY() + Math.sin(swerve.getPose().getTranslation().getAngle().getDegrees() + turretDegreeFromRobotCenter) * turretDistanceToRobotCenter;
+
+        double turretAngleFromTag9 = Math.atan2(hubCenterLocation.getX() - turretPositionX, hubCenterLocation.getY() - turretPositionY);
+
+        double turretDistanceToTag9 = Math.sqrt(Math.abs(turretPositionX - hubCenterLocation.getX()) + Math.abs(turretPositionY - hubCenterLocation.getY()));
 
         //set turret target position
-        targetTurretPosition = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), angleFromTag9);
+        targetTurretPosition = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), turretAngleFromTag9);
 
         //set turret hood target position (Rudimentary calculation)
-        if (distanceToTag9 < 1) {
+        if (turretDistanceToTag9 < 1) {
             targetHoodPosition = 0;
         } else {
-            targetHoodPosition = 30 - (30 / distanceToTag9);
+            targetHoodPosition = 30 - (30 / turretDistanceToTag9);
         }
     }
 

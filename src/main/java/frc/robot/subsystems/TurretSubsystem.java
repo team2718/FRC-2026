@@ -43,16 +43,18 @@ public TurretSubsystem() {
     turretspinner = new SparkMax(Constants.TurretConstants.turretspinnerID, SparkLowLevel.MotorType.kBrushless);
     turrethood = new TalonFX(Constants.TurretConstants.turrethoodID);
 
+    //Configuring motor variables (The current limit is set to 5 amps for now)
+
     SparkMaxConfig turretshooterconfig = new SparkMaxConfig();
     turretshooterconfig.inverted(false);
-    turretshooterconfig.smartCurrentLimit(20);
+    turretshooterconfig.smartCurrentLimit(5); //5 amps
     turretshooterconfig.idleMode(IdleMode.kCoast);
 
     turretshooter.configure(turretshooterconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     SparkMaxConfig turretspinnerconfig = new SparkMaxConfig();
     turretspinnerconfig.inverted(false);
-    turretspinnerconfig.smartCurrentLimit(20);
+    turretspinnerconfig.smartCurrentLimit(5); //5 amps
     turretspinnerconfig.idleMode(IdleMode.kCoast);
 
     turretspinner.configure(turretspinnerconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -60,9 +62,9 @@ public TurretSubsystem() {
 
     TalonFXConfiguration turrethoodconfig = new TalonFXConfiguration();
 
-    //TO BE ADJUSTED (All these parameters were just copied from last year's elevator subsystem <_<)
+    //TO BE ADJUSTED (These parameters were just copied from last year's elevator subsystem <_<)
 
-        turrethoodconfig.CurrentLimits.StatorCurrentLimit = 40;
+        turrethoodconfig.CurrentLimits.StatorCurrentLimit = 5; //5 amps
         turrethoodconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         turrethoodconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         turrethoodconfig.Slot0.kG = 0.455;
