@@ -27,9 +27,10 @@ public class IndexerSubsystem extends SubsystemBase{
 public IndexerSubsystem() {
     indexermotor = new SparkMax(Constants.IndexerConstants.indexermotorID, SparkLowLevel.MotorType.kBrushless);
 
+    //Set Current Limit to 5 amps for now
     SparkMaxConfig indexerconfig = new SparkMaxConfig();
     indexerconfig.inverted(false);
-    indexerconfig.smartCurrentLimit(20);
+    indexerconfig.smartCurrentLimit(5);
     indexerconfig.idleMode(IdleMode.kCoast);
 
     indexermotor.configure(indexerconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
