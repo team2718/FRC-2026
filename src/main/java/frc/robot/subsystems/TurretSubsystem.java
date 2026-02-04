@@ -29,7 +29,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TurretSubsystem extends SubsystemBase{
 
-    private final SparkMax turretshooter;
+    private final TalonFX turretshooter1;
+    private final TalonFX turretshooter2;
     private final SparkMax turretspinner;
     private final TalonFX turrethood;
 
@@ -39,9 +40,10 @@ public class TurretSubsystem extends SubsystemBase{
     private GenericEntry intakeSwitch = comptab.add("intake switch", false).getEntry();
 
 public TurretSubsystem() {
-    turretshooter = new SparkMax(Constants.TurretConstants.turretshooterID, SparkLowLevel.MotorType.kBrushless);
+    turretshooter1 = new TalonFX(Constants.TurretConstants.turretshooter1ID);
     turretspinner = new SparkMax(Constants.TurretConstants.turretspinnerID, SparkLowLevel.MotorType.kBrushless);
-    turrethood = new TalonFX(Constants.TurretConstants.turrethoodID);
+    turretshooter2 = new TalonFX(Constants.TurretConstants.turretshooter2ID);
+       turrethood = new TalonFX(Constants.TurretConstants.turrethoodID);
 
     //Configuring motor variables (The current limit is set to 5 amps for now)
 
@@ -49,16 +51,54 @@ public TurretSubsystem() {
     turretshooterconfig.inverted(false);
     turretshooterconfig.smartCurrentLimit(5); //5 amps
     turretshooterconfig.idleMode(IdleMode.kCoast);
+    TalonFXConfiguration turretshooter1config = new TalonFXConfiguration();
+    TalonFXConfiguration turretshooter2config = new TalonFXConfiguration();
 
-    turretshooter.configure(turretshooterconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+    //TO BE ADJUSTED (All these parameters were just copied from last year's elevator subsystem <_<)
 
     SparkMaxConfig turretspinnerconfig = new SparkMaxConfig();
     turretspinnerconfig.inverted(false);
     turretspinnerconfig.smartCurrentLimit(5); //5 amps
     turretspinnerconfig.idleMode(IdleMode.kCoast);
+        turretshooter1config.CurrentLimits.StatorCurrentLimit = 40;
+        turretshooter1config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        turretshooter1config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        turretshooter1config.Slot0.kG = 0.455;
+        turretshooter1config.Slot0.kS = 0.245;
+        turretshooter1config.Slot0.kV = 0.131;
+        turretshooter1config.Slot0.kA = 0.0011;
+        turretshooter1config.Slot0.kP = 1.8;
+        turretshooter1config.Slot0.kI = 0.0;
+        turretshooter1config.Slot0.kD = 0.0;
+        turretshooter1config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        turretshooter1config.MotionMagic.MotionMagicCruiseVelocity = 60;
+        turretshooter1config.MotionMagic.MotionMagicAcceleration = 70;
 
-    turretspinner.configure(turretspinnerconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        turretshooter1.getConfigurator().apply(turretshooter1config);
 
+        turretshooter1.getPosition().setUpdateFrequency(100);
+
+
+        turretshooter2config.CurrentLimits.StatorCurrentLimit = 40;
+        turretshooter2config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        turretshooter2config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        turretshooter2config.Slot0.kG = 0.455;
+        turretshooter2config.Slot0.kS = 0.245;
+        turretshooter2config.Slot0.kV = 0.131;
+        turretshooter2config.Slot0.kA = 0.0011;
+        turretshooter2config.Slot0.kP = 1.8;
+        turretshooter2config.Slot0.kI = 0.0;
+        turretshooter2config.Slot0.kD = 0.0;
+        turretshooter2config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+        turretshooter2config.MotionMagic.MotionMagicCruiseVelocity = 60;
+        turretshooter2config.MotionMagic.MotionMagicAcceleration = 70;
+
+        turretshooter2.getConfigurator().apply(turretshooter2config);
+
+        turretshooter2.getPosition().setUpdateFrequency(100);
+
+    
 
     TalonFXConfiguration turrethoodconfig = new TalonFXConfiguration();
 
@@ -100,7 +140,8 @@ public static double getWrappedAngleDifference(double source, double target) {
 
 //sets speed of the shooter
 public void setShooterSpeed(double power) {
-    turretshooter.set(power);
+    turretshooter1.set(power);
+    turretshooter2.set(-power);
 }
 
 //sets rotational speed of the turret
