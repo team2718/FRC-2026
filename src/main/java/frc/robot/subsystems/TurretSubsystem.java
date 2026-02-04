@@ -64,7 +64,7 @@ public TurretSubsystem() {
 
     //TO BE ADJUSTED (These parameters were just copied from last year's elevator subsystem <_<)
 
-        turrethoodconfig.CurrentLimits.StatorCurrentLimit = 5; //5 amps
+        turrethoodconfig.CurrentLimits.StatorCurrentLimit = 5;
         turrethoodconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         turrethoodconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         turrethoodconfig.Slot0.kG = 0.455;
