@@ -35,7 +35,7 @@ public final class Constants {
     //placeholder ids
     public static final int turretshooterID = 9;
     public static final int turretspinnerID = 10;
-    public static final int turrethoodID = 44;
+    public static final int turrethoodID = 42;
   }
 
   public static final class ClimberConstants {
