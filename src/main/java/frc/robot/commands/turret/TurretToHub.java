@@ -89,9 +89,9 @@ public class TurretToHub extends Command {
     public void execute() {  
 
         if (shooter.getTurretPosition() >= -170 && shooter.getTurretPosition() <= 170) {
-            shooter.setTurretSpin(speed * (targetTurretPosition - shooter.getTurretPosition()));
+            shooter.setTurretPosition(speed * (targetTurretPosition - shooter.getTurretPosition()));
         } else {
-            shooter.setTurretSpin(0);
+            shooter.setTurretPosition(0);
         }
 
         if (shooter.getTurretHood() >= 0 && shooter.getTurretHood() <= 360) {

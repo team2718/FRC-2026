@@ -91,7 +91,7 @@ public void setShooterSpeed(double power) {
 }
 
 //sets rotational speed of the turret
-public void setTurretSpin(double power) {
+public void setTurretPosition(double power) {
     turretspinner.set(power);
 }
 
@@ -102,12 +102,30 @@ public double getTurretPosition() {
 
 //sets rotational speed of the hood
 public void setTurretHood(double power) {
+
+    if ( (power > 0 && getTurretHood() > 80) || (power < 0 && getTurretHood() < 40) ) {
+        turrethood.set(0);
+        return; 
+    }
+
     turrethood.set(power);
+
+    return; 
+
 }
 
 //returns the current position of the hood
 public double getTurretHood() {
     return turrethood.getPosition().getValueAsDouble();
+}
+
+public void SetHoodToAngle(double angle) {
+
+    if (Math.abs(getTurretHood() - angle) < 0.3) {
+        setTurretHood(0);
+        return;
+    }
+
 }
 
 @Override
