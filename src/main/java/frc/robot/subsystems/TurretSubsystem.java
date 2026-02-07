@@ -64,11 +64,11 @@ public TurretSubsystem() {
         turretshooter1config.CurrentLimits.StatorCurrentLimit = 40;
         turretshooter1config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         turretshooter1config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        turretshooter1config.Slot0.kG = 0.455;
-        turretshooter1config.Slot0.kS = 0.245;
-        turretshooter1config.Slot0.kV = 0.131;
-        turretshooter1config.Slot0.kA = 0.0011;
-        turretshooter1config.Slot0.kP = 1.8;
+        turretshooter1config.Slot0.kG = 0.0;
+        turretshooter1config.Slot0.kS = 0.0;
+        turretshooter1config.Slot0.kV = 0.0;
+        turretshooter1config.Slot0.kA = 0.0;
+        turretshooter1config.Slot0.kP = 2;
         turretshooter1config.Slot0.kI = 0.0;
         turretshooter1config.Slot0.kD = 0.0;
         turretshooter1config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -83,11 +83,11 @@ public TurretSubsystem() {
         turretshooter2config.CurrentLimits.StatorCurrentLimit = 40;
         turretshooter2config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         turretshooter2config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        turretshooter2config.Slot0.kG = 0.455;
-        turretshooter2config.Slot0.kS = 0.245;
-        turretshooter2config.Slot0.kV = 0.131;
-        turretshooter2config.Slot0.kA = 0.0011;
-        turretshooter2config.Slot0.kP = 1.8;
+        turretshooter2config.Slot0.kG = 0.0;
+        turretshooter2config.Slot0.kS = 0.0;
+        turretshooter2config.Slot0.kV = 0.0;
+        turretshooter2config.Slot0.kA = 0.0;
+        turretshooter2config.Slot0.kP = 2;
         turretshooter2config.Slot0.kI = 0.0;
         turretshooter2config.Slot0.kD = 0.0;
         turretshooter2config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -141,7 +141,11 @@ public static double getWrappedAngleDifference(double source, double target) {
 //sets speed of the shooter
 public void setShooterSpeed(double power) {
     turretshooter1.set(power);
-    turretshooter2.set(-power);
+    //turretshooter2.set(power);
+}
+
+public double getShooter() {
+    return turretshooter1.getPosition().getValueAsDouble() / 1.5;
 }
 
 //sets rotational speed of the turret
