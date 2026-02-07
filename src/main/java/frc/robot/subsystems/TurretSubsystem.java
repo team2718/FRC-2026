@@ -84,6 +84,19 @@ public TurretSubsystem() {
 
 }
 
+public static double getWrappedAngleDifference(double source, double target) {
+    double diff = (target - source) % 360;
+
+    if (diff >= 180) {
+        diff -= 360;
+    }
+    else if (diff <= -180) {
+        diff += 360;
+    }
+
+    return diff;
+}
+
 
 //sets speed of the shooter
 public void setShooterSpeed(double power) {
@@ -103,28 +116,30 @@ public double getTurretPosition() {
 //sets rotational speed of the hood
 public void setTurretHood(double power) {
 
-    if ( (power > 0 && getTurretHood() > 80) || (power < 0 && getTurretHood() < 40) ) {
+    if ( (power > 0 && getTurretHood() > 80) || (power < 0 && getTurretHood() < 42) ) {
         turrethood.set(0);
         return; 
     }
 
     turrethood.set(power);
-
     return; 
 
 }
 
 //returns the current position of the hood
 public double getTurretHood() {
-    return turrethood.getPosition().getValueAsDouble();
+    return (turrethood.getPosition().getValueAsDouble() / 29.5 % 360);
 }
 
-public void SetHoodToAngle(double angle) {
+public void setHoodToAngle(double angle) {
 
-    if (Math.abs(getTurretHood() - angle) < 0.3) {
+    if (Math.abs(getWrappedAngleDifference(getTurretHood(), angle)) < 0.3) {
         setTurretHood(0);
         return;
     }
+
+    
+    setTurretHood(1 * getWrappedAngleDifference(getTurretHood(), angle));
 
 }
 

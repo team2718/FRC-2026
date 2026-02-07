@@ -94,11 +94,8 @@ public class TurretToHub extends Command {
             shooter.setTurretPosition(0);
         }
 
-        if (shooter.getTurretHood() >= 0 && shooter.getTurretHood() <= 360) {
-            shooter.setTurretHood(speed * (targetHoodPosition - shooter.getTurretHood()));
-        } else {
-            shooter.setTurretHood(0);
-        }
+        shooter.setHoodToAngle(30);
+
     }
 
 @Override
