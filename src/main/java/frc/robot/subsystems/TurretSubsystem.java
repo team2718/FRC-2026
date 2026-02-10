@@ -15,6 +15,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 
 import frc.robot.Constants;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -33,7 +34,42 @@ public class TurretSubsystem extends SubsystemBase {
     // sensors
     private GenericEntry intakeSwitch = comptab.add("intake switch", false).getEntry();
 
+
+    // field position calculations
+    private double targetTurretPosition;
+    private double targetHoodPosition;
+
+    private double turretDistanceToRobotCenter = 0.5;
+    private double turretDegreeFromRobotCenter = 40;
+
+    SwerveSubsystem swerve;
+    private final Translation2d hubCenterLocation = new Translation2d(11.92, 4.03);
+
+    
+    double robotAngleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
+    double robotDistanceToTag9 = Math.sqrt(Math.pow(swerve.getPose().getX() - hubCenterLocation.getX(), 2) + Math.pow(swerve.getPose().getY() - hubCenterLocation.getY(), 2));
+
+    double turretPositionX;
+    double turretPositionY;
+
+    double turretAngleFromTag9;
+    double turretDistanceToTag9;
+
+    double projectedTime = Math.sqrt(robotDistanceToTag9);
+
+    double projectedTurretPositionX;
+    double projectedTurretPositionY;
+
+    double projectedTurretAngleFromTag9;
+    double projectedTurretDistanceToTag9;
+
+
     public TurretSubsystem() {
+
+
+    //Motors-----------------------------------------------------------------------------------------------------------------------------------
+
+
         turretshooterLeft = new TalonFX(Constants.TurretConstants.turretshooterLeftID);
         // turretspinner = new SparkMax(Constants.TurretConstants.turretspinnerID, SparkLowLevel.MotorType.kBrushless);
         turretshooterRight = new TalonFX(Constants.TurretConstants.turretshooterRightID);
@@ -103,6 +139,52 @@ public class TurretSubsystem extends SubsystemBase {
 
         turrethood.getPosition().setUpdateFrequency(100);
 
+
+    //Field Positions-----------------------------------------------------------------------------------------------------------------------------------
+
+    
+        this.swerve = swerve;
+
+        robotAngleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
+
+        robotDistanceToTag9 = Math.sqrt(Math.pow(swerve.getPose().getX() - hubCenterLocation.getX(), 2) + Math.pow(swerve.getPose().getY() - hubCenterLocation.getY(), 2));
+
+
+        //Calculates the position of the turret on the field by taking the turret's distance and angle (relative to the where the robot's facing) from the center point of the robot
+        turretPositionX = swerve.getPose().getX() + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() + turretDegreeFromRobotCenter) * turretDistanceToRobotCenter;
+        turretPositionY = swerve.getPose().getY() + Math.sin(swerve.getPose().getTranslation().getAngle().getDegrees() + turretDegreeFromRobotCenter) * turretDistanceToRobotCenter;
+
+        turretAngleFromTag9 = Math.atan2(hubCenterLocation.getX() - turretPositionX, hubCenterLocation.getY() - turretPositionY);
+
+        turretDistanceToTag9 = Math.sqrt(Math.pow(turretPositionX - hubCenterLocation.getX(), 2) + Math.pow(turretPositionY - hubCenterLocation.getY(), 2));
+
+        /*
+        When we shoot fuel while the robot is moving, the fuel's speed moves relative to the robot's speed, throwing us off.
+        To counteract this, we can calculate the time it will take for the fuel to reach the goal, and project the robot's position at that point. (current position + ( current velocity * the fuel goal time )) 
+        If we point the turret in the direction of the hub based from that position instead of it's current position, it should line up.
+         */
+
+        //Projects the time it will take for the feul to reach the goal when the robot shoots (Currently a shoddy estimate, farther = longer time)
+        projectedTime = Math.sqrt(robotDistanceToTag9);
+
+        //Projects the turret's projected location relative to the field
+        projectedTurretPositionX = swerve.getPose().getX() + (swerve.getRobotVelocity().vxMetersPerSecond * projectedTime) + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() + turretDegreeFromRobotCenter) * turretDistanceToRobotCenter;
+        projectedTurretPositionY = swerve.getPose().getY() + (swerve.getRobotVelocity().vyMetersPerSecond * projectedTime) + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() + turretDegreeFromRobotCenter) * turretDistanceToRobotCenter;
+
+        //Projects the turret's angle from the hub
+        projectedTurretAngleFromTag9 = Math.atan2(hubCenterLocation.getX() - projectedTurretPositionX, hubCenterLocation.getY() - projectedTurretPositionY);
+        //Projects the turret's distance to the hub
+        projectedTurretDistanceToTag9 = Math.sqrt(Math.pow(projectedTurretPositionX - hubCenterLocation.getX(), 2) + Math.pow(projectedTurretPositionY - hubCenterLocation.getY(), 2));
+
+        //set turret target position
+        targetTurretPosition = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), projectedTurretAngleFromTag9);
+
+        //set turret hood target position (Rudimentary calculation)
+        if (projectedTurretDistanceToTag9 < 1) {
+            targetHoodPosition = 0;
+        } else {
+            targetHoodPosition = 30 - (30 / projectedTurretDistanceToTag9);
+        }
     }
 
     public static double getWrappedAngleDifference(double source, double target) {
@@ -155,14 +237,14 @@ public class TurretSubsystem extends SubsystemBase {
         return (turrethood.getPosition().getValueAsDouble() / 29.5 % 360);
     }
 
-    //Estimates the angle we want to shoot the fuel at based on the turret's distance to the hub
+    //Estimates the angle we want to shoot the fuel at based on the turret's distance to the hub (20 = angle the ball shoots at when the hood is at 80 degrees, not sure what is actually is)
     public double targetHoodAngle(double dist) {
-        return 80 - ((28500 / (Math.pow(dist + 25, 2))) + 46.25);
+        return 80 - 20 - ((28500 / (Math.pow(dist + 25, 2))) + 46.25);
     }
 
     //Estimates the speed we want to shoot the fuel at based on the turret's distance to the hub
-    public double targetShooterSpeed(double dist) {
-        return (((Math.pow(dist + 12, 2)) * 0.0094) + 20.3) + (1/(dist - 2.15));
+    public double targetShooterSpeed() {
+        return (((Math.pow(projectedTurretDistanceToTag9 + 12, 2)) * 0.0094) + 20.3) + (1/(projectedTurretDistanceToTag9 - 2.15));
     }
 
     public void setHoodToAngle(double angle) {
