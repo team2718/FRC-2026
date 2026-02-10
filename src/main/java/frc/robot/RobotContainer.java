@@ -5,11 +5,10 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
-//import frc.robot.commands.turret.TurretShoot;
-//import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.AlignWithHubFront;
-//import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.commands.turret.TurretShoot;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,48 +21,48 @@ public class RobotContainer {
 
     CommandXboxController driverController = new CommandXboxController(0);
 
-    SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-            "swerve"));
+    // SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+    //         "swerve"));
 
-    // private final TurretSubsystem m_turret = new TurretSubsystem();
+    private final TurretSubsystem m_turret = new TurretSubsystem();
     // private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
-    // private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
+    private final TurretShoot turretShoot = new TurretShoot(m_turret, 3125);
     // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
     // private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
     // private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
-    VisionSubsystem vision = new VisionSubsystem();
+    // VisionSubsystem vision = new VisionSubsystem();
 
-    SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
-            () -> driverController.getLeftY() * -1,
-            () -> driverController.getLeftX() * -1)
-            .withControllerRotationAxis(() -> driverController.getRightX() * -1)
-            .deadband(OperatorConstants.DEADBAND)
-            .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
-            .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
-            .allianceRelativeControl(false)
-            .robotRelative(false);
+    // SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
+    //         () -> driverController.getLeftY() * -1,
+    //         () -> driverController.getLeftX() * -1)
+    //         .withControllerRotationAxis(() -> driverController.getRightX() * -1)
+    //         .deadband(OperatorConstants.DEADBAND)
+    //         .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
+    //         .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
+    //         .allianceRelativeControl(false)
+    //         .robotRelative(false);
 
-    SwerveInputStream driveDirectAngleFieldRelative = driveAngularVelocityRobotRelative.copy()
-            .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
-            .headingWhile(true)
-            .robotRelative(false)
-            .allianceRelativeControl(true);
+    // SwerveInputStream driveDirectAngleFieldRelative = driveAngularVelocityRobotRelative.copy()
+    //         .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+    //         .headingWhile(true)
+    //         .robotRelative(false)
+    //         .allianceRelativeControl(true);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
+        // swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
 
-        driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
+        // driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
 
         autoChooser.setDefaultOption("An Auto", "An Auto");
         autoChooser.addOption("Another Auto", "Another Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
-        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
+        // driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
     }
 
     private void configureBindings() {
@@ -75,7 +74,7 @@ public class RobotContainer {
         // driverController.leftBumper().onTrue(runOuttake);
 
         //Right Trigger: Spins the shooter wheel while holding down
-        // driverController.rightTrigger().onTrue(turretShoot);
+        driverController.rightTrigger().whileTrue(turretShoot);
         
         //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified) and setting the hood
         //driverController.rightBumper().onTrue(turretToHub);
@@ -95,12 +94,13 @@ public class RobotContainer {
 
     
     public void periodic() {
-        swerve.getSwerveDrive().updateOdometry();
-        vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
+        // swerve.getSwerveDrive().updateOdometry();
+        // vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
     }
 
     public Command getAutonomousCommand() {
-        return swerve.getAutonomousCommand(autoChooser.getSelected());
+        return null;
+        // return swerve.getAutonomousCommand(autoChooser.getSelected());
     }
 
 }

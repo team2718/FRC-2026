@@ -8,27 +8,28 @@ public class TurretShoot extends Command {
     // private final LEDSubsystem LEDs;
     private double speed;
 
-    public TurretShoot(TurretSubsystem shooter, double speed) {
+    public TurretShoot(TurretSubsystem shooter, double rpm) {
         this.shooter = shooter;
-      
-        this.speed = speed;
+
+        this.speed = rpm;
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public void execute() {
-        shooter.setShooterSpeed(speed);
+        shooter.setShooterSpeedRPM(speed);
     }
 
-@Override
-public void end(boolean interuppted) {
-
-}
+    @Override
+    public void end(boolean interuppted) {
+        shooter.setShooterSpeedRPM(0);
+    }
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }
 }
