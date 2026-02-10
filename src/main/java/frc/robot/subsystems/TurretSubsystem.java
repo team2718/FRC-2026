@@ -155,6 +155,16 @@ public class TurretSubsystem extends SubsystemBase {
         return (turrethood.getPosition().getValueAsDouble() / 29.5 % 360);
     }
 
+    //Estimates the angle we want to shoot the fuel at based on the turret's distance to the hub
+    public double targetHoodAngle(double dist) {
+        return 80 - ((28500 / (Math.pow(dist + 25, 2))) + 46.25);
+    }
+
+    //Estimates the speed we want to shoot the fuel at based on the turret's distance to the hub
+    public double targetShooterSpeed(double dist) {
+        return (((Math.pow(dist + 12, 2)) * 0.0094) + 20.3) + (1/(dist - 2.15));
+    }
+
     public void setHoodToAngle(double angle) {
 
         if (Math.abs(getWrappedAngleDifference(getTurretHood(), angle)) < 0.3) {
