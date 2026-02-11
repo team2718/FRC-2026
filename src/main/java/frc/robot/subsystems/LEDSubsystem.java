@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.utils.SK6812RGBW;
 
 public class LEDSubsystem extends SubsystemBase {
 
@@ -32,7 +33,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   private LEDState m_state = LEDState.RAINBOW;
 
-  private final AddressableLED m_led = new AddressableLED(Constants.LEDS.PWMPort);
+  private final SK6812RGBW m_led = new SK6812RGBW(Constants.LEDS.PWMPort);
   private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDS.Length / 4 * 3);
   private final AddressableLEDBuffer m_RealledBuffer = new AddressableLEDBuffer(Constants.LEDS.Length);
   private final Distance kLedSpacing = Meters.of(1 / 60.0);
@@ -50,9 +51,6 @@ public class LEDSubsystem extends SubsystemBase {
 
 
   public LEDSubsystem() {
-    m_led.setBitTiming(300, 900, 600, 600);
-    m_led.setSyncTime(80);
-    m_led.setColorOrder(ColorOrder.kGRB);
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
