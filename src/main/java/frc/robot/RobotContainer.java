@@ -8,6 +8,9 @@ import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.turret.TurretShoot;
 //import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.AlignWithHubFront;
+import frc.robot.commands.turret.TurretShoot;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 //import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -24,6 +27,7 @@ public class RobotContainer {
 
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
+    private final LEDSubsystem m_led = new LEDSubsystem();
 
     // private final TurretSubsystem m_turret = new TurretSubsystem();
     // private final IntakeSubsystem m_intake = new IntakeSubsystem();
@@ -91,6 +95,10 @@ public class RobotContainer {
         }
         */
 
+        driverController.rightTrigger().whileTrue(
+            m_led.setLEDState(LEDState.SHOOTER)
+            );
+        
     }
 
     
