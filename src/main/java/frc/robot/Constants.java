@@ -72,7 +72,7 @@ public final class Constants {
   */
   public static final class LEDS{
     //these are random numbers... they haven't been tested yet
-    public static final int PWMPort = 748;
+    public static final int PWMPort = 0;
     public static final int Length = 8;
   }
 }
