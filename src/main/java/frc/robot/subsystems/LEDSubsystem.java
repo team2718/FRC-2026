@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.LEDPattern.GradientType;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.AddressableLED.ColorOrder;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -32,8 +33,9 @@ public class LEDSubsystem extends SubsystemBase {
   private LEDState m_state = LEDState.RAINBOW;
 
   private final AddressableLED m_led = new AddressableLED(Constants.LEDS.PWMPort);
-  private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDS.Length);
-  private final Distance kLedSpacing = Meters.of(1 / 30.0);
+  private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDS.Length / 4 * 3);
+  private final AddressableLEDBuffer m_RealledBuffer = new AddressableLEDBuffer(Constants.LEDS.Length);
+  private final Distance kLedSpacing = Meters.of(1 / 60.0);
 
   private final LinearVelocity kScrollingSpeed = MetersPerSecond.of(0.5);
 
@@ -48,6 +50,9 @@ public class LEDSubsystem extends SubsystemBase {
 
 
   public LEDSubsystem() {
+    m_led.setBitTiming(300, 900, 600, 600);
+    m_led.setSyncTime(80);
+    m_led.setColorOrder(ColorOrder.kGRB);
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
     m_led.start();
@@ -80,6 +85,6 @@ public class LEDSubsystem extends SubsystemBase {
       m_scrollingRainbow.applyTo(m_ledBuffer);
     }
 
-    m_led.setData(m_ledBuffer);
+    m_led.setData(m_RealledBuffer);
   }
 }
