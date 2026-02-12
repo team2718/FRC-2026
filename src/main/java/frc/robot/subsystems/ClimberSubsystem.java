@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 
 public class ClimberSubsystem {
     // Fields
@@ -62,8 +63,13 @@ public class ClimberSubsystem {
     }
 
     // Methods
+    public void updateElevations() {
+        // Need to do some math here to translate encoder rotation to height raised
+        hookElevation = Constants.ClimberConstants.HOOK_BASE_ELEVATION + getClimbMotorPosition();
+    }
     public void periodic() {
         setAlerts();
+        updateElevations();
         SmartDashboard.putNumber("ClimbMotor Encoder", getClimbMotorPosition());
         SmartDashboard.putBoolean("Climbing?", climbing);
         SmartDashboard.putBoolean("Releasing?", releasing);

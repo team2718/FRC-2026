@@ -43,10 +43,13 @@ public final class Constants {
     public static final double BAR1_ELEVATION = Units.inchesToMeters(27.0);
     public static final double BAR2_ELEVATION = Units.inchesToMeters(45.0);
     public static final double BAR3_ELEVATION = Units.inchesToMeters(63.0);
-    public static final double L1_ELEVATION = 1.0;
-    public static final double L2_ELEVATION = BAR1_ELEVATION + Units.inchesToMeters(1);
-    public static final double L3_ELEVATION = BAR2_ELEVATION + Units.inchesToMeters(1);
-    public static final double CLIMBER_P = 0.03;
+    public static final double L1_ELEVATION = Units.inchesToMeters(2.0);
+    public static final double L2_ELEVATION = BAR1_ELEVATION + Units.inchesToMeters(2);
+    public static final double L3_ELEVATION = BAR2_ELEVATION + Units.inchesToMeters(2);
+    public static final double EXTEND_P = 0.03;
+    public static final double RETRACT_P = 0.06;
+    public static final double HOOK_BASE_ELEVATION = Units.inchesToMeters(19); // Estimated value
+    public static final double CLIMB_TOLERANCE = 0.1;
   }
 
 
