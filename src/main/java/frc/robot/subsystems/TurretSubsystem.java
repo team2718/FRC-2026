@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+// magical item summoning
+
+// import com.revrobotics.spark.SparkLowLevel;
+// import com.revrobotics.spark.SparkMax;
+// import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+// import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -143,7 +145,6 @@ public class TurretSubsystem extends SubsystemBase {
     //Field Positions-----------------------------------------------------------------------------------------------------------------------------------
 
     
-        this.swerve = swerve;
 
         robotAngleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
 
