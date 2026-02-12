@@ -37,8 +37,8 @@ public class SK6812RGBW extends AddressableLED {
     }
 
     for (int i = 0; i < rgbBuffer.getLength(); i++) {
-      rgbwValues[i * 4] = rgbBuffer.getRed(i);
-      rgbwValues[i * 4 + 1] = rgbBuffer.getGreen(i);
+      rgbwValues[i * 4] = rgbBuffer.getGreen(i);
+      rgbwValues[i * 4 + 1] = rgbBuffer.getRed(i);
       rgbwValues[i * 4 + 2] = rgbBuffer.getBlue(i);
       rgbwValues[i * 4 + 3] = whiteValue;
     }
@@ -64,7 +64,7 @@ public class SK6812RGBW extends AddressableLED {
       throw new IllegalArgumentException("Length cannot be greater than 5460");
     }
 
-    super.setLength(length);
+    super.setLength((int) Math.ceil(length * 4.0 / 3.0));
 
     rgbwValues = new int[length * 4];
     rgbwBuffer = new AddressableLEDBuffer((int) Math.ceil(length * 4.0 / 3.0));

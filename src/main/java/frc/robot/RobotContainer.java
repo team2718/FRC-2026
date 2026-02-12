@@ -95,10 +95,13 @@ public class RobotContainer {
         }
         */
 
-        driverController.rightTrigger().whileTrue(
+        driverController.rightTrigger().onTrue(
             m_led.setLEDState(LEDState.SHOOTER)
-            );
-        
+        );
+
+        driverController.rightTrigger().onFalse(
+            m_led.setLEDState(LEDState.RAINBOW)
+        );
     }
 
     

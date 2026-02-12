@@ -37,7 +37,7 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDS.Length);
   private final Distance kLedSpacing = Meters.of(1 / 60.0);
 
-  private final LinearVelocity kScrollingSpeed = MetersPerSecond.of(0.5);
+  private final LinearVelocity kScrollingSpeed = MetersPerSecond.of(0.1);
 
   private final Map<Double, Color> maskSteps = Map.of(0.0, Color.kWhite, 0.5, Color.kBlack);
   private final LEDPattern mask = LEDPattern.steps(maskSteps).scrollAtAbsoluteSpeed(kScrollingSpeed, kLedSpacing);
@@ -45,7 +45,7 @@ public class LEDSubsystem extends SubsystemBase {
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
   private final LEDPattern m_scrollingRainbow = m_rainbow.scrollAtAbsoluteSpeed(kScrollingSpeed, kLedSpacing);
 
-  private final LEDPattern m_shooter = LEDPattern.solid(new Color(255, 255, 0));
+  private final LEDPattern m_shooter = LEDPattern.solid(new Color(0, 0, 255));
   private final LEDPattern m_scrollingShooter = m_shooter.mask(mask);
 
 
