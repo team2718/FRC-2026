@@ -6,10 +6,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AlignWithHubFront;
+// import frc.robot.commands.indexer.SpinIndexerForeward;
+// import frc.robot.commands.indexer.SpinIndexerBackward;
 import frc.robot.commands.turret.TurretShoot;
 //import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
+// import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -30,11 +33,14 @@ public class RobotContainer {
     private final LEDSubsystem m_led = new LEDSubsystem();
 
     private final TurretSubsystem m_turret = new TurretSubsystem();
+    // private final IndexerSubsystem m_indexer = new IndexerSubsystem();
     // private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
     //Multiply by 13 as a placeholder to convert the target velocity to rpm (Previous number was 3125)
     private final TurretShoot turretShoot = new TurretShoot(m_turret, 1);
     // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
+    // private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(m_indexer, 1);
+    // private final SpinIndexerBackward spindexerBackward = new SpinIndexerBackward(m_indexer, 1);
     // private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
     // private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
@@ -75,12 +81,15 @@ public class RobotContainer {
 
         //Left Trigger: Spins the intake wheel when the setup is at the ending position
         // driverController.leftTrigger().onTrue(runIntake);
+        // driverController.leftTrigger().onTrue(spindexerForeward);
         
         //Left Bumper: Spins the intake wheel backwards when the setup is at the ending position
         // driverController.leftBumper().onTrue(runOuttake);
+        // driverController.leftTrigger().onTrue(spindexerBackward);
 
         //Right Trigger: Spins the shooter wheel while holding down
         driverController.rightTrigger().whileTrue(turretShoot);
+        // driverController.leftTrigger().onTrue(spindexerForeward);
         
         //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified) and setting the hood
         //driverController.rightBumper().onTrue(turretToHub);
@@ -105,7 +114,7 @@ public class RobotContainer {
         );
     }
 
-    
+
     public void periodic() {
         swerve.getSwerveDrive().updateOdometry();
         vision.updateSwervePoseFromVision(swerve.getSwerveDrive());

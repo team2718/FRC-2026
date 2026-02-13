@@ -52,6 +52,12 @@ public final class Constants {
     public static final double CLIMB_TOLERANCE = 0.1;
   }
 
+    public static final class IndexerConstants
+  {
+    //placeolder ids
+    public static final int indexermotor1ID = 66;
+    public static final int indexermotor2ID = 68;
+  }
 
     public static final class IntakeConstants
   {
