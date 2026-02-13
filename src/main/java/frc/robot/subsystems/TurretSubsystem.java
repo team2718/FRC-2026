@@ -239,8 +239,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     //Estimates the angle we want to shoot the fuel at based on the turret's distance to the hub (20 = angle the ball shoots at when the hood is at 80 degrees, not sure what is actually is)
-    public double targetHoodAngle(double dist) {
-        return 80 - 20 - ((28500 / (Math.pow(dist + 25, 2))) + 46.25);
+    public double targetHoodAngle() {
+        return 80 - 20 - ((28500 / (Math.pow(projectedTurretDistanceToTag9 + 25, 2))) + 46.25);
     }
 
     //Estimates the speed we want to shoot the fuel at based on the turret's distance to the hub

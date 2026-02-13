@@ -42,7 +42,7 @@ public class TurretToHub extends Command {
         //     shooter.setTurretPosition(0);
         // }
 
-        shooter.setHoodToAngle(shooter.targetShooterSpeed());
+        shooter.setHoodToAngle(shooter.targetHoodAngle());
 
     }
 

@@ -33,7 +33,7 @@ public class RobotContainer {
     // private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
     //Multiply by 13 as a placeholder to convert the target velocity to rpm (Previous number was 3125)
-    private final TurretShoot turretShoot = new TurretShoot(m_turret, m_turret.targetShooterSpeed()*13);
+    private final TurretShoot turretShoot = new TurretShoot(m_turret, 1);
     // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
     // private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
     // private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);

@@ -6,12 +6,13 @@ import frc.robot.subsystems.TurretSubsystem;
 public class TurretShoot extends Command {
     private final TurretSubsystem shooter;
     // private final LEDSubsystem LEDs;
-    private double speed;
+    private double speedcontrol;
 
-    public TurretShoot(TurretSubsystem shooter, double rpm) {
+    public TurretShoot(TurretSubsystem shooter, double speedcontrol) {
         this.shooter = shooter;
 
-        this.speed = rpm;
+        this.speedcontrol = speedcontrol;
+
     }
 
     @Override
@@ -20,7 +21,8 @@ public class TurretShoot extends Command {
 
     @Override
     public void execute() {
-        shooter.setShooterSpeedRPM(speed);
+        //shooter.setShooterSpeedRPM(speed);
+        shooter.setShooterSpeedRPM(shooter.targetShooterSpeed() * 13 * speedcontrol);
     }
 
     @Override
