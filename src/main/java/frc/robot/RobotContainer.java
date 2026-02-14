@@ -9,13 +9,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AlignWithHubFront;
-// import frc.robot.commands.indexer.SpinIndexerForeward;
-// import frc.robot.commands.indexer.SpinIndexerBackward;
+import frc.robot.commands.climber.ClimbToLevel;
+import frc.robot.commands.indexer.SpinIndexerForeward;
+import frc.robot.commands.indexer.SpinIndexerBackward;
 import frc.robot.commands.turret.TurretShoot;
 //import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
-// import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -41,14 +43,15 @@ public class RobotContainer {
 
     private final TurretSubsystem m_turret = new TurretSubsystem();
     private final IntakeSubsystem m_intake = new IntakeSubsystem();
-    // private final IndexerSubsystem m_indexer = new IndexerSubsystem();
+    private final IndexerSubsystem m_indexer = new IndexerSubsystem();
+    private final ClimberSubsystem m_climber = new ClimberSubsystem();
     // private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
     //Multiply by 13 as a placeholder to convert the target velocity to rpm (Previous number was 3125)
     private final TurretShoot turretShoot = new TurretShoot(m_turret, 1);
     // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
-    // private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(m_indexer, 1);
-    // private final SpinIndexerBackward spindexerBackward = new SpinIndexerBackward(m_indexer, 1);
+    private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(m_indexer, 1);
+    private final SpinIndexerBackward spindexerBackward = new SpinIndexerBackward(m_indexer, 1);
     // private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
     // private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
@@ -93,6 +96,15 @@ public class RobotContainer {
 
             NamedCommands.registerCommand("RunOuttake",
         new RunOuttake(m_intake, 0.5));
+
+            NamedCommands.registerCommand("ClimbLevel1",
+        new ClimbToLevel(m_climber, 1));
+
+            NamedCommands.registerCommand("SpinIndexerBackward",
+        new SpinIndexerBackward(m_indexer,.5));
+
+            NamedCommands.registerCommand("SpinIndexerForward",
+            new SpinIndexerForeward(m_indexer,.5));
 
     }
 
