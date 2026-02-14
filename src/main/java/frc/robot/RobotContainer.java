@@ -23,6 +23,10 @@ import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.commands.intake.RunIntake;
+import frc.robot.commands.intake.RunOuttake;
+
 
 public class RobotContainer {
 
@@ -36,6 +40,7 @@ public class RobotContainer {
     private final LEDSubsystem m_led = new LEDSubsystem();
 
     private final TurretSubsystem m_turret = new TurretSubsystem();
+    private final IntakeSubsystem m_intake = new IntakeSubsystem();
     // private final IndexerSubsystem m_indexer = new IndexerSubsystem();
     // private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
@@ -79,9 +84,15 @@ public class RobotContainer {
         configureBindings();
         driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
 
-         //Testing some auto commands
+         //Testing some auto commands (values to change once we have values needed)
             NamedCommands.registerCommand("AutoShoot",
         new TurretShoot(m_turret, 0.5)); 
+
+            NamedCommands.registerCommand("RunIntake", 
+        new RunIntake(m_intake,0.5));
+
+            NamedCommands.registerCommand("RunOuttake",
+        new RunOuttake(m_intake, 0.5));
 
     }
 
