@@ -1,6 +1,9 @@
 package frc.robot;
 
 import java.io.File;
+
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -75,6 +78,11 @@ public class RobotContainer {
 
         configureBindings();
         driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
+
+         //Testing some auto commands
+            NamedCommands.registerCommand("AutoShoot",
+        new TurretShoot(m_turret, 0.5)); 
+
     }
 
     private void configureBindings() {
