@@ -54,7 +54,7 @@ public class ClimberSubsystem {
 
     // Constructors
     public ClimberSubsystem() {
-        climbMotor = new SparkMax(0, MotorType.kBrushless);
+        climbMotor = new SparkMax(Constants.ClimberConstants.climbMotorID, MotorType.kBrushless);
         climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake);
         climbMotorConfig.inverted(false);

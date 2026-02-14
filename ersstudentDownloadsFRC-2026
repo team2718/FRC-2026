@@ -1,0 +1,134 @@
+[33ma71b3b0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstalidation[m[33m)[m HEAD@{0}: checkout: moving from stalidation to stalidation
+[33ma71b3b0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstalidation[m[33m)[m HEAD@{1}: checkout: moving from Indexer to stalidation
+[33md320913[m[33m ([m[1;31morigin/Indexer[m[33m, [m[1;32mIndexer[m[33m)[m HEAD@{2}: checkout: moving from staging to Indexer
+[33m260fee7[m[33m ([m[1;31morigin/staging[m[33m, [m[1;32mstaging[m[33m)[m HEAD@{3}: reset: moving to HEAD
+[33m260fee7[m[33m ([m[1;31morigin/staging[m[33m, [m[1;32mstaging[m[33m)[m HEAD@{4}: commit: Indexer code here, to be refined
+[33m134557f[m[33m ([m[1;31morigin/stalidation[m[33m)[m HEAD@{5}: checkout: moving from LEDs to staging
+[33mc05383f[m[33m ([m[1;31morigin/LEDs[m[33m, [m[1;32mLEDs[m[33m)[m HEAD@{6}: checkout: moving from stalidation to LEDs
+[33ma71b3b0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstalidation[m[33m)[m HEAD@{7}: checkout: moving from stalidation to stalidation
+[33ma71b3b0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstalidation[m[33m)[m HEAD@{8}: commit: Spindexer Code added (To be refined)
+[33m134557f[m[33m ([m[1;31morigin/stalidation[m[33m)[m HEAD@{9}: pull --tags origin stalidation: Fast-forward
+[33mdad1657[m HEAD@{10}: pull --tags origin stalidation: Fast-forward
+[33ma0be8e3[m HEAD@{11}: pull --tags origin stalidation: Fast-forward
+[33m68fd618[m[33m ([m[1;31morigin/Turret/Whole[m[33m, [m[1;32mTurret/Whole[m[33m)[m HEAD@{12}: checkout: moving from Turret/Whole to stalidation
+[33m68fd618[m[33m ([m[1;31morigin/Turret/Whole[m[33m, [m[1;32mTurret/Whole[m[33m)[m HEAD@{13}: checkout: moving from stalidation to Turret/Whole
+[33m68fd618[m[33m ([m[1;31morigin/Turret/Whole[m[33m, [m[1;32mTurret/Whole[m[33m)[m HEAD@{14}: checkout: moving from Turret/Whole to stalidation
+[33m68fd618[m[33m ([m[1;31morigin/Turret/Whole[m[33m, [m[1;32mTurret/Whole[m[33m)[m HEAD@{15}: commit (merge): Merge remote-tracking branch 'origin/LEDs' into Turret/Whole
+[33me5be969[m HEAD@{16}: checkout: moving from LEDs to Turret/Whole
+[33mc05383f[m[33m ([m[1;31morigin/LEDs[m[33m, [m[1;32mLEDs[m[33m)[m HEAD@{17}: reset: moving to HEAD
+[33mc05383f[m[33m ([m[1;31morigin/LEDs[m[33m, [m[1;32mLEDs[m[33m)[m HEAD@{18}: pull --tags origin LEDs: Fast-forward
+[33me283544[m HEAD@{19}: checkout: moving from Turret/Whole to LEDs
+[33me5be969[m HEAD@{20}: checkout: moving from Turret/Hood to Turret/Whole
+[33m4854d48[m[33m ([m[1;31morigin/Turret/Hood[m[33m, [m[1;32mTurret/Hood[m[33m)[m HEAD@{21}: pull --tags origin Turret/Hood: Fast-forward
+[33m5f33ddf[m HEAD@{22}: checkout: moving from Turret/Whole to Turret/Hood
+[33me5be969[m HEAD@{23}: checkout: moving from LEDs to Turret/Whole
+[33me283544[m HEAD@{24}: pull --tags origin LEDs: Fast-forward
+[33m13373e9[m HEAD@{25}: commit: LED lights progress
+[33m7e7e603[m HEAD@{26}: commit: PWMPort = 0
+[33m516c060[m HEAD@{27}: checkout: moving from Turret/Whole to LEDs
+[33me5be969[m HEAD@{28}: commit: Moved the calculated field variables to the Turret Subsystem so we can put our calculation functions to use
+[33m6afd2ef[m HEAD@{29}: checkout: moving from Indexer to Turret/Whole
+[33md320913[m[33m ([m[1;31morigin/Indexer[m[33m, [m[1;32mIndexer[m[33m)[m HEAD@{30}: checkout: moving from Turret/Whole to Indexer
+[33m6afd2ef[m HEAD@{31}: pull --tags origin Turret/Whole: Fast-forward
+[33m42bec86[m HEAD@{32}: pull --tags origin Turret/Whole: Fast-forward
+[33m6942982[m HEAD@{33}: checkout: moving from IntakeStuff to Turret/Whole
+[33maf854eb[m[33m ([m[1;31morigin/IntakeStuff[m[33m, [m[1;32mIntakeStuff[m[33m)[m HEAD@{34}: checkout: moving from Turret/Shoot to IntakeStuff
+[33m1b54714[m[33m ([m[1;31morigin/Turret/Shoot[m[33m, [m[1;32mTurret/Shoot[m[33m)[m HEAD@{35}: checkout: moving from Turret/Shoot to Turret/Shoot
+[33m1b54714[m[33m ([m[1;31morigin/Turret/Shoot[m[33m, [m[1;32mTurret/Shoot[m[33m)[m HEAD@{36}: commit: Added a function getShooterPosition to account for the 1.5:1 ratio
+[33m07bb9c1[m HEAD@{37}: checkout: moving from Turret/Shoot to Turret/Shoot
+[33m07bb9c1[m HEAD@{38}: checkout: moving from Turret/Hood to Turret/Shoot
+[33m5f33ddf[m HEAD@{39}: commit: setHoodToAngle function created, we'll do the calculations after lunch
+[33m1c3bf03[m HEAD@{40}: commit: Started work on Turret Hood functions (setHoodToAngle) there aren't any real calculations yet though
+[33mbfd738e[m HEAD@{41}: checkout: moving from Turret/Rotation to Turret/Hood
+[33m2d1039c[m[33m ([m[1;31morigin/Turret/Rotation[m[33m, [m[1;32mTurret/Rotation[m[33m)[m HEAD@{42}: commit: Made initial calculations to account for shooting fuel while the robot is moving
+[33ma2b7f7c[m[33m ([m[1;31morigin/TurretRotation[m[33m, [m[1;32mTurretRotation[m[33m)[m HEAD@{43}: checkout: moving from Turret/Rotation to Turret/Rotation
+[33ma2b7f7c[m[33m ([m[1;31morigin/TurretRotation[m[33m, [m[1;32mTurretRotation[m[33m)[m HEAD@{44}: checkout: moving from Turret/Hood to Turret/Rotation
+[33mbfd738e[m HEAD@{45}: reset: moving to HEAD
+[33mbfd738e[m HEAD@{46}: pull --tags origin Turret/Hood: Fast-forward
+[33mea15e2f[m HEAD@{47}: checkout: moving from Turret/Rotation to Turret/Hood
+[33ma2b7f7c[m[33m ([m[1;31morigin/TurretRotation[m[33m, [m[1;32mTurretRotation[m[33m)[m HEAD@{48}: reset: moving to HEAD
+[33ma2b7f7c[m[33m ([m[1;31morigin/TurretRotation[m[33m, [m[1;32mTurretRotation[m[33m)[m HEAD@{49}: checkout: moving from Indexer to Turret/Rotation
+[33md320913[m[33m ([m[1;31morigin/Indexer[m[33m, [m[1;32mIndexer[m[33m)[m HEAD@{50}: checkout: moving from Indexer to Indexer
+[33md320913[m[33m ([m[1;31morigin/Indexer[m[33m, [m[1;32mIndexer[m[33m)[m HEAD@{51}: commit: The spindexer has 2 motors, actually
+[33m11b5db7[m HEAD@{52}: pull --tags origin Indexer: Fast-forward
+[33m2b90ec6[m HEAD@{53}: checkout: moving from TurretRotation to Indexer
+[33ma2b7f7c[m[33m ([m[1;31morigin/TurretRotation[m[33m, [m[1;32mTurretRotation[m[33m)[m HEAD@{54}: commit: Recalculated the turret to be based on the position of the turret on the field instead of the center of the robot for accuracy
+[33mea15e2f[m HEAD@{55}: checkout: moving from Turret/Hood to TurretRotation
+[33mea15e2f[m HEAD@{56}: pull --tags origin Turret/Hood: Fast-forward
+[33m1662daa[m HEAD@{57}: checkout: moving from IntakeStuff to Turret/Hood
+[33maf854eb[m[33m ([m[1;31morigin/IntakeStuff[m[33m, [m[1;32mIntakeStuff[m[33m)[m HEAD@{58}: commit: Added Configs to Intake Motor (Inverted=True)
+[33m20ddd51[m HEAD@{59}: checkout: moving from Turret/Hood to IntakeStuff
+[33m1662daa[m HEAD@{60}: commit: Accidentally put the turret commands in the wrong location, fixed
+[33me66a7a9[m HEAD@{61}: checkout: moving from IntakeStuff to Turret/Hood
+[33m20ddd51[m HEAD@{62}: checkout: moving from Turret/Hood to IntakeStuff
+[33me66a7a9[m HEAD@{63}: commit: Configured Turret Motors
+[33m6d1932b[m HEAD@{64}: checkout: moving from Indexer to Turret/Hood
+[33m2b90ec6[m HEAD@{65}: commit: Added Config to Indexer
+[33mb122ba5[m HEAD@{66}: checkout: moving from IntakeStuff to Indexer
+[33m20ddd51[m HEAD@{67}: checkout: moving from Turret/Hood to IntakeStuff
+[33m6d1932b[m HEAD@{68}: checkout: moving from Indexer to Turret/Hood
+[33mb122ba5[m HEAD@{69}: commit: Actually Coded Indexer Code :O
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{70}: checkout: moving from main to Indexer
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{71}: checkout: moving from Turret/Hood to main
+[33m6d1932b[m HEAD@{72}: checkout: moving from IntakeStuff to Turret/Hood
+[33m20ddd51[m HEAD@{73}: commit: Intake Testing
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{74}: checkout: moving from main to IntakeStuff
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{75}: checkout: moving from IntakeStuff to main
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{76}: checkout: moving from IntakeStuff to IntakeStuff
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{77}: checkout: moving from main to IntakeStuff
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{78}: checkout: moving from Turret/Hood to main
+[33m6d1932b[m HEAD@{79}: commit: Added code for the hood & made a calculation to make the turret face the hub
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{80}: checkout: moving from main to Turret/Hood
+[33mb0d0e50[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{81}: pull --tags origin main: Fast-forward
+[33m6a32f78[m[33m ([m[1;31morigin/Truett-code[m[33m, [m[1;32mTruett-code[m[33m)[m HEAD@{82}: checkout: moving from feat/ShooterSubsystem to main
+[33m08f0256[m[33m ([m[1;32mfeat/ShooterSubsystem[m[33m)[m HEAD@{83}: checkout: moving from Align-With-Tag to feat/ShooterSubsystem
+[33m04dcfd3[m[33m ([m[1;31morigin/Align-With-Tag[m[33m, [m[1;32mAlign-With-Tag[m[33m)[m HEAD@{84}: commit: Starting work on alligning with the hub
+[33mdadfd9c[m HEAD@{85}: checkout: moving from feat/ShooterSubsystem to Align-With-Tag
+[33m08f0256[m[33m ([m[1;32mfeat/ShooterSubsystem[m[33m)[m HEAD@{86}: checkout: moving from main to feat/ShooterSubsystem
+[33m6a32f78[m[33m ([m[1;31morigin/Truett-code[m[33m, [m[1;32mTruett-code[m[33m)[m HEAD@{87}: pull --tags origin main: Fast-forward
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{88}: checkout: moving from main to main
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{89}: checkout: moving from main to main
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{90}: checkout: moving from feat/ShooterSubsystem to main
+[33m08f0256[m[33m ([m[1;32mfeat/ShooterSubsystem[m[33m)[m HEAD@{91}: commit: Fixed Turret Spin Command
+[33m9db7633[m HEAD@{92}: checkout: moving from main to feat/ShooterSubsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{93}: reset: moving to HEAD
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{94}: checkout: moving from Vision-Subsystem to main
+[33m56828ba[m[33m ([m[1;31morigin/Vision-Subsystem[m[33m, [m[1;32mVision-Subsystem[m[33m)[m HEAD@{95}: checkout: moving from main to Vision-Subsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{96}: checkout: moving from Vision-Subsystem to main
+[33m56828ba[m[33m ([m[1;31morigin/Vision-Subsystem[m[33m, [m[1;32mVision-Subsystem[m[33m)[m HEAD@{97}: checkout: moving from feat/ShooterSubsystem to Vision-Subsystem
+[33m9db7633[m HEAD@{98}: commit: Right Trigger: Spins the shooter wheels
+[33m67bfa83[m HEAD@{99}: checkout: moving from main to feat/ShooterSubsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{100}: checkout: moving from feat/ShooterSubsystem to main
+[33m67bfa83[m HEAD@{101}: commit: Coded Base For Turret Subsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{102}: checkout: moving from main to feat/ShooterSubsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{103}: checkout: moving from Caleb-Winterscheidt to main
+[33m9ba9ced[m[33m ([m[1;32mCaleb-Winterscheidt[m[33m)[m HEAD@{104}: checkout: moving from Truett-code to Caleb-Winterscheidt
+[33m6a32f78[m[33m ([m[1;31morigin/Truett-code[m[33m, [m[1;32mTruett-code[m[33m)[m HEAD@{105}: checkout: moving from feat/IntakeSubsystem to Truett-code
+[33mf25ff80[m[33m ([m[1;31morigin/feat/IntakeSubsystem[m[33m, [m[1;32mfeat/IntakeSubsystem[m[33m)[m HEAD@{106}: checkout: moving from Truett-code to feat/IntakeSubsystem
+[33m6a32f78[m[33m ([m[1;31morigin/Truett-code[m[33m, [m[1;32mTruett-code[m[33m)[m HEAD@{107}: checkout: moving from feat/IntakeSubsystem to Truett-code
+[33mf25ff80[m[33m ([m[1;31morigin/feat/IntakeSubsystem[m[33m, [m[1;32mfeat/IntakeSubsystem[m[33m)[m HEAD@{108}: reset: moving to HEAD
+[33mf25ff80[m[33m ([m[1;31morigin/feat/IntakeSubsystem[m[33m, [m[1;32mfeat/IntakeSubsystem[m[33m)[m HEAD@{109}: checkout: moving from Vision-Subsystem to feat/IntakeSubsystem
+[33m56828ba[m[33m ([m[1;31morigin/Vision-Subsystem[m[33m, [m[1;32mVision-Subsystem[m[33m)[m HEAD@{110}: checkout: moving from feat/IntakeSubsystem to Vision-Subsystem
+[33mf25ff80[m[33m ([m[1;31morigin/feat/IntakeSubsystem[m[33m, [m[1;32mfeat/IntakeSubsystem[m[33m)[m HEAD@{111}: commit: Outtake. Yeah.
+[33mf11243d[m HEAD@{112}: checkout: moving from feat/IntakeSubsystem to feat/IntakeSubsystem
+[33mf11243d[m HEAD@{113}: commit: removed a bad semicolon
+[33m8c43e43[m HEAD@{114}: commit: Changed the controller type from "XboxController" to "CommandXboxController"
+[33m5d28530[m HEAD@{115}: pull --tags origin feat/IntakeSubsystem: Merge made by the 'ort' strategy.
+[33mb97e5d5[m HEAD@{116}: rebase (finish): returning to refs/heads/feat/IntakeSubsystem
+[33mb97e5d5[m HEAD@{117}: rebase (pick): Added Intake Subsystem & Commands, along with button functionality
+[33mec5cb9a[m HEAD@{118}: rebase (pick): Setting Up Intake Subsystem Code (I will refine this at home)
+[33m4a967ab[m HEAD@{119}: rebase (start): checkout origin/main
+[33me3c5d71[m HEAD@{120}: checkout: moving from main to feat/IntakeSubsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{121}: checkout: moving from feat/IntakeSubsystem to main
+[33me3c5d71[m HEAD@{122}: commit: Added Intake Subsystem & Commands, along with button functionality
+[33m920e4e5[m HEAD@{123}: commit: Setting Up Intake Subsystem Code (I will refine this at home)
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{124}: checkout: moving from main to feat/IntakeSubsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{125}: checkout: moving from feat/ElasticDashboard to main
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{126}: checkout: moving from feat/IntakeSubsystem to feat/ElasticDashboard
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{127}: checkout: moving from main to feat/IntakeSubsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{128}: checkout: moving from feat/ElasticDashboard to main
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{129}: checkout: moving from feat/ElasticDashboard to feat/ElasticDashboard
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{130}: checkout: moving from main to feat/ElasticDashboard
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{131}: checkout: moving from feat/IntakeSubsystem to main
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{132}: checkout: moving from main to feat/IntakeSubsystem
+[33med1a375[m[33m ([m[1;32mfeat/ElasticDashboard[m[33m)[m HEAD@{133}: clone: from https://github.com/team2718/FRC-2026.git

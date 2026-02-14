@@ -20,14 +20,8 @@ public class RunIntake extends Command {
     @Override
     public void execute() {
 
-        /*If the intake wheel is set to the ground, ready to intake (If the setup is at the right position) the intake wheel can run
-        Otherwise, the intake wheel cannot activate*/
-
-        if (intake.atEndPosition()) {
-            intake.SetIntakeSpeed(speed);
-        } else {
-            intake.SetIntakeSpeed(0);
-        }
+        //Sets the speed of the intake foreward
+        intake.SetIntakeSpeed(speed);
 
         
     }
@@ -35,7 +29,6 @@ public class RunIntake extends Command {
     @Override
     public void end(boolean interuppted) {
         intake.setSpeed(0);
-        intake.setActivatorSpeed(0);
     }
 
     @Override

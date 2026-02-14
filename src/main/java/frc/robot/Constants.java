@@ -40,6 +40,7 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
+    public static final int climbMotorID = 51;
     public static final double BAR1_ELEVATION = Units.inchesToMeters(27.0);
     public static final double BAR2_ELEVATION = Units.inchesToMeters(45.0);
     public static final double BAR3_ELEVATION = Units.inchesToMeters(63.0);
@@ -63,7 +64,6 @@ public final class Constants {
   {
     //placeholder ids
     public static final int intakemotorID = 7;
-    public static final int intakeactivatorID = 8;
   }
   /*
   public static class OI {
