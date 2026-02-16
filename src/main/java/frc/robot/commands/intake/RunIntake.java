@@ -21,7 +21,7 @@ public class RunIntake extends Command {
     public void execute() {
 
         //Sets the speed of the intake foreward
-        intake.SetIntakeSpeed(speed);
+        intake.setSpeed(speed);
 
         
     }

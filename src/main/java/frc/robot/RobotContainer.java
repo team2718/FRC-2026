@@ -12,7 +12,6 @@ import frc.robot.commands.climber.RetractHook;
 import frc.robot.commands.climber.SetToZero;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
-import frc.robot.commands.intake.RunOuttake;
 import frc.robot.commands.turret.TurretShoot;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.LEDSubsystem;
@@ -51,7 +50,7 @@ public class RobotContainer {
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(m_indexer, -1);
 
     private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
-    private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
+    private final RunIntake runOuttake = new RunIntake(m_intake, -0.5);
 
     //private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
     //private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
