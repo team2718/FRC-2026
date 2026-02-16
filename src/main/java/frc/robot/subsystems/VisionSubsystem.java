@@ -18,12 +18,12 @@ public class VisionSubsystem extends SubsystemBase {
   private final Camera frontCamera = new Camera("FrontAprilCamera",
       new Rotation3d(
           Units.degreesToRadians(0),
-          Units.degreesToRadians(-35),
+          Units.degreesToRadians(-50),
           Units.degreesToRadians(0)),
       new Translation3d(
-          Units.inchesToMeters(13.16),
-          Units.inchesToMeters(0.5),
-          Units.inchesToMeters(6)));
+          Units.inchesToMeters(12.97),
+          Units.inchesToMeters(0),
+          Units.inchesToMeters(4.25)));
 
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout
       .loadField(AprilTagFields.k2026RebuiltWelded);

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -7,9 +9,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class ClimberSubsystem {
+public class ClimberSubsystem extends SubsystemBase{
     // Fields
     private final SparkMax climbMotor;
     private SparkMaxConfig climbMotorConfig;
@@ -58,7 +61,10 @@ public class ClimberSubsystem {
         climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake);
         climbMotorConfig.inverted(false);
-        climbMotorConfig.smartCurrentLimit(20);
+        climbMotorConfig.smartCurrentLimit(40);
+
+        climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         climbMotorAlert = new Alert("Motor \"Climb Motor\" is faulting!", AlertType.kError);
     }
 
