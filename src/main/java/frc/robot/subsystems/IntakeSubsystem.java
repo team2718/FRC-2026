@@ -1,8 +1,12 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 //import com.revrobotics.spark.config.SparkParameters;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants;
 //import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase{
 
     private final SparkMax intakemotor;
-    private final SparkMax intakeactivator;
 
     // shuffleboard
     private ShuffleboardTab comptab = Shuffleboard.getTab("intake");
@@ -25,18 +28,13 @@ public class IntakeSubsystem extends SubsystemBase{
 
 public IntakeSubsystem() {
     intakemotor = new SparkMax(Constants.IntakeConstants.intakemotorID, SparkLowLevel.MotorType.kBrushless);
-    intakeactivator = new SparkMax(Constants.IntakeConstants.intakeactivatorID, SparkLowLevel.MotorType.kBrushless);
-}
 
+    SparkMaxConfig intakeconfig = new SparkMaxConfig();
+    intakeconfig.inverted(true);
+    intakeconfig.smartCurrentLimit(5);
+    intakeconfig.idleMode(IdleMode.kCoast);
 
-//sets activator speed foreward
-public void setActivatorSpeed(double power) {
-    intakeactivator.set(power);
-}
-
-//stops activator
-public void stopActivator(double power) {
-    intakeactivator.set(0);
+    intakemotor.configure(intakeconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 }
 
 //sets intake speed 
@@ -49,32 +47,9 @@ public void stopIntake() {
     intakemotor.set(0);
 }
 
-//for backwards intake
-public void setbackSpeed(double power) {
-    intakemotor.set(-power);
-}
-
 //returns the current speed of the intake motor
 public double getIntakeSpeed() {
     return intakemotor.get();
-}
-
-//returns the current speed of the activator motor
-public double getActivatorSpeed() {
-    return intakeactivator.get();
-}
-
-//returns the current position of the activator motor
-public double getActivatorPosition() {
-    return intakeactivator.getAbsoluteEncoder().getPosition();
-}
-
-public boolean atStartPosition() {
-    return intakeactivator.getAbsoluteEncoder().getPosition() > -3 && intakeactivator.getAbsoluteEncoder().getPosition() < 3;
-}
-
-public boolean atEndPosition() {
-    return intakeactivator.getAbsoluteEncoder().getPosition() > 117 && intakeactivator.getAbsoluteEncoder().getPosition() < 123;
 }
 
 @Override

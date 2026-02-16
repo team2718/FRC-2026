@@ -4,10 +4,10 @@ import frc.robot.Constants;
 import frc.robot.subsystems.ClimberSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class RetractHook extends Command {
+public class SetToZero extends Command {
     private ClimberSubsystem climber;
 
-    public RetractHook(ClimberSubsystem climber) {
+    public SetToZero(ClimberSubsystem climber) {
         this.climber = climber;
     }
 
@@ -20,18 +20,18 @@ public class RetractHook extends Command {
     @Override
     public void execute() {
         // Set PID to inverse; use a stronger P than for extension, to account for the robot weight
-        climber.setClimbMotor((climber.getHookElevation() - Constants.ClimberConstants.HOOK_BASE_ELEVATION) * -1 * Constants.ClimberConstants.RETRACT_P);
+        climber.setClimbMotorVoltage(-5);
     }
 
     @Override
     public boolean isFinished() {
-        // See if the hook is fully, or almost fully, retracted
-        return (Math.abs(climber.getHookElevation() - Constants.ClimberConstants.HOOK_BASE_ELEVATION) <= Constants.ClimberConstants.CLIMB_TOLERANCE);
+        return false;
     }
 
     @Override
     public void end(boolean interuppted) {
         // Stop the motor
         climber.setClimbMotor(0);
+        climber.resetHookElevation();
     }
 }
