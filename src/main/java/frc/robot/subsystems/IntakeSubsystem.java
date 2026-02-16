@@ -20,6 +20,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase{
 
     private final SparkMax intakemotor;
+    private final SparkMax intakepositioner;
+
+    private final double stowedAngle;
+    private final double activeAngle;
 
     // shuffleboard
     private ShuffleboardTab comptab = Shuffleboard.getTab("intake");
@@ -28,6 +32,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
 public IntakeSubsystem() {
     intakemotor = new SparkMax(Constants.IntakeConstants.intakemotorID, SparkLowLevel.MotorType.kBrushless);
+    intakepositioner = new SparkMax(Constants.IntakeConstants.intakepositionerID, SparkLowLevel.MotorType.kBrushless);
 
     SparkMaxConfig intakeconfig = new SparkMaxConfig();
     intakeconfig.inverted(true);
@@ -35,6 +40,16 @@ public IntakeSubsystem() {
     intakeconfig.idleMode(IdleMode.kCoast);
 
     intakemotor.configure(intakeconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkMaxConfig intakepositionerconfig = new SparkMaxConfig();
+    intakepositionerconfig.inverted(true);
+    intakepositionerconfig.smartCurrentLimit(5);
+    intakepositionerconfig.idleMode(IdleMode.kCoast);
+
+    intakepositioner.configure(intakepositionerconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    stowedAngle = 135;
+    activeAngle = 45;
 }
 
 //sets intake speed 
@@ -52,14 +67,24 @@ public double getIntakeSpeed() {
     return intakemotor.get();
 }
 
+//if the intake is closer to one position, the function sets it to the other
+public void setToTargetPosition() {
+    if (getPositionerAngle() < 90) {
+        intakepositioner.set(activeAngle - getPositionerAngle());
+    } else {
+        intakepositioner.set(stowedAngle - getPositionerAngle());
+    }
+}
+
+//gets the angle of the positioner motor
+public double getPositionerAngle() {
+    return intakepositioner.getAbsoluteEncoder().getPosition();
+}
+
+
 @Override
 public void periodic() {
      intakeSwitch.setBoolean(true);
 }
-
-//sets intake in commmand
-public void SetIntakeSpeed(double speed) {
-    intakemotor.set(speed);
-} 
 
 }

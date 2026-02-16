@@ -103,11 +103,11 @@ public class RobotContainer {
         
         //Left Bumper: Spins the intake wheel & spindexer backward
         driverController.leftBumper().whileTrue(runOuttake);
-        driverController.leftTrigger().whileTrue(spindexerBackward);
+        driverController.leftBumper().whileTrue(spindexerBackward);
 
         //Right Trigger: Spins the shooter wheel & spindexer while holding down
         driverController.rightTrigger().whileTrue(turretShoot);
-        driverController.leftTrigger().whileTrue(spindexerForeward);
+        driverController.rightTrigger().whileTrue(spindexerForeward);
         
         //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified) and setting the hood
         driverController.rightBumper().onTrue(turretToHub);
@@ -131,7 +131,8 @@ public class RobotContainer {
         }
         */
 
-
+        //placeholder button: If the intake is at the stowed position, pressing x will set it to the active position, and vise-versa
+        driverController.x().onTrue(Commands.runOnce(() -> {m_intake.setToTargetPosition();}, m_intake));
 
         driverController.rightTrigger().onTrue(
             m_led.setLEDState(LEDState.SHOOTER)
