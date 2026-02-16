@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AlignWithHubFront;
-import frc.robot.commands.climber.ClimbToLevel;
 import frc.robot.commands.climber.ExtendHook;
 import frc.robot.commands.climber.RetractHook;
 import frc.robot.commands.indexer.SpinIndexerForeward;
@@ -33,6 +32,8 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.intake.RunOuttake;
 import frc.robot.commands.indexer.SpinIndexerForeward;
+import frc.robot.commands.climber.ExtendHook;
+import frc.robot.commands.climber.RetractHook;
 
 
 public class RobotContainer {
@@ -63,7 +64,7 @@ public class RobotContainer {
     //private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
     //private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
     //private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
-    private final ExtendHook extendHook = new ExtendHook(m_climber);
+    private final ExtendHook extendHook = new ExtendHook(m_climber);   //to be used for binding, not bound yet
     private final RetractHook retractHook = new RetractHook(m_climber);
 
     VisionSubsystem vision = new VisionSubsystem();
@@ -91,7 +92,7 @@ public class RobotContainer {
 
         driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
 
-        autoChooser.setDefaultOption("An Auto", "An Auto");
+        autoChooser.setDefaultOption("FRC_26_HumanOutpostAuto", "FRC_26_HumanOutpostAuto");
         autoChooser.addOption("Another Auto", "Another Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -108,12 +109,14 @@ public class RobotContainer {
             NamedCommands.registerCommand("RunOuttake",
         new RunOuttake(m_intake, 0.5));
 
-            NamedCommands.registerCommand("ClimbLevel1",
-        new ClimbToLevel(m_climber, 1));
-
             NamedCommands.registerCommand("SpinIndexerForward",
         new SpinIndexerForeward(m_indexer,.5));
 
+            NamedCommands.registerCommand("ExtendHook", 
+        new ExtendHook(m_climber));
+
+            NamedCommands.registerCommand("RetractHook", 
+        new RetractHook(m_climber));
     }
 
     private void configureBindings() {
