@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.intake.RunOuttake;
+import frc.robot.commands.indexer.SpinIndexerForeward;
 
 
 public class RobotContainer {
@@ -110,11 +111,8 @@ public class RobotContainer {
             NamedCommands.registerCommand("ClimbLevel1",
         new ClimbToLevel(m_climber, 1));
 
-            NamedCommands.registerCommand("SpinIndexerBackward",
-        new SpinIndexerBackward(m_indexer,.5));
-
             NamedCommands.registerCommand("SpinIndexerForward",
-            new SpinIndexerForeward(m_indexer,.5));
+        new SpinIndexerForeward(m_indexer,.5));
 
     }
 
