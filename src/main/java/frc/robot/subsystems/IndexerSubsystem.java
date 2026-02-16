@@ -59,12 +59,6 @@ public void stopIndexer() {
     indexermotor2.set(0);
 }
 
-//sets indexer motor speed foreward
-public void setReverse(double power) {
-    indexermotor1.set(-power);
-    indexermotor2.set(-power);
-}
-
 //returns the current speed of the intake motor
 public double getIntakeSpeed() {
     return indexermotor1.get();

@@ -12,7 +12,6 @@ import frc.robot.commands.climber.RetractHook;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.intake.RunOuttake;
-import frc.robot.commands.indexer.SpinIndexerBackward;
 import frc.robot.commands.turret.TurretShoot;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.LEDSubsystem;
@@ -48,16 +47,16 @@ public class RobotContainer {
     private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
 
     private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(m_indexer, 1);
-    private final SpinIndexerBackward spindexerBackward = new SpinIndexerBackward(m_indexer, 1);
+    private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(m_indexer, -1);
 
     private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
     private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
     private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
-    private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
-    private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
-    private final ExtendHook extendHook = new ExtendHook();
-    private final RetractHook retractHook = new RetractHook();
+    //private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
+    //private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
+    //private final ExtendHook extendHook = new ExtendHook();
+    //private final RetractHook retractHook = new RetractHook();
 
     VisionSubsystem vision = new VisionSubsystem();
 
@@ -94,15 +93,17 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        //Left Trigger: Spins the intake wheel foreward, along with the indexer
+        //It wouldn't be practical for the spindexer to be mapped to a unique input, so the thought is to spin it in the direction we want the fuel to go in. Subject to change.
+
+        //Left Trigger: Spins the intake wheel & spindexer foreward
         driverController.leftTrigger().whileTrue(runIntake);
         driverController.leftTrigger().whileTrue(spindexerForeward);
         
-        //Left Bumper: Spins the intake wheel backward
+        //Left Bumper: Spins the intake wheel & spindexer backward
         driverController.leftBumper().whileTrue(runOuttake);
         driverController.leftTrigger().whileTrue(spindexerBackward);
 
-        //Right Trigger: Spins the shooter wheel while holding down
+        //Right Trigger: Spins the shooter wheel & spindexer while holding down
         driverController.rightTrigger().whileTrue(turretShoot);
         driverController.leftTrigger().whileTrue(spindexerForeward);
         
@@ -111,6 +112,9 @@ public class RobotContainer {
         //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
         //D-Pad Controls Climbing
+        driverController.povLeft().onTrue(climbToLevel1);
+
+        /*
         if (climbToLevel1.isFinished()) {
             driverController.povLeft().onTrue(climbToLevel1);
         }
@@ -123,6 +127,7 @@ public class RobotContainer {
         if (retractHook.isFinished()) {
             driverController.povDown().onTrue(retractHook);
         }
+        */
 
 
 
