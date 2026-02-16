@@ -1,6 +1,5 @@
 package frc.robot.commands.climber;
 
-import frc.robot.Constants;
 import frc.robot.subsystems.ClimberSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -13,24 +12,27 @@ public class SetToZero extends Command {
 
     @Override
     public void initialize() {
-        // Set desired level to 0
+        // Set desired level to 0, and reduce current limit
         climber.setDesiredLevel(0);
+        climber.setCurrentLimit(10);
     }
 
     @Override
     public void execute() {
-        // Set PID to inverse; use a stronger P than for extension, to account for the robot weight
+        // Set a small negative current
         climber.setClimbMotorVoltage(-5);
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        // Check if the current is near the stall limit
+        return (climber.getAmps() >= 9);
     }
 
     @Override
     public void end(boolean interuppted) {
-        // Stop the motor
+        // Stop the motor, reset the current limit, and set the default hook elevation
+        climber.setCurrentLimit(40);
         climber.setClimbMotor(0);
         climber.resetHookElevation();
     }

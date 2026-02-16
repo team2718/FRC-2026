@@ -9,6 +9,7 @@ import frc.robot.commands.AlignWithHubFront;
 import frc.robot.commands.climber.ClimbToLevel;
 import frc.robot.commands.climber.ExtendHook;
 import frc.robot.commands.climber.RetractHook;
+import frc.robot.commands.climber.SetToZero;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.intake.RunOuttake;
@@ -57,6 +58,7 @@ public class RobotContainer {
     //private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
     private final ExtendHook extendHook = new ExtendHook(m_climber);
     private final RetractHook retractHook = new RetractHook(m_climber);
+    private final SetToZero setToZero = new SetToZero(m_climber);
 
     VisionSubsystem vision = new VisionSubsystem();
 

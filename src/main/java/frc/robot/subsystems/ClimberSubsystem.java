@@ -24,6 +24,13 @@ public class ClimberSubsystem extends SubsystemBase {
     private double hookElevation = 0;
 
     // Getters and Setters
+    public void setCurrentLimit(int amps) {
+        climbMotorConfig.smartCurrentLimit(amps);
+        climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+    public double getAmps() {
+        return climbMotor.getOutputCurrent();
+    }
     public double getClimbMotorPosition() {
         return climbMotor.getEncoder().getPosition();
     }
