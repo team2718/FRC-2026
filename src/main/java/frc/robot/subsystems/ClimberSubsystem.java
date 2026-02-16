@@ -39,6 +39,9 @@ public class ClimberSubsystem extends SubsystemBase {
     public double getHookElevation() {
         return hookElevation;
     }
+    public void resetHookElevation() {
+        hookElevation = Constants.ClimberConstants.HOOK_BASE_ELEVATION;
+    }
     public int getDesiredLevel() {
         return desiredLevel;
     }
@@ -61,7 +64,7 @@ public class ClimberSubsystem extends SubsystemBase {
         climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake);
         climbMotorConfig.inverted(false);
-        climbMotorConfig.smartCurrentLimit(20);
+        climbMotorConfig.smartCurrentLimit(40);
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         climbMotorAlert = new Alert("Motor \"Climb Motor\" is faulting!", AlertType.kError);
     }

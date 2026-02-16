@@ -52,11 +52,11 @@ public class RobotContainer {
     private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
     private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
 
-    private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
+    //private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
     //private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
     //private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
-    //private final ExtendHook extendHook = new ExtendHook();
-    //private final RetractHook retractHook = new RetractHook();
+    private final ExtendHook extendHook = new ExtendHook(m_climber);
+    private final RetractHook retractHook = new RetractHook(m_climber);
 
     VisionSubsystem vision = new VisionSubsystem();
 
@@ -112,7 +112,7 @@ public class RobotContainer {
         //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
         //D-Pad Controls Climbing
-        driverController.povLeft().onTrue(climbToLevel1);
+        //driverController.povLeft().onTrue(climbToLevel1);
 
         /*
         if (climbToLevel1.isFinished()) {

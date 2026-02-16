@@ -7,6 +7,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class ExtendHook extends Command {
     private ClimberSubsystem climber;
 
+    public ExtendHook(ClimberSubsystem climber) {
+        this.climber = climber;
+    }
+
     @Override
     public void initialize() {
         // Sets the Hook's desired level to 1

@@ -47,11 +47,6 @@ public void stopIntake() {
     intakemotor.set(0);
 }
 
-//for backwards intake
-public void setbackSpeed(double power) {
-    intakemotor.set(-power);
-}
-
 //returns the current speed of the intake motor
 public double getIntakeSpeed() {
     return intakemotor.get();
