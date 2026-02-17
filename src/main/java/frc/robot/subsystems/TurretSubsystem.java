@@ -165,8 +165,8 @@ public class TurretSubsystem extends SubsystemBase {
         If we point the turret in the direction of the hub based from that position instead of it's current position, it should line up.
          */
 
-        //Projects the time it will take for the feul to reach the goal when the robot shoots (Currently a shoddy estimate, farther = longer time)
-        projectedTime = Math.sqrt(robotDistanceToTag9);
+        //Projects the time it will take for the feul to reach the goal when the robot shoots
+        projectedTime = robotDistanceToTag9 * Math.cos(getTurretHood());
 
         //Projects the turret's projected location relative to the field
         projectedTurretPositionX = swerve.getPose().getX() + (swerve.getRobotVelocity().vxMetersPerSecond * projectedTime) + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() + turretDegreeFromRobotCenter) * turretDistanceToRobotCenter;
