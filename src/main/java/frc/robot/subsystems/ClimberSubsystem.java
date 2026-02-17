@@ -1,14 +1,18 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ClimberSubsystem {
+public class ClimberSubsystem extends SubsystemBase {
     // Fields
     private final SparkMax climbMotor;
     private SparkMaxConfig climbMotorConfig;
@@ -20,6 +24,13 @@ public class ClimberSubsystem {
     private double hookElevation = 0;
 
     // Getters and Setters
+    public void setCurrentLimit(int amps) {
+        climbMotorConfig.smartCurrentLimit(amps);
+        climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+    public double getAmps() {
+        return climbMotor.getOutputCurrent();
+    }
     public double getClimbMotorPosition() {
         return climbMotor.getEncoder().getPosition();
     }
@@ -34,6 +45,9 @@ public class ClimberSubsystem {
     }
     public double getHookElevation() {
         return hookElevation;
+    }
+    public void resetHookElevation() {
+        hookElevation = Constants.ClimberConstants.HOOK_BASE_ELEVATION;
     }
     public int getDesiredLevel() {
         return desiredLevel;
@@ -53,17 +67,23 @@ public class ClimberSubsystem {
 
     // Constructors
     public ClimberSubsystem() {
-        climbMotor = new SparkMax(0, MotorType.kBrushless);
+        climbMotor = new SparkMax(Constants.ClimberConstants.climbMotorID, MotorType.kBrushless);
         climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake);
         climbMotorConfig.inverted(false);
-        climbMotorConfig.smartCurrentLimit(20);
+        climbMotorConfig.smartCurrentLimit(40);
+        climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         climbMotorAlert = new Alert("Motor \"Climb Motor\" is faulting!", AlertType.kError);
     }
 
     // Methods
+    public void updateElevations() {
+        // Need to do some math here to translate encoder rotation to height raised
+        hookElevation = Constants.ClimberConstants.HOOK_BASE_ELEVATION + getClimbMotorPosition();
+    }
     public void periodic() {
         setAlerts();
+        updateElevations();
         SmartDashboard.putNumber("ClimbMotor Encoder", getClimbMotorPosition());
         SmartDashboard.putBoolean("Climbing?", climbing);
         SmartDashboard.putBoolean("Releasing?", releasing);

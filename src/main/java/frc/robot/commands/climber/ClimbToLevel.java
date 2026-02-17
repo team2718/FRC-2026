@@ -30,29 +30,29 @@ public final class ClimbToLevel extends Command {
         if ((climber.getDesiredLevel() == 1 && climber.getRobotElevation() < Constants.ClimberConstants.L1_ELEVATION) || 
         (climber.getDesiredLevel() > 1 && climber.getRobotElevation() < Constants.ClimberConstants.BAR1_ELEVATION)) {
             if (climber.getHookElevation() < Constants.ClimberConstants.BAR1_ELEVATION) {
-                climber.setClimbMotor((Constants.ClimberConstants.BAR1_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.CLIMBER_P);
+                climber.setClimbMotor((Constants.ClimberConstants.BAR1_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.EXTEND_P);
             }
             else {
-                climber.setClimbMotor((Constants.ClimberConstants.BAR1_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.CLIMBER_P);
+                climber.setClimbMotor((Constants.ClimberConstants.BAR1_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.RETRACT_P);
             }
         }
         // L2 Climb
         else if ((climber.getDesiredLevel() == 2 && climber.getRobotElevation() < Constants.ClimberConstants.L2_ELEVATION) ||
         (climber.getDesiredLevel() > 2 && climber.getRobotElevation() < Constants.ClimberConstants.BAR2_ELEVATION)) {
             if (climber.getHookElevation() < Constants.ClimberConstants.BAR2_ELEVATION) {
-                climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.CLIMBER_P);
+                climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.EXTEND_P);
             }
             else {
-                climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.CLIMBER_P);
+                climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.RETRACT_P);
             }
         }
         // L3 Climb
         else if (climber.getDesiredLevel() == 3 && climber.getRobotElevation() < Constants.ClimberConstants.L3_ELEVATION) {
             if (climber.getHookElevation() < Constants.ClimberConstants.BAR3_ELEVATION) {
-                climber.setClimbMotor((Constants.ClimberConstants.BAR3_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.CLIMBER_P);
+                climber.setClimbMotor((Constants.ClimberConstants.BAR3_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.EXTEND_P);
             }
             else {
-                climber.setClimbMotor((Constants.ClimberConstants.BAR3_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.CLIMBER_P);
+                climber.setClimbMotor((Constants.ClimberConstants.BAR3_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.RETRACT_P);
             }    
         }
     }

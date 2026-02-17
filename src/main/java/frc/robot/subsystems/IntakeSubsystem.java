@@ -1,22 +1,29 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkParameters;
+//import com.revrobotics.spark.config.SparkParameters;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.math.controller.PIDController;
+//import edu.wpi.first.wpilibj2.command.Command;
+//import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase{
 
     private final SparkMax intakemotor;
-    private final SparkMax intakeactivator;
+    private final SparkMax intakepositioner;
+
+    private final double stowedAngle;
+    private final double activeAngle;
 
     // shuffleboard
     private ShuffleboardTab comptab = Shuffleboard.getTab("intake");
@@ -25,18 +32,24 @@ public class IntakeSubsystem extends SubsystemBase{
 
 public IntakeSubsystem() {
     intakemotor = new SparkMax(Constants.IntakeConstants.intakemotorID, SparkLowLevel.MotorType.kBrushless);
-    intakeactivator = new SparkMax(Constants.IntakeConstants.intakeactivatorID, SparkLowLevel.MotorType.kBrushless);
-}
+    intakepositioner = new SparkMax(Constants.IntakeConstants.intakepositionerID, SparkLowLevel.MotorType.kBrushless);
 
+    SparkMaxConfig intakeconfig = new SparkMaxConfig();
+    intakeconfig.inverted(true);
+    intakeconfig.smartCurrentLimit(5);
+    intakeconfig.idleMode(IdleMode.kCoast);
 
-//sets activator speed foreward
-public void setActivatorSpeed(double power) {
-    intakeactivator.set(power);
-}
+    intakemotor.configure(intakeconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-//stops activator
-public void stopActivator(double power) {
-    intakeactivator.set(0);
+    SparkMaxConfig intakepositionerconfig = new SparkMaxConfig();
+    intakepositionerconfig.inverted(true);
+    intakepositionerconfig.smartCurrentLimit(5);
+    intakepositionerconfig.idleMode(IdleMode.kCoast);
+
+    intakepositioner.configure(intakepositionerconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    stowedAngle = 135;
+    activeAngle = 45;
 }
 
 //sets intake speed 
@@ -49,42 +62,29 @@ public void stopIntake() {
     intakemotor.set(0);
 }
 
-//for backwards intake
-public void setbackSpeed(double power) {
-    intakemotor.set(-power);
-}
-
 //returns the current speed of the intake motor
 public double getIntakeSpeed() {
     return intakemotor.get();
 }
 
-//returns the current speed of the activator motor
-public double getActivatorSpeed() {
-    return intakeactivator.get();
+//if the intake is closer to one position, the function sets it to the other
+public void setToTargetPosition() {
+    if (getPositionerAngle() < 90) {
+        intakepositioner.set(activeAngle - getPositionerAngle());
+    } else {
+        intakepositioner.set(stowedAngle - getPositionerAngle());
+    }
 }
 
-//returns the current position of the activator motor
-public double getActivatorPosition() {
-    return intakeactivator.getAbsoluteEncoder().getPosition();
+//gets the angle of the positioner motor
+public double getPositionerAngle() {
+    return intakepositioner.getAbsoluteEncoder().getPosition();
 }
 
-public boolean atStartPosition() {
-    return intakeactivator.getAbsoluteEncoder().getPosition() > -3 && intakeactivator.getAbsoluteEncoder().getPosition() < 3;
-}
-
-public boolean atEndPosition() {
-    return intakeactivator.getAbsoluteEncoder().getPosition() > 117 && intakeactivator.getAbsoluteEncoder().getPosition() < 123;
-}
 
 @Override
 public void periodic() {
      intakeSwitch.setBoolean(true);
 }
-
-//sets intake in commmand
-public void SetIntakeSpeed(double speed) {
-    intakemotor.set(speed);
-} 
 
 }

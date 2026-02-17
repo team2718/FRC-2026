@@ -6,6 +6,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AlignWithHubFront;
+import frc.robot.commands.climber.ClimbToLevel;
+import frc.robot.commands.climber.ExtendHook;
+import frc.robot.commands.climber.RetractHook;
+import frc.robot.commands.climber.SetToZero;
+import frc.robot.commands.indexer.SpinIndexerForeward;
+import frc.robot.commands.intake.RunIntake;
+import frc.robot.commands.turret.TurretShoot;
+import frc.robot.commands.turret.TurretToHub;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
+import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
@@ -22,13 +36,28 @@ public class RobotContainer {
     SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
-    // private final TurretSubsystem m_turret = new TurretSubsystem();
-    // private final IntakeSubsystem m_intake = new IntakeSubsystem();
+    private final LEDSubsystem m_led = new LEDSubsystem();
 
-    // private final TurretShoot turretShoot = new TurretShoot(m_turret, 0.5);
-    // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
-    // private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
-    // private final RunOuttake runOuttake = new RunOuttake(m_intake, 0.5);
+    private final TurretSubsystem m_turret = new TurretSubsystem();
+    private final IndexerSubsystem m_indexer = new IndexerSubsystem();
+    private final IntakeSubsystem m_intake = new IntakeSubsystem();
+    private final ClimberSubsystem m_climber = new ClimberSubsystem();
+
+    private final TurretShoot turretShoot = new TurretShoot(m_turret, 1);
+    private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
+
+    private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(m_indexer, 1);
+    private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(m_indexer, -1);
+
+    private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
+    private final RunIntake runOuttake = new RunIntake(m_intake, -0.5);
+
+    //private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
+    //private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
+    //private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
+    private final ExtendHook extendHook = new ExtendHook(m_climber);
+    private final RetractHook retractHook = new RetractHook(m_climber);
+    private final SetToZero setToZero = new SetToZero(m_climber);
 
     VisionSubsystem vision = new VisionSubsystem();
 
@@ -65,32 +94,55 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        //Left Trigger: Spins the intake wheel when the setup is at the ending position
-        // driverController.leftTrigger().onTrue(runIntake);
-        
-        //Left Bumper: Spins the intake wheel backwards when the setup is at the ending position
-        // driverController.leftBumper().onTrue(runOuttake);
+        //It wouldn't be practical for the spindexer to be mapped to a unique input, so the thought is to spin it in the direction we want the fuel to go in. Subject to change.
 
-        //Right Trigger: Spins the shooter wheel while holding down
-        // driverController.rightTrigger().onTrue(turretShoot);
+        //Left Trigger: Spins the intake wheel & spindexer foreward
+        driverController.leftTrigger().whileTrue(runIntake);
+        driverController.leftTrigger().whileTrue(spindexerForeward);
         
-        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified)
-        // driverController.rightBumper().onTrue(turretToHub);
+        //Left Bumper: Spins the intake wheel & spindexer backward
+        driverController.leftBumper().whileTrue(runOuttake);
+        driverController.leftBumper().whileTrue(spindexerBackward);
+
+        //Right Trigger: Spins the shooter wheel & spindexer while holding down
+        driverController.rightTrigger().whileTrue(turretShoot);
+        driverController.rightTrigger().whileTrue(spindexerForeward);
+        
+        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified) and setting the hood
+        driverController.rightBumper().onTrue(turretToHub);
         //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
+        //D-Pad Controls Climbing
+        //driverController.povLeft().onTrue(climbToLevel1);
+
         /*
-        if (intakeAtStartingPos) {
-            driverController.leftBumper().onTrue(setIntakePos);
-        } else if (intakeAtEndingPos) {
-            driverController.leftBumper().onTrue(unsetIntakePos);
-        } else {
-            driverController.leftBumper().onTrue(stopIntake);
+        if (climbToLevel1.isFinished()) {
+            driverController.povLeft().onTrue(climbToLevel1);
+        }
+        if (climbToLevel2.isFinished()) {
+            driverController.povUp().onTrue(climbToLevel2);
+        }
+        if (climbToLevel3.isFinished()) {
+            driverController.povRight().onTrue(climbToLevel3);
+        }
+        if (retractHook.isFinished()) {
+            driverController.povDown().onTrue(retractHook);
         }
         */
 
+        //placeholder button: If the intake is at the stowed position, pressing x will set it to the active position, and vise-versa
+        driverController.x().onTrue(Commands.runOnce(() -> {m_intake.setToTargetPosition();}, m_intake));
+
+        driverController.rightTrigger().onTrue(
+            m_led.setLEDState(LEDState.SHOOTER)
+        );
+
+        driverController.rightTrigger().onFalse(
+            m_led.setLEDState(LEDState.RAINBOW)
+        );
     }
 
-    
+
     public void periodic() {
         swerve.getSwerveDrive().updateOdometry();
         vision.updateSwervePoseFromVision(swerve.getSwerveDrive());

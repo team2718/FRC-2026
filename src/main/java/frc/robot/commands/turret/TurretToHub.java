@@ -1,7 +1,9 @@
 package frc.robot.commands.turret;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 
 public class TurretToHub extends Command {
     private final TurretSubsystem shooter;
@@ -14,17 +16,34 @@ public class TurretToHub extends Command {
         this.speed = speed;
     }
 
+    public static double getWrappedAngleDifference(double source, double target) {
+        double diff = (target - source) % 360;
+
+        if (diff >= 180) {
+            diff -= 360;
+        }
+        else if (diff <= -180) {
+            diff += 360;
+        }
+
+        return diff;
+    }
+
     @Override
     public void initialize() {}
 
-    //Spins the turret to position 180 (placeholder) when activated
+    //Spins the turret and the hood to their respective target positions when activated
     @Override
-    public void execute() {
-        if (shooter.getTurretPosition() >= 0 && shooter.getTurretPosition() <= 360) {
-            shooter.setTurretSpin(speed * (180 - shooter.getTurretPosition())); //180 = desired angle
-        } else {
-            shooter.setTurretSpin(0);
-        }
+    public void execute() {  
+
+        // if (shooter.getTurretPosition() >= -170 && shooter.getTurretPosition() <= 170) {
+        //     shooter.setTurretPosition(speed * (targetTurretPosition - shooter.getTurretPosition()));
+        // } else {
+        //     shooter.setTurretPosition(0);
+        // }
+
+        shooter.setHoodToAngle(shooter.targetHoodAngle());
+
     }
 
 @Override

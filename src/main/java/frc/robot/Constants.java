@@ -33,26 +33,38 @@ public final class Constants {
   public static final class TurretConstants
   {
     //placeholder ids
-    public static final int turretshooterID = 9;
     public static final int turretspinnerID = 10;
+    public static final int turrethoodID = 42;
+    public static final int turretshooterLeftID = 21;
+    public static final int turretshooterRightID = 20;
   }
 
   public static final class ClimberConstants {
+    public static final int climbMotorID = 51;
     public static final double BAR1_ELEVATION = Units.inchesToMeters(27.0);
     public static final double BAR2_ELEVATION = Units.inchesToMeters(45.0);
     public static final double BAR3_ELEVATION = Units.inchesToMeters(63.0);
-    public static final double L1_ELEVATION = 1.0;
-    public static final double L2_ELEVATION = BAR1_ELEVATION + Units.inchesToMeters(1);
-    public static final double L3_ELEVATION = BAR2_ELEVATION + Units.inchesToMeters(1);
-    public static final double CLIMBER_P = 0.03;
+    public static final double L1_ELEVATION = Units.inchesToMeters(2.0);
+    public static final double L2_ELEVATION = BAR1_ELEVATION + Units.inchesToMeters(2);
+    public static final double L3_ELEVATION = BAR2_ELEVATION + Units.inchesToMeters(2);
+    public static final double EXTEND_P = 0.03;
+    public static final double RETRACT_P = 0.06;
+    public static final double HOOK_BASE_ELEVATION = Units.inchesToMeters(19); // Estimated value
+    public static final double CLIMB_TOLERANCE = 0.1;
   }
 
+    public static final class IndexerConstants
+  {
+    //placeolder ids
+    public static final int indexermotor1ID = 66;
+    public static final int indexermotor2ID = 68;
+  }
 
     public static final class IntakeConstants
   {
     //placeholder ids
     public static final int intakemotorID = 7;
-    public static final int intakeactivatorID = 8;
+    public static final int intakepositionerID = 15;
   }
   /*
   public static class OI {
@@ -68,4 +80,9 @@ public final class Constants {
     public static final int kdriverControllerButton8 = 8;
   }
   */
+  public static final class LEDS{
+    //these are random numbers... they haven't been tested yet
+    public static final int PWMPort = 0;
+    public static final int Length = 12;
+  }
 }

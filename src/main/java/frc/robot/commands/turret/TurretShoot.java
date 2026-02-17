@@ -6,29 +6,32 @@ import frc.robot.subsystems.TurretSubsystem;
 public class TurretShoot extends Command {
     private final TurretSubsystem shooter;
     // private final LEDSubsystem LEDs;
-    private double speed;
+    private double speedcontrol;
 
-    public TurretShoot(TurretSubsystem shooter, double speed) {
+    public TurretShoot(TurretSubsystem shooter, double speedcontrol) {
         this.shooter = shooter;
-      
-        this.speed = speed;
+
+        this.speedcontrol = speedcontrol;
+
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public void execute() {
-        shooter.setShooterSpeed(speed);
+        //shooter.setShooterSpeedRPM(speed); Multiply by 13 as a placeholder to convert the target velocity to rpm (Previous number was 3125)
+        shooter.setShooterSpeedRPM(shooter.targetShooterSpeed() * 13 * speedcontrol);
     }
 
-@Override
-public void end(boolean interuppted) {
-
-}
+    @Override
+    public void end(boolean interuppted) {
+        shooter.setShooterSpeedRPM(0);
+    }
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }
 }
