@@ -27,6 +27,24 @@
           "data": {
             "pathName": "FRC_26_Stop_Being_Greedy"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ExtendHook"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_ClimbInverted"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RetractHook"
+          }
         }
       ]
     }
