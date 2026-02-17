@@ -43,13 +43,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ClimbLevel1"
+            "name": "ExtendHook"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "FRC_26_Climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RetractHook"
           }
         }
       ]
