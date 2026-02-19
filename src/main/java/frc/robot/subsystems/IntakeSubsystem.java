@@ -1,5 +1,10 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
@@ -20,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase{
 
     private final SparkMax intakemotor;
-    private final SparkMax intakepositioner;
+    private final TalonFX intakepositioner;
 
     private final double stowedAngle;
     private final double activeAngle;
@@ -32,7 +37,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
 public IntakeSubsystem() {
     intakemotor = new SparkMax(Constants.IntakeConstants.intakemotorID, SparkLowLevel.MotorType.kBrushless);
-    intakepositioner = new SparkMax(Constants.IntakeConstants.intakepositionerID, SparkLowLevel.MotorType.kBrushless);
+    intakepositioner = new TalonFX(Constants.IntakeConstants.intakepositionerID);
 
     SparkMaxConfig intakeconfig = new SparkMaxConfig();
     intakeconfig.inverted(true);
@@ -41,12 +46,24 @@ public IntakeSubsystem() {
 
     intakemotor.configure(intakeconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    SparkMaxConfig intakepositionerconfig = new SparkMaxConfig();
-    intakepositionerconfig.inverted(true);
-    intakepositionerconfig.smartCurrentLimit(5);
-    intakepositionerconfig.idleMode(IdleMode.kCoast);
+    TalonFXConfiguration intakepositionerconfig = new TalonFXConfiguration();
+    intakepositionerconfig.CurrentLimits.StatorCurrentLimit = 25;
+    intakepositionerconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-    intakepositioner.configure(intakepositionerconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    intakepositionerconfig.Slot0.kG = 0.0;
+    intakepositionerconfig.Slot0.kS = 0.0;
+    intakepositionerconfig.Slot0.kV = 0.12;
+    intakepositionerconfig.Slot0.kA = 0.0;
+
+    intakepositionerconfig.Slot0.kP = 0.0;
+    intakepositionerconfig.Slot0.kI = 0.0;
+    intakepositionerconfig.Slot0.kD = 0.0;
+    intakepositionerconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+    intakepositionerconfig.MotionMagic.MotionMagicAcceleration = 1000;
+    intakepositionerconfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+
+    intakepositionerconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    intakepositioner.getConfigurator().apply(intakepositionerconfig);
 
     stowedAngle = 135;
     activeAngle = 45;
@@ -78,7 +95,7 @@ public void setToTargetPosition() {
 
 //gets the angle of the positioner motor
 public double getPositionerAngle() {
-    return intakepositioner.getAbsoluteEncoder().getPosition();
+    return intakepositioner.getPosition().getValueAsDouble();
 }
 
 
