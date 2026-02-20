@@ -28,8 +28,8 @@ public class RobotContainer {
 
     // private final TurretSubsystem m_turret = new TurretSubsystem();
     // private final IndexerSubsystem m_indexer = new IndexerSubsystem();
-    private final IntakeSubsystem m_intake = new IntakeSubsystem();
-    private final ClimberSubsystem m_climber = new ClimberSubsystem();
+    // private final IntakeSubsystem m_intake = new IntakeSubsystem();
+    // private final ClimberSubsystem m_climber = new ClimberSubsystem();
 
     // private final TurretShoot turretShoot = new TurretShoot(m_turret, 1);
     // private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
@@ -99,17 +99,17 @@ public class RobotContainer {
         // driverController.rightBumper().onTrue(turretToHub);
         //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
-        driverController.leftTrigger().whileTrue(
-            Commands.runEnd(() -> m_climber.setClimbMotorVoltage(8), () -> m_climber.setClimbMotorVoltage(0), m_climber)
-        );
+        // driverController.leftTrigger().whileTrue(
+        //     Commands.runEnd(() -> m_climber.setClimbMotorVoltage(8), () -> m_climber.setClimbMotorVoltage(0), m_climber)
+        // );
 
-        driverController.rightTrigger().whileTrue(
-            Commands.runEnd(() -> m_climber.setClimbMotorVoltage(-8), () -> m_climber.setClimbMotorVoltage(0), m_climber)
-        );
+        // driverController.rightTrigger().whileTrue(
+        //     Commands.runEnd(() -> m_climber.setClimbMotorVoltage(-8), () -> m_climber.setClimbMotorVoltage(0), m_climber)
+        // );
 
-        driverController.leftBumper().whileTrue(
-            Commands.runEnd(() -> m_intake.setSpeed(0.6), () -> m_intake.setSpeed(0), m_intake)
-        );
+        // driverController.leftBumper().whileTrue(
+        //     Commands.runEnd(() -> m_intake.setSpeed(0.6), () -> m_intake.setSpeed(0), m_intake)
+        // );
 
         //D-Pad Controls Climbing
         // if (climbToLevel1.isFinished()) {
