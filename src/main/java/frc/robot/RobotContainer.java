@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AlignWithHubFront;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
@@ -27,7 +28,7 @@ public class RobotContainer {
 
     // private final TurretSubsystem m_turret = new TurretSubsystem();
     // private final IndexerSubsystem m_indexer = new IndexerSubsystem();
-    // private final IntakeSubsystem m_intake = new IntakeSubsystem();
+    private final IntakeSubsystem m_intake = new IntakeSubsystem();
     private final ClimberSubsystem m_climber = new ClimberSubsystem();
 
     // private final TurretShoot turretShoot = new TurretShoot(m_turret, 1);
@@ -50,7 +51,7 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
             () -> driverController.getLeftY() * -1,
             () -> driverController.getLeftX() * -1)
-            .withControllerRotationAxis(() -> driverController.getRightX())
+            .withControllerRotationAxis(() -> -driverController.getRightX())
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
             .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
@@ -68,7 +69,7 @@ public class RobotContainer {
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.driveFieldOriented(driveAngularVelocityFieldRelative));
+        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
 
         driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
 
@@ -104,6 +105,10 @@ public class RobotContainer {
 
         driverController.rightTrigger().whileTrue(
             Commands.runEnd(() -> m_climber.setClimbMotorVoltage(-8), () -> m_climber.setClimbMotorVoltage(0), m_climber)
+        );
+
+        driverController.leftBumper().whileTrue(
+            Commands.runEnd(() -> m_intake.setSpeed(0.6), () -> m_intake.setSpeed(0), m_intake)
         );
 
         //D-Pad Controls Climbing

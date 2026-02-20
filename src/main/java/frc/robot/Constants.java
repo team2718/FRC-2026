@@ -63,7 +63,7 @@ public final class Constants {
     public static final class IntakeConstants
   {
     //placeholder ids
-    public static final int intakemotorID = 7;
+    public static final int intakemotorID = 17;
   }
   /*
   public static class OI {

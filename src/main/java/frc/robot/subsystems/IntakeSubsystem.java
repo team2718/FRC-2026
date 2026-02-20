@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
@@ -19,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase{
 
-    private final SparkMax intakemotor;
+    private final TalonFX intakemotor;
 
     // shuffleboard
     private ShuffleboardTab comptab = Shuffleboard.getTab("intake");
@@ -27,14 +31,12 @@ public class IntakeSubsystem extends SubsystemBase{
     private GenericEntry intakeSwitch = comptab.add("intake switch", false).getEntry();
 
 public IntakeSubsystem() {
-    intakemotor = new SparkMax(Constants.IntakeConstants.intakemotorID, SparkLowLevel.MotorType.kBrushless);
-
-    SparkMaxConfig intakeconfig = new SparkMaxConfig();
-    intakeconfig.inverted(true);
-    intakeconfig.smartCurrentLimit(5);
-    intakeconfig.idleMode(IdleMode.kCoast);
-
-    intakemotor.configure(intakeconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    intakemotor = new TalonFX(Constants.IntakeConstants.intakemotorID);
+    TalonFXConfiguration intakeconfig = new TalonFXConfiguration();
+    intakeconfig.CurrentLimits.StatorCurrentLimit = 20;
+    intakeconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    intakeconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    intakemotor.getConfigurator().apply(intakeconfig);
 }
 
 //sets intake speed 
