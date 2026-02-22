@@ -22,7 +22,7 @@ public class VisionSubsystem extends SubsystemBase {
           Units.degreesToRadians(0)),
       new Translation3d(
           Units.inchesToMeters(12.97),
-          Units.inchesToMeters(0),
+          Units.inchesToMeters(0.5),
           Units.inchesToMeters(4.25)));
 
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout

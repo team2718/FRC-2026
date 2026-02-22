@@ -69,16 +69,16 @@ public class RobotContainer {
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
+        // swerve.setDefaultCommand(swerve.driveFieldOriented(driveDirectAngleFieldRelative));
 
-        driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
+        // driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
 
         autoChooser.setDefaultOption("An Auto", "An Auto");
         autoChooser.addOption("Another Auto", "Another Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
-        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
+        // driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
     }
 
     private void configureBindings() {
