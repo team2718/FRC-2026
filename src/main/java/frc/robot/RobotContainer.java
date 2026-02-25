@@ -2,28 +2,29 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.TurretShoot;
 import frc.robot.commands.turret.TurretToHub;
-import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.LEDSubsystem.LEDState;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
 
     // ** Controllers **
-    
+
     private final CommandXboxController driverController = new CommandXboxController(0);
-    // private final CommandXboxController operatorController = new CommandXboxController(1);
+    private final CommandXboxController buttonBoxController = new CommandXboxController(1);
 
     // ** Subsystems **
 
@@ -32,7 +33,7 @@ public class RobotContainer {
     private final TurretSubsystem turret = new TurretSubsystem();
     private final IndexerSubsystem indexer = new IndexerSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
-    // private final ClimberSubsystem climber = new ClimberSubsystem();
+    private final ClimberSubsystem climber = new ClimberSubsystem();
 
     private final LEDSubsystem leds = new LEDSubsystem();
     private final VisionSubsystem vision = new VisionSubsystem();
@@ -48,9 +49,9 @@ public class RobotContainer {
     private final RunIntake runIntake = new RunIntake(intake, 0.5);
     private final RunIntake runOuttake = new RunIntake(intake, -0.5);
 
-    //private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
-    //private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
-    //private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
+    // private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
+    // private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
+    // private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
     // private final ExtendHook extendHook = new ExtendHook(climber);
     // private final RetractHook retractHook = new RetractHook(climber);
     // private final SetToZero setToZero = new SetToZero(climber);
@@ -59,6 +60,12 @@ public class RobotContainer {
     Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
+
+    private boolean swerveEnabled = true;
+    private boolean turretEnabled = true;
+    private boolean indexerIntakeEnabled = true;
+    private boolean climberEnabled = true;
+    private boolean allEnabled = true;
 
     public RobotContainer() {
         // Create auto chooser
@@ -75,66 +82,93 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        //It wouldn't be practical for the spindexer to be mapped to a unique input, so the thought is to spin it in the direction we want the fuel to go in. Subject to change.
+        // It wouldn't be practical for the spindexer to be mapped to a unique input, so
+        // the thought is to spin it in the direction we want the fuel to go in. Subject
+        // to change.
 
-        //Left Trigger: Spins the intake wheel & spindexer foreward
+        // Left Trigger: Spins the intake wheel & spindexer foreward
         driverController.leftTrigger().whileTrue(runIntake);
         driverController.leftTrigger().whileTrue(spindexerForeward);
-        
-        //Left Bumper: Spins the intake wheel & spindexer backward
+
+        // Left Bumper: Spins the intake wheel & spindexer backward
         driverController.leftBumper().whileTrue(runOuttake);
         driverController.leftBumper().whileTrue(spindexerBackward);
 
-        //Right Trigger: Spins the shooter wheel & spindexer while holding down
+        // Right Trigger: Spins the shooter wheel & spindexer while holding down
         driverController.rightTrigger().whileTrue(turretShoot);
         driverController.rightTrigger().whileTrue(spindexerForeward);
-        
-        //Right Bumper: Sets the turret to face a specific direction (Pointing toward the hub, or whatever specified) and setting the hood
-        driverController.rightBumper().onTrue(turretToHub);
-        //(Concept) Left Trigger: Sets intake setup to intake position, or starting position depending on where it is
 
-        //D-Pad Controls Climbing
-        //driverController.povLeft().onTrue(climbToLevel1);
+        // Right Bumper: Sets the turret to face a specific direction (Pointing toward
+        // the hub, or whatever specified) and setting the hood
+        driverController.rightBumper().onTrue(turretToHub);
+        // (Concept) Left Trigger: Sets intake setup to intake position, or starting
+        // position depending on where it is
+
+        // D-Pad Controls Climbing
+        // driverController.povLeft().onTrue(climbToLevel1);
 
         /*
-        if (climbToLevel1.isFinished()) {
-            driverController.povLeft().onTrue(climbToLevel1);
-        }
-        if (climbToLevel2.isFinished()) {
-            driverController.povUp().onTrue(climbToLevel2);
-        }
-        if (climbToLevel3.isFinished()) {
-            driverController.povRight().onTrue(climbToLevel3);
-        }
-        if (retractHook.isFinished()) {
-            driverController.povDown().onTrue(retractHook);
-        }
-        */
+         * if (climbToLevel1.isFinished()) {
+         * driverController.povLeft().onTrue(climbToLevel1);
+         * }
+         * if (climbToLevel2.isFinished()) {
+         * driverController.povUp().onTrue(climbToLevel2);
+         * }
+         * if (climbToLevel3.isFinished()) {
+         * driverController.povRight().onTrue(climbToLevel3);
+         * }
+         * if (retractHook.isFinished()) {
+         * driverController.povDown().onTrue(retractHook);
+         * }
+         */
 
-        //placeholder button: If the intake is at the stowed position, pressing x will set it to the active position, and vise-versa
+        // placeholder button: If the intake is at the stowed position, pressing x will
+        // set it to the active position, and vise-versa
         driverController.leftTrigger().onTrue(
-            Commands.runEnd(() -> {
-                intake.setActive();
-                intake.setIntakeVoltage(5);
-            }, () -> {
-                intake.setStowed();
-                intake.setIntakeVoltage(0);
-            }, intake)
-        );
+                Commands.runEnd(() -> {
+                    intake.setActive();
+                    intake.setIntakeVoltage(5);
+                }, () -> {
+                    intake.setStowed();
+                    intake.setIntakeVoltage(0);
+                }, intake));
 
         driverController.rightTrigger().onTrue(
-            leds.setLEDState(LEDState.SHOOTER)
-        );
+                leds.setLEDState(LEDState.SHOOTER));
 
         driverController.rightTrigger().onFalse(
-            leds.setLEDState(LEDState.RAINBOW)
-        );
+                leds.setLEDState(LEDState.RAINBOW));
     }
-
 
     public void periodic() {
         swerve.getSwerveDrive().updateOdometry();
         vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
+
+        int leftTrigger = (int) (buttonBoxController.getHID().getLeftTriggerAxis() * 32);
+
+        swerveEnabled = (leftTrigger & 0b1) == 0;
+        turretEnabled = (leftTrigger & 0b10) == 0;
+        indexerIntakeEnabled = (leftTrigger & 0b100) == 0;
+        climberEnabled = (leftTrigger & 0b1000) == 0;
+        allEnabled = (leftTrigger & 0b10000) == 0;
+
+        if (!allEnabled) {
+            swerveEnabled = false;
+            turretEnabled = false;
+            indexerIntakeEnabled = false;
+            climberEnabled = false;
+        }
+
+        SmartDashboard.putBoolean("Enabled/Swerve", swerveEnabled);
+        SmartDashboard.putBoolean("Enabled/Turret", turretEnabled);
+        SmartDashboard.putBoolean("Enabled/IndexerIntake", indexerIntakeEnabled);
+        SmartDashboard.putBoolean("Enabled/Climber", climberEnabled);
+
+        swerve.setEnabled(swerveEnabled);
+        // turret.setEnabled(turretEnabled);
+        indexer.setEnabled(indexerIntakeEnabled);
+        intake.setEnabled(indexerIntakeEnabled);
+        // climber.setEnabled(climberEnabled);
     }
 
     public Command getAutonomousCommand() {

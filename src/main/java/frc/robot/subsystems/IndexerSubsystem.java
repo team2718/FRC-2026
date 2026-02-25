@@ -12,12 +12,15 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerSubsystem extends SubsystemBase {
 
     private final SparkMax indexerMotor;
     private final TalonFX portalMotor;
+
+    private boolean enabled = true;
 
     public IndexerSubsystem() {
         indexerMotor = new SparkMax(Constants.IndexerConstants.indexerMotorID, SparkLowLevel.MotorType.kBrushless);
@@ -37,19 +40,28 @@ public class IndexerSubsystem extends SubsystemBase {
         portalMotor.getConfigurator().apply(portalMotorConfig);
     }
 
-    public void setIndexerSpeed(double speed) {
-        indexerMotor.set(speed);
-    }
-
-    public void setPortalSpeed(double speed) {
-        portalMotor.set(speed);
-    }
-
     public void setIndexerVoltage(double voltage) {
-        indexerMotor.setVoltage(voltage);
+        if (enabled) {
+             indexerMotor.setVoltage(voltage);
+        }
     }
 
-     public void setPortalVoltage(double voltage) {
-        portalMotor.setVoltage(voltage);
-     }
+    public void setPortalVoltage(double voltage) {
+        if (enabled) {
+            portalMotor.setVoltage(voltage);
+        }
+    }
+
+    @Override
+    public void periodic() {
+        if (!enabled) {
+            indexerMotor.stopMotor();
+            portalMotor.stopMotor();
+            return;
+        }
+    }
+
+    public void setEnabled(boolean indexerIntakeEnabled) {
+        this.enabled = indexerIntakeEnabled;
+    }
 }

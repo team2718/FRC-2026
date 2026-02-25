@@ -267,4 +267,9 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Left Shooter RPM", turretshooterLeft.getVelocity().getValue().in(RPM));
     }
 
+    public void setEnabled(boolean turretEnabled) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setEnabled'");
+    }
+
 }

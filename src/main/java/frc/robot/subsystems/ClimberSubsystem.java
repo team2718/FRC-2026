@@ -91,4 +91,8 @@ public class ClimberSubsystem extends SubsystemBase {
     public void setAlerts(){
         climbMotorAlert.set(climbMotor.hasActiveFault());
     }
+    public void setEnabled(boolean climberEnabled) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setEnabled'");
+    }
 }

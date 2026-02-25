@@ -30,6 +30,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private boolean setStowed = false;
 
+    private boolean enabled = true;
+
     public IntakeSubsystem() {
         intakeMotor = new TalonFX(Constants.IntakeConstants.intakeMotorID);
         slapdownMotor = new SparkMax(Constants.IntakeConstants.slapdownMotorID, SparkLowLevel.MotorType.kBrushless);
@@ -52,12 +54,10 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor.getConfigurator().apply(intakeMotorConfig);
     }
 
-    public void setIntakeSpeed(double power) {
-        intakeMotor.set(power);
-    }
-
     public void setIntakeVoltage(double voltage) {
-        intakeMotor.setVoltage(voltage);
+        if (enabled) {
+            intakeMotor.setVoltage(voltage);
+        }
     }
 
     public void setStowed() {
@@ -78,11 +78,21 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Intake/Slapdown Angle", getSlapdownAngleDegrees());
         SmartDashboard.putNumber("Intake/Slapdown Setpoint", slapdownMotor.getClosedLoopController().getMAXMotionSetpointPosition() * 360);
 
+        if (!enabled) {
+            intakeMotor.stopMotor();
+            slapdownMotor.stopMotor();
+            return;
+        }
+
         if (setStowed) {
             slapdownMotor.getClosedLoopController().setSetpoint(stowedAngle, SparkMax.ControlType.kMAXMotionPositionControl);
         } else {
             slapdownMotor.getClosedLoopController().setSetpoint(activeAngle, SparkMax.ControlType.kMAXMotionPositionControl);
         }
+    }
+
+    public void setEnabled(boolean indexerIntakeEnabled) {
+        this.enabled = indexerIntakeEnabled;
     }
 
 }
