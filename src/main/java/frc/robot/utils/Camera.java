@@ -18,6 +18,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class Camera {
@@ -86,7 +87,10 @@ public class Camera {
 
       // Fallback to lowest-ambiguity single-tag estimation
       if (visionEst.isEmpty()) {
+        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy","Lowest Ambiguity Pose");
         visionEst = poseEstimator.estimateLowestAmbiguityPose(result);
+      } else {
+        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy","Coproc MultiTag Pose");
       }
 
       updateEstimationStdDevs(visionEst, result.getTargets());

@@ -23,13 +23,17 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.Constants.OperatorConstants;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
+import swervelib.SwerveInputStream;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -50,7 +54,7 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @param directory Directory of swerve drive config files.
    */
-  
+
   public SwerveSubsystem(File directory) {
 
     if (Constants.COMPETITION_MODE) {
@@ -68,12 +72,17 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.setHeadingCorrection(false);
     swerveDrive.setCosineCompensator(true);
 
-    // TODO: test this later (see https://docs.yagsl.com/overview/our-features/angular-velocity-compensation)
+    // TODO: test this later (see
+    // https://docs.yagsl.com/overview/our-features/angular-velocity-compensation)
     // swerveDrive.setAngularVelocityCompensation(true, true, 0.1);
 
     // Stop the default odometry thread since we will be handling odometry manually
     // when using vision.
     swerveDrive.stopOdometryThread();
+  }
+
+  public SwerveSubsystem() {
+    this(new File(Filesystem.getDeployDirectory(), "swerve"));
   }
 
   public void setEnabled(boolean enabled) {
@@ -220,7 +229,7 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-    /**
+  /**
    * Drive the robot given a chassis field oriented velocity.
    *
    * @param velocity Velocity according to the field.
@@ -411,5 +420,24 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
+  }
+
+  public SwerveInputStream getAngularVelocityRobotRelativeInputStream(CommandXboxController driverController) {
+    return SwerveInputStream.of(swerveDrive,
+        () -> driverController.getLeftY() * -1,
+        () -> driverController.getLeftX() * -1)
+        .withControllerRotationAxis(() -> driverController.getRightX() * -1)
+        .deadband(OperatorConstants.DEADBAND)
+        .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
+        .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
+        .allianceRelativeControl(false)
+        .robotRelative(false);
+  }
+
+  public SwerveInputStream getDirectAngleFieldRelativeInputStream(CommandXboxController driverController) {
+    return getAngularVelocityRobotRelativeInputStream(driverController)
+        .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
+        .headingWhile(true)
+        .allianceRelativeControl(true);
   }
 }

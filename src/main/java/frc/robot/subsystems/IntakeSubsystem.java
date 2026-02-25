@@ -1,107 +1,88 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
-//import com.revrobotics.spark.config.SparkParameters;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import frc.robot.Constants;
-//import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
-public class IntakeSubsystem extends SubsystemBase{
+public class IntakeSubsystem extends SubsystemBase {
 
-    private final SparkMax intakemotor;
-    private final TalonFX intakepositioner;
+    private final TalonFX intakeMotor;
+    private final SparkMax slapdownMotor;
 
-    private final double stowedAngle;
-    private final double activeAngle;
+    private final double stowedAngle = 0;
+    private final double activeAngle = 90;
 
-    // shuffleboard
-    private ShuffleboardTab comptab = Shuffleboard.getTab("intake");
-    //sensors 
-    private GenericEntry intakeSwitch = comptab.add("intake switch", false).getEntry();
+    private boolean setStowed = false;
 
-public IntakeSubsystem() {
-    intakemotor = new SparkMax(Constants.IntakeConstants.intakemotorID, SparkLowLevel.MotorType.kBrushless);
-    intakepositioner = new TalonFX(Constants.IntakeConstants.intakepositionerID);
+    public IntakeSubsystem() {
+        intakeMotor = new TalonFX(Constants.IntakeConstants.intakeMotorID);
+        slapdownMotor = new SparkMax(Constants.IntakeConstants.slapdownMotorID, SparkLowLevel.MotorType.kBrushless);
 
-    SparkMaxConfig intakeconfig = new SparkMaxConfig();
-    intakeconfig.inverted(true);
-    intakeconfig.smartCurrentLimit(5);
-    intakeconfig.idleMode(IdleMode.kCoast);
+        SparkMaxConfig slapdownMotorConfig = new SparkMaxConfig();
+        slapdownMotorConfig.inverted(false);
+        slapdownMotorConfig.smartCurrentLimit(15);
+        slapdownMotorConfig.idleMode(IdleMode.kCoast);
+        slapdownMotorConfig.absoluteEncoder.zeroCentered(true);
+        slapdownMotorConfig.absoluteEncoder.zeroOffset(0.5); // TODO: find the correct offset for the absolute encoder
+        slapdownMotorConfig.closedLoop.pid(0.1, 0.0, 0.0); // TODO: tune the PID values for the slapdown motor
+        slapdownMotorConfig.closedLoop.maxMotion.cruiseVelocity(RotationsPerSecond.of(1).in(RPM)); // TODO: find the correct cruise velocity for the slapdown motor
+        slapdownMotorConfig.closedLoop.maxMotion.maxAcceleration(RotationsPerSecondPerSecond.of(0.1).in(RPM.per(Second))); // TODO: find the correct acceleration for the slapdown motor
+        slapdownMotor.configure(slapdownMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    intakemotor.configure(intakeconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    TalonFXConfiguration intakepositionerconfig = new TalonFXConfiguration();
-    intakepositionerconfig.CurrentLimits.StatorCurrentLimit = 25;
-    intakepositionerconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-    intakepositionerconfig.Slot0.kG = 0.0;
-    intakepositionerconfig.Slot0.kS = 0.0;
-    intakepositionerconfig.Slot0.kV = 0.12;
-    intakepositionerconfig.Slot0.kA = 0.0;
-
-    intakepositionerconfig.Slot0.kP = 0.0;
-    intakepositionerconfig.Slot0.kI = 0.0;
-    intakepositionerconfig.Slot0.kD = 0.0;
-    intakepositionerconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
-    intakepositionerconfig.MotionMagic.MotionMagicAcceleration = 1000;
-    intakepositionerconfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-
-    intakepositionerconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    intakepositioner.getConfigurator().apply(intakepositionerconfig);
-
-    stowedAngle = 135;
-    activeAngle = 45;
-}
-
-//sets intake speed 
-public void setSpeed(double power) {
-    intakemotor.set(power);
-}
-
-//stops intake
-public void stopIntake() {
-    intakemotor.set(0);
-}
-
-//returns the current speed of the intake motor
-public double getIntakeSpeed() {
-    return intakemotor.get();
-}
-
-//if the intake is closer to one position, the function sets it to the other
-public void setToTargetPosition() {
-    if (getPositionerAngle() < 90) {
-        intakepositioner.set(activeAngle - getPositionerAngle());
-    } else {
-        intakepositioner.set(stowedAngle - getPositionerAngle());
+        TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
+        intakeMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 20;
+        intakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        intakeMotor.getConfigurator().apply(intakeMotorConfig);
     }
-}
 
-//gets the angle of the positioner motor
-public double getPositionerAngle() {
-    return intakepositioner.getPosition().getValueAsDouble();
-}
+    public void setIntakeSpeed(double power) {
+        intakeMotor.set(power);
+    }
 
+    public void setIntakeVoltage(double voltage) {
+        intakeMotor.setVoltage(voltage);
+    }
 
-@Override
-public void periodic() {
-     intakeSwitch.setBoolean(true);
-}
+    public void setStowed() {
+        setStowed = true;
+    }
+
+    public void setActive() {
+        setStowed = false;
+    }
+
+    // gets the angle of the positioner motor
+    public double getSlapdownAngleDegrees() {
+        return slapdownMotor.getAbsoluteEncoder().getPosition() * 360;
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Intake/Slapdown Angle", getSlapdownAngleDegrees());
+        SmartDashboard.putNumber("Intake/Slapdown Setpoint", slapdownMotor.getClosedLoopController().getMAXMotionSetpointPosition() * 360);
+
+        if (setStowed) {
+            slapdownMotor.getClosedLoopController().setSetpoint(stowedAngle, SparkMax.ControlType.kMAXMotionPositionControl);
+        } else {
+            slapdownMotor.getClosedLoopController().setSetpoint(activeAngle, SparkMax.ControlType.kMAXMotionPositionControl);
+        }
+    }
 
 }

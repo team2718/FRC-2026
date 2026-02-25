@@ -1,22 +1,13 @@
 package frc.robot;
 
-import java.io.File;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.AlignWithHubFront;
-import frc.robot.commands.climber.ClimbToLevel;
-import frc.robot.commands.climber.ExtendHook;
-import frc.robot.commands.climber.RetractHook;
-import frc.robot.commands.climber.SetToZero;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.TurretShoot;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -29,67 +20,57 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
 
-    //XboxController driverController = new XboxController(0);
+    // ** Controllers **
+    
+    private final CommandXboxController driverController = new CommandXboxController(0);
+    // private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    CommandXboxController driverController = new CommandXboxController(0);
+    // ** Subsystems **
 
-    SwerveSubsystem swerve = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-            "swerve"));
+    private final SwerveSubsystem swerve = new SwerveSubsystem();
 
-    private final LEDSubsystem m_led = new LEDSubsystem();
+    private final TurretSubsystem turret = new TurretSubsystem();
+    private final IndexerSubsystem indexer = new IndexerSubsystem();
+    private final IntakeSubsystem intake = new IntakeSubsystem();
+    // private final ClimberSubsystem climber = new ClimberSubsystem();
 
-    private final TurretSubsystem m_turret = new TurretSubsystem();
-    private final IndexerSubsystem m_indexer = new IndexerSubsystem();
-    private final IntakeSubsystem m_intake = new IntakeSubsystem();
-    private final ClimberSubsystem m_climber = new ClimberSubsystem();
+    private final LEDSubsystem leds = new LEDSubsystem();
+    private final VisionSubsystem vision = new VisionSubsystem();
 
-    private final TurretShoot turretShoot = new TurretShoot(m_turret, 1);
-    private final TurretToHub turretToHub = new TurretToHub(m_turret, 0.5);
+    // ** Commands **
 
-    private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(m_indexer, 1);
-    private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(m_indexer, -1);
+    private final TurretShoot turretShoot = new TurretShoot(turret, 1);
+    private final TurretToHub turretToHub = new TurretToHub(turret, 0.5);
 
-    private final RunIntake runIntake = new RunIntake(m_intake, 0.5);
-    private final RunIntake runOuttake = new RunIntake(m_intake, -0.5);
+    private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
+    private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -1);
+
+    private final RunIntake runIntake = new RunIntake(intake, 0.5);
+    private final RunIntake runOuttake = new RunIntake(intake, -0.5);
 
     //private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
     //private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
     //private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
-    private final ExtendHook extendHook = new ExtendHook(m_climber);
-    private final RetractHook retractHook = new RetractHook(m_climber);
-    private final SetToZero setToZero = new SetToZero(m_climber);
+    // private final ExtendHook extendHook = new ExtendHook(climber);
+    // private final RetractHook retractHook = new RetractHook(climber);
+    // private final SetToZero setToZero = new SetToZero(climber);
 
-    VisionSubsystem vision = new VisionSubsystem();
-
-    SwerveInputStream driveAngularVelocityRobotRelative = SwerveInputStream.of(swerve.getSwerveDrive(),
-            () -> driverController.getLeftY() * -1,
-            () -> driverController.getLeftX() * -1)
-            .withControllerRotationAxis(() -> driverController.getRightX() * -1)
-            .deadband(OperatorConstants.DEADBAND)
-            .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
-            .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
-            .allianceRelativeControl(false)
-            .robotRelative(false);
-
-    SwerveInputStream driveDirectAngleFieldRelative = driveAngularVelocityRobotRelative.copy()
-            .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
-            .headingWhile(true)
-            .robotRelative(false)
-            .allianceRelativeControl(true);
+    SwerveInputStream swerveInput = swerve.getDirectAngleFieldRelativeInputStream(driverController);
+    Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
-
-        driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
-
+        // Create auto chooser
         autoChooser.setDefaultOption("An Auto", "An Auto");
         autoChooser.addOption("Another Auto", "Another Auto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
+        // Set swerve to drive with the driver's controller input by default
+        swerve.setDefaultCommand(swerveCommand);
+
+        // Configure button bindings
         configureBindings();
-        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
     }
 
     private void configureBindings() {
@@ -131,14 +112,22 @@ public class RobotContainer {
         */
 
         //placeholder button: If the intake is at the stowed position, pressing x will set it to the active position, and vise-versa
-        driverController.x().onTrue(Commands.runOnce(() -> {m_intake.setToTargetPosition();}, m_intake));
+        driverController.leftTrigger().onTrue(
+            Commands.runEnd(() -> {
+                intake.setActive();
+                intake.setIntakeVoltage(5);
+            }, () -> {
+                intake.setStowed();
+                intake.setIntakeVoltage(0);
+            }, intake)
+        );
 
         driverController.rightTrigger().onTrue(
-            m_led.setLEDState(LEDState.SHOOTER)
+            leds.setLEDState(LEDState.SHOOTER)
         );
 
         driverController.rightTrigger().onFalse(
-            m_led.setLEDState(LEDState.RAINBOW)
+            leds.setLEDState(LEDState.RAINBOW)
         );
     }
 

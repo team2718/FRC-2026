@@ -72,10 +72,10 @@ public class TurretSubsystem extends SubsystemBase {
     //Motors-----------------------------------------------------------------------------------------------------------------------------------
 
 
-        turretshooterLeft = new TalonFX(Constants.TurretConstants.turretshooterLeftID);
+        turretshooterLeft = new TalonFX(Constants.TurretConstants.turretShooterLeftID);
         // turretspinner = new SparkMax(Constants.TurretConstants.turretspinnerID, SparkLowLevel.MotorType.kBrushless);
-        turretshooterRight = new TalonFX(Constants.TurretConstants.turretshooterRightID);
-        turrethood = new TalonFX(Constants.TurretConstants.turrethoodID);
+        turretshooterRight = new TalonFX(Constants.TurretConstants.turretShooterRightID);
+        turrethood = new TalonFX(Constants.TurretConstants.turretHoodID);
 
         // Configuring motor variables (The current limit is set to 5 amps for now)
 

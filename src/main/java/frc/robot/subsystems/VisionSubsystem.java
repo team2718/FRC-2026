@@ -9,6 +9,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.Camera;
 import swervelib.SwerveDrive;
@@ -18,7 +19,7 @@ public class VisionSubsystem extends SubsystemBase {
   private final Camera frontCamera = new Camera("FrontAprilCamera",
       new Rotation3d(
           Units.degreesToRadians(0),
-          Units.degreesToRadians(-35),
+          Units.degreesToRadians(-50),
           Units.degreesToRadians(0)),
       new Translation3d(
           Units.inchesToMeters(13.16),
@@ -33,6 +34,11 @@ public class VisionSubsystem extends SubsystemBase {
 
     if (frontCameraPose.isPresent()) {
       EstimatedRobotPose pose = frontCameraPose.get();
+
+      SmartDashboard.putNumber("Vision/Estimated Pose/X", pose.estimatedPose.getX());
+      SmartDashboard.putNumber("Vision/Estimated Pose/Y", pose.estimatedPose.getY());
+      SmartDashboard.putNumber("Vision/Estimated Pose/Z", pose.estimatedPose.getZ());
+
       swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(), pose.timestampSeconds,
           frontCamera.getCurStdDevs());
     }

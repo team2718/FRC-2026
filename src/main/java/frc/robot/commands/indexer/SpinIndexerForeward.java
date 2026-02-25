@@ -21,13 +21,13 @@ public class SpinIndexerForeward extends Command {
     public void execute() {
 
         //Set indexer Speed
-        indexer.setSpeed(speed);
+        indexer.setIndexerVoltage(speed);
         
     }
 
     @Override
     public void end(boolean interuppted) {
-        indexer.setSpeed(0);
+        indexer.setIndexerVoltage(0);
     }
 
     @Override

@@ -21,14 +21,14 @@ public class RunIntake extends Command {
     public void execute() {
 
         //Sets the speed of the intake foreward
-        intake.setSpeed(speed);
+        intake.setIntakeVoltage(speed);
 
         
     }
 
     @Override
     public void end(boolean interuppted) {
-        intake.setSpeed(0);
+        intake.setIntakeVoltage(0);
     }
 
     @Override
