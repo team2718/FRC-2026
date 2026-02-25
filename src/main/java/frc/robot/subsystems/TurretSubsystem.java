@@ -37,10 +37,6 @@ public class TurretSubsystem extends SubsystemBase {
     private GenericEntry intakeSwitch = comptab.add("intake switch", false).getEntry();
 
 
-    // field position calculations
-    private double targetTurretPosition;
-    private double targetHoodPosition;
-
     private double turretDistanceToRobotCenter = 0.5;
     private double turretDegreeFromRobotCenter = 40;
 
@@ -177,14 +173,11 @@ public class TurretSubsystem extends SubsystemBase {
         //Projects the turret's distance to the hub
         projectedTurretDistanceToTag9 = Math.sqrt(Math.pow(projectedTurretPositionX - hubCenterLocation.getX(), 2) + Math.pow(projectedTurretPositionY - hubCenterLocation.getY(), 2));
 
-        //set turret target position
-        targetTurretPosition = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), projectedTurretAngleFromTag9);
+        getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), projectedTurretAngleFromTag9);
 
         //set turret hood target position (Rudimentary calculation)
         if (projectedTurretDistanceToTag9 < 1) {
-            targetHoodPosition = 0;
         } else {
-            targetHoodPosition = 30 - (30 / projectedTurretDistanceToTag9);
         }
     }
 

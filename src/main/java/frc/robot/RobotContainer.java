@@ -9,7 +9,6 @@ import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.TurretShoot;
 import frc.robot.commands.turret.TurretToHub;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
@@ -33,7 +32,7 @@ public class RobotContainer {
     private final TurretSubsystem turret = new TurretSubsystem();
     private final IndexerSubsystem indexer = new IndexerSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
-    private final ClimberSubsystem climber = new ClimberSubsystem();
+    // private final ClimberSubsystem climber = new ClimberSubsystem();
 
     private final LEDSubsystem leds = new LEDSubsystem();
     private final VisionSubsystem vision = new VisionSubsystem();

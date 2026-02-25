@@ -1,19 +1,12 @@
 package frc.robot.commands.turret;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
 
 public class TurretToHub extends Command {
     private final TurretSubsystem shooter;
-    // private final LEDSubsystem LEDs;
-    private double speed;
-
     public TurretToHub(TurretSubsystem shooter, double speed) {
         this.shooter = shooter;
-      
-        this.speed = speed;
     }
 
     public static double getWrappedAngleDifference(double source, double target) {
