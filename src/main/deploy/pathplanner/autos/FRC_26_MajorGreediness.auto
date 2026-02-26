@@ -7,7 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StartThenShoot"
+            "pathName": "FRC_26_StartBeingMajorlyGreedy"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_BeMajorlyGreedy"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_MajorGreedinessToShoot"
           }
         },
         {
@@ -19,25 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ShootThenOutpost"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_OutpostToShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_ShootThenClimbInverted"
+            "pathName": "FRC_26_ShootThenClimb"
           }
         },
         {
@@ -49,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ClimbInverted"
+            "pathName": "FRC_26_Climb"
           }
         },
         {
