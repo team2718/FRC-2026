@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_Start_Being_Greedy"
+            "pathName": "FRC_26_StartBeingMinorlyGreedy"
           }
         },
         {
@@ -19,13 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_Be_Greedy"
+            "pathName": "FRC_26_BeMinorlyGreedy"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_Stop_Being_Greedy"
+            "pathName": "FRC_26_StopBeingMinorlyGreedy"
           }
         },
         {
