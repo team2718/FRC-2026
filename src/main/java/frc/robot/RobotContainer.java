@@ -1,20 +1,23 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.RebuiltMatchPeriods;
+import frc.robot.Constants.RebuiltMatchPeriods.AutoWinner;
+import frc.robot.Constants.RebuiltMatchPeriods.MatchPeriod;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
-import frc.robot.commands.turret.TurretShoot;
-import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -29,7 +32,7 @@ public class RobotContainer {
 
     private final SwerveSubsystem swerve = new SwerveSubsystem();
 
-    private final TurretSubsystem turret = new TurretSubsystem();
+    // private final TurretSubsystem turret = new TurretSubsystem();
     private final IndexerSubsystem indexer = new IndexerSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
     // private final ClimberSubsystem climber = new ClimberSubsystem();
@@ -39,8 +42,8 @@ public class RobotContainer {
 
     // ** Commands **
 
-    private final TurretShoot turretShoot = new TurretShoot(turret, 1);
-    private final TurretToHub turretToHub = new TurretToHub(turret, 0.5);
+    // private final TurretShoot turretShoot = new TurretShoot(turret, 1);
+    // private final TurretToHub turretToHub = new TurretToHub(turret, 0.5);
 
     private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -1);
@@ -60,6 +63,8 @@ public class RobotContainer {
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
+    private final Timer matchTimer = new Timer();
+
     private boolean swerveEnabled = true;
     private boolean turretEnabled = true;
     private boolean indexerIntakeEnabled = true;
@@ -74,6 +79,28 @@ public class RobotContainer {
 
         // Set swerve to drive with the driver's controller input by default
         swerve.setDefaultCommand(swerveCommand);
+
+        // Setup timer
+
+        matchTimer.reset();
+
+        // Start match time on autonomous start
+        RobotModeTriggers.autonomous().onTrue(Commands.runOnce(() -> {
+            matchTimer.reset();
+            matchTimer.start();
+        }));
+
+        // Start match time on teleop start
+        RobotModeTriggers.teleop().onTrue(Commands.runOnce(() -> {
+            matchTimer.reset();
+            matchTimer.start();
+        }));
+
+        // Stop match time on end of match
+        RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> {
+            matchTimer.reset();
+            matchTimer.stop();
+        }));
 
         // Configure button bindings
         configureBindings();
@@ -94,12 +121,12 @@ public class RobotContainer {
         driverController.leftBumper().whileTrue(spindexerBackward);
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
-        driverController.rightTrigger().whileTrue(turretShoot);
+        // driverController.rightTrigger().whileTrue(turretShoot);
         driverController.rightTrigger().whileTrue(spindexerForeward);
 
         // Right Bumper: Sets the turret to face a specific direction (Pointing toward
         // the hub, or whatever specified) and setting the hood
-        driverController.rightBumper().onTrue(turretToHub);
+        // driverController.rightBumper().onTrue(turretToHub);
         // (Concept) Left Trigger: Sets intake setup to intake position, or starting
         // position depending on where it is
 
@@ -168,6 +195,48 @@ public class RobotContainer {
         indexer.setEnabled(indexerIntakeEnabled);
         intake.setEnabled(indexerIntakeEnabled);
         // climber.setEnabled(climberEnabled);
+
+        updateShuffleboardTimers();
+    }
+
+    private void updateShuffleboardTimers() {
+        if (DriverStation.isDisabled()) {
+            SmartDashboard.putNumber("Match Time", 0);
+            SmartDashboard.putString("Match Period", "Disabled");
+            SmartDashboard.putNumber("Time Left in Period", 0);
+            return;
+        }
+
+        if (DriverStation.isAutonomous()) {
+            SmartDashboard.putNumber("Match Time", RebuiltMatchPeriods.AUTONOMOUS_DURATION - matchTimer.get());
+            SmartDashboard.putString("Match Period", "Autonomous");
+            SmartDashboard.putNumber("Time Left in Period", RebuiltMatchPeriods.AUTONOMOUS_DURATION - matchTimer.get());
+        } else if (DriverStation.isTeleop()) {
+            SmartDashboard.putNumber("Match Time", (2 * 60 + 20) - matchTimer.get());
+            SmartDashboard.putNumber("Time Left in Period", RebuiltMatchPeriods.getTimeLeftInCurrentPeriod(matchTimer.get()));
+            AutoWinner autoWinner = AutoWinner.fromGameData(DriverStation.getGameSpecificMessage());
+            MatchPeriod period = Constants.RebuiltMatchPeriods.getTeleopPeriodFromTime(matchTimer.get());
+
+            if (autoWinner == AutoWinner.UNKNOWN) {
+                SmartDashboard.putString("Match Period", period.toString());
+                return;
+            }
+
+            if (period == MatchPeriod.TRANSITION_SHIFT) {
+                SmartDashboard.putString("Match Period", period.toString() + "\n" + autoWinner.opposite() + " up first!");
+            } else if (period == MatchPeriod.SHIFT_1 || period == MatchPeriod.SHIFT_3) {
+                SmartDashboard.putString("Match Period", period.toString() + "\n" + autoWinner.opposite() + " active!");
+            } else if (period == MatchPeriod.SHIFT_2 || period == MatchPeriod.SHIFT_4) {
+                SmartDashboard.putString("Match Period", period.toString() + "\n" + autoWinner + " active!");
+            } else {
+                SmartDashboard.putString("Match Period", period.toString());
+            }
+            
+        } else {
+            SmartDashboard.putNumber("Match Time", 0);
+            SmartDashboard.putString("Match Period", "Testing");
+            SmartDashboard.putNumber("Time Left in Period", 0);
+        }
     }
 
     public Command getAutonomousCommand() {
