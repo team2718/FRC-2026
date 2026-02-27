@@ -11,9 +11,11 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+@Logged
 public class IntakeSubsystem extends SubsystemBase {
 
     private final TalonFX intakeMotor;
@@ -35,10 +37,14 @@ public class IntakeSubsystem extends SubsystemBase {
         slapdownMotorConfig.smartCurrentLimit(15);
         slapdownMotorConfig.idleMode(IdleMode.kBrake);
         // slapdownMotorConfig.absoluteEncoder.zeroCentered(true);
-        // slapdownMotorConfig.absoluteEncoder.zeroOffset(0.5); // TODO: find the correct offset for the absolute encoder
-        // slapdownMotorConfig.closedLoop.pid(0.1, 0.0, 0.0); // TODO: tune the PID values for the slapdown motor
-        // slapdownMotorConfig.closedLoop.maxMotion.cruiseVelocity(RotationsPerSecond.of(1).in(RPM)); // TODO: find the correct cruise velocity for the slapdown motor
-        // slapdownMotorConfig.closedLoop.maxMotion.maxAcceleration(RotationsPerSecondPerSecond.of(0.1).in(RPM.per(Second))); // TODO: find the correct acceleration for the slapdown motor
+        // slapdownMotorConfig.absoluteEncoder.zeroOffset(0.5); // TODO: find the
+        // correct offset for the absolute encoder
+        // slapdownMotorConfig.closedLoop.pid(0.1, 0.0, 0.0); // TODO: tune the PID
+        // values for the slapdown motor
+        // slapdownMotorConfig.closedLoop.maxMotion.cruiseVelocity(RotationsPerSecond.of(1).in(RPM));
+        // // TODO: find the correct cruise velocity for the slapdown motor
+        // slapdownMotorConfig.closedLoop.maxMotion.maxAcceleration(RotationsPerSecondPerSecond.of(0.1).in(RPM.per(Second)));
+        // // TODO: find the correct acceleration for the slapdown motor
         slapdownMotor.configure(slapdownMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
@@ -76,7 +82,9 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // SmartDashboard.putNumber("Intake/Slapdown Angle", getSlapdownAngleDegrees());
-        // SmartDashboard.putNumber("Intake/Slapdown Setpoint", slapdownMotor.getClosedLoopController().getMAXMotionSetpointPosition() * 360);
+        // SmartDashboard.putNumber("Intake/Slapdown Setpoint",
+        // slapdownMotor.getClosedLoopController().getMAXMotionSetpointPosition() *
+        // 360);
 
         if (!enabled) {
             intakeMotor.stopMotor();
@@ -85,9 +93,11 @@ public class IntakeSubsystem extends SubsystemBase {
         }
 
         // if (setStowed) {
-        //     slapdownMotor.getClosedLoopController().setSetpoint(stowedAngle, SparkMax.ControlType.kMAXMotionPositionControl);
+        // slapdownMotor.getClosedLoopController().setSetpoint(stowedAngle,
+        // SparkMax.ControlType.kMAXMotionPositionControl);
         // } else {
-        //     slapdownMotor.getClosedLoopController().setSetpoint(activeAngle, SparkMax.ControlType.kMAXMotionPositionControl);
+        // slapdownMotor.getClosedLoopController().setSetpoint(activeAngle,
+        // SparkMax.ControlType.kMAXMotionPositionControl);
         // }
     }
 

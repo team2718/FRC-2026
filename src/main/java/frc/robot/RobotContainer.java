@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -28,6 +30,7 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 
+@Logged
 public class RobotContainer {
 
     // ** Controllers **
@@ -37,14 +40,20 @@ public class RobotContainer {
 
     // ** Subsystems **
 
+    @NotLogged
     private final SwerveSubsystem swerve = new SwerveSubsystem();
 
+    @Logged(name="Turret")
     private final TurretSubsystem turret = new TurretSubsystem();
+    @Logged(name="Indexer")
     private final IndexerSubsystem indexer = new IndexerSubsystem();
+    @Logged(name="Intake")
     private final IntakeSubsystem intake = new IntakeSubsystem();
+    @Logged(name="Climber")
     private final ClimberSubsystem climber = new ClimberSubsystem();
 
     // private final LEDSubsystem leds = new LEDSubsystem();
+    @Logged(name="Vision")
     private final VisionSubsystem vision = new VisionSubsystem();
 
     // ** Commands **
@@ -66,7 +75,7 @@ public class RobotContainer {
     private final RetractHook retractHook = new RetractHook(climber);
     // private final SetToZero setToZero = new SetToZero(climber);
 
-    SwerveInputStream swerveInput = swerve.getDirectAngleFieldRelativeInputStream(driverController);
+    SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
     Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();

@@ -1,17 +1,20 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
+@Logged
 public class ClimberSubsystem extends SubsystemBase {
     // Fields
     private final SparkMax climbMotor;
@@ -30,43 +33,55 @@ public class ClimberSubsystem extends SubsystemBase {
         climbMotorConfig.smartCurrentLimit(amps);
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
+
     public double getAmps() {
         return climbMotor.getOutputCurrent();
     }
+
     public double getClimbMotorPosition() {
         return climbMotor.getEncoder().getPosition();
     }
+
     public void setClimbMotorVoltage(double voltage) {
         if (enabled) {
             climbMotor.setVoltage(voltage);
         }
     }
-    public void setClimbMotor(double speed){
+
+    public void setClimbMotor(double speed) {
         if (enabled) {
             climbMotor.set(speed);
         }
     }
+
     public double getRobotElevation() {
         return robotElevation;
     }
+
     public double getHookElevation() {
         return hookElevation;
     }
+
     public void resetHookElevation() {
         climbMotor.getEncoder().setPosition(0);
     }
+
     public int getDesiredLevel() {
         return desiredLevel;
     }
+
     public void setDesiredLevel(int desiredLevel) {
         this.desiredLevel = desiredLevel;
     }
+
     public boolean isClimbing() {
         return climbing;
     }
+
     public void setClimbing(boolean climbing) {
         this.climbing = climbing;
     }
+
     public boolean isReleasing() {
         return releasing;
     }
@@ -87,6 +102,7 @@ public class ClimberSubsystem extends SubsystemBase {
         // Need to do some math here to translate encoder rotation to height raised
         hookElevation = Constants.ClimberConstants.HOOK_BASE_ELEVATION + getClimbMotorPosition();
     }
+
     public void periodic() {
         SmartDashboard.putNumber("Climber Current", climbMotor.getOutputCurrent());
         SmartDashboard.putNumber("Climber Output", climbMotor.getAppliedOutput());
@@ -96,9 +112,11 @@ public class ClimberSubsystem extends SubsystemBase {
             climbMotor.set(0);
         }
     }
-    public void setAlerts(){
+
+    public void setAlerts() {
         climbMotorAlert.set(climbMotor.hasActiveFault());
     }
+
     public void setEnabled(boolean climberEnabled) {
         enabled = climberEnabled;
     }

@@ -22,7 +22,8 @@ public class TurretShoot extends Command {
     @Override
     public void execute() {
         //shooter.setShooterSpeedRPM(speed); Multiply by 13 as a placeholder to convert the target velocity to rpm (Previous number was 3125)
-        shooter.setShooterSpeedRPM(shooter.targetShooterSpeed() * 13 * speedcontrol);
+        // TODO: Replace 10 with the actual distance to the target, which can be obtained from the vision system
+        shooter.setShooterSpeedRPM(shooter.targetShooterSpeed(10) * 13 * speedcontrol);
     }
 
     @Override

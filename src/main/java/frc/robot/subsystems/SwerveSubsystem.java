@@ -17,6 +17,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -57,7 +58,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public SwerveSubsystem(File directory) {
 
-    if (Constants.COMPETITION_MODE) {
+    if (Constants.REDUCED_TELEMETRY) {
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
     } else {
       SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -432,6 +433,11 @@ public class SwerveSubsystem extends SubsystemBase {
         .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
         .allianceRelativeControl(false)
         .robotRelative(false);
+  }
+
+  public SwerveInputStream getAngularVelocityFieldRelativeInputStream(CommandXboxController driverController) {
+    return getAngularVelocityRobotRelativeInputStream(driverController)
+        .allianceRelativeControl(true);
   }
 
   public SwerveInputStream getDirectAngleFieldRelativeInputStream(CommandXboxController driverController) {

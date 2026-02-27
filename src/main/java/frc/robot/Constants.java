@@ -22,7 +22,9 @@ import edu.wpi.first.units.measure.LinearVelocity;
  */
 public final class Constants {
 
-  public static final boolean COMPETITION_MODE = false;
+  // Set to true if performance or space become an issue. This will disable all telemetry except for critical errors and warnings.
+  public static final boolean REDUCED_TELEMETRY = false;
+
   public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(14.0);
 
   public static class OperatorConstants {
@@ -32,7 +34,7 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    // public static final int turretSpinnerID = 10;
+    // public static final int turretSpinnerID = 17;
     public static final int HOOD_MOTOR_ID = 15;
     public static final int LEFT_SHOOTER_MOTOR_ID = 14;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 13;

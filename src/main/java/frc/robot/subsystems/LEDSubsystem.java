@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.util.Map;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.SK6812RGBW;
 
+@Logged
 public class LEDSubsystem extends SubsystemBase {
 
   public enum LEDState {
@@ -40,7 +43,6 @@ public class LEDSubsystem extends SubsystemBase {
   private final LEDPattern m_shooter = LEDPattern.solid(new Color(0, 0, 255));
   private final LEDPattern m_scrollingShooter = m_shooter.mask(mask);
 
-
   public LEDSubsystem() {
     m_led.setLength(m_ledBuffer.getLength());
     m_led.setData(m_ledBuffer);
@@ -49,7 +51,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   public Command setLEDState(LEDState state) {
     return Commands.runOnce(() -> {
-        m_state = state;
+      m_state = state;
     });
   }
 
@@ -69,7 +71,7 @@ public class LEDSubsystem extends SubsystemBase {
 
     // DriverStation State Overrides
     if (DriverStation.isDisabled()) {
-        
+
     } else if (DriverStation.isTest()) {
       m_scrollingRainbow.applyTo(m_ledBuffer);
     }

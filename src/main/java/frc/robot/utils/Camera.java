@@ -87,10 +87,10 @@ public class Camera {
 
       // Fallback to lowest-ambiguity single-tag estimation
       if (visionEst.isEmpty()) {
-        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy","Lowest Ambiguity Pose");
+        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Lowest Ambiguity Pose");
         visionEst = poseEstimator.estimateLowestAmbiguityPose(result);
       } else {
-        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy","Coproc MultiTag Pose");
+        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Coproc MultiTag Pose");
       }
 
       updateEstimationStdDevs(visionEst, result.getTargets());

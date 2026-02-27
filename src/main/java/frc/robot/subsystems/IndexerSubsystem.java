@@ -11,9 +11,11 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import frc.robot.Constants;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
+@Logged
 public class IndexerSubsystem extends SubsystemBase {
 
     private final SparkMax indexerMotor;
@@ -47,7 +49,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public void setIndexerVoltage(double voltage) {
         if (enabled) {
-             indexerMotor.setVoltage(voltage);
+            indexerMotor.setVoltage(voltage);
         }
     }
 
