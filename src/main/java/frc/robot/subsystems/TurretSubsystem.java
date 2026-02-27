@@ -1,41 +1,23 @@
 package frc.robot.subsystems;
+import static edu.wpi.first.units.Units.RPM;
 
-// magical item summoning
-
-// import com.revrobotics.spark.SparkLowLevel;
-// import com.revrobotics.spark.SparkMax;
-// import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-// import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import static edu.wpi.first.units.Units.RPM;
-
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
-
-import frc.robot.Constants;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class TurretSubsystem extends SubsystemBase {
 
     private final TalonFX turretshooterLeft;
     private final TalonFX turretshooterRight;
-    // private final SparkMax turretspinner;
     private final TalonFX turrethood;
-
-    // shuffleboard
-    private ShuffleboardTab comptab = Shuffleboard.getTab("intake");
-    // sensors
-    private GenericEntry intakeSwitch = comptab.add("intake switch", false).getEntry();
-
 
     private double turretDistanceToRobotCenter = 0.5;
     private double turretDegreeFromRobotCenter = 40;
@@ -255,8 +237,6 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        intakeSwitch.setBoolean(true);
-
         SmartDashboard.putNumber("Left Shooter RPM", turretshooterLeft.getVelocity().getValue().in(RPM));
     }
 

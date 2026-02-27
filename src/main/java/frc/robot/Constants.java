@@ -32,14 +32,14 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    public static final int turretSpinnerID = 10;
-    public static final int turretHoodID = 42;
-    public static final int turretShooterLeftID = 21;
-    public static final int turretShooterRightID = 20;
+    // public static final int turretSpinnerID = 10;
+    public static final int turretHoodID = 15;
+    public static final int turretShooterLeftID = 14;
+    public static final int turretShooterRightID = 13;
   }
 
   public static final class ClimberConstants {
-    public static final int climbMotorID = 51;
+    public static final int climbMotorID = 10;
 
     public static final double BAR1_ELEVATION = Units.inchesToMeters(27.0);
     public static final double BAR2_ELEVATION = Units.inchesToMeters(45.0);
@@ -54,13 +54,13 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final int indexerMotorID = 66;
-    public static final int portalMotorID = 0;
+    public static final int indexerMotorID = 9;
+    public static final int portalMotorID = 16;
   }
 
   public static final class IntakeConstants {
-    public static final int intakeMotorID = 7;
-    public static final int slapdownMotorID = 15;
+    public static final int intakeMotorID = 12;
+    public static final int slapdownMotorID = 11;
   }
 
   public static final class LEDS {

@@ -11,15 +11,13 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.RebuiltMatchPeriods;
 import frc.robot.Constants.RebuiltMatchPeriods.AutoWinner;
 import frc.robot.Constants.RebuiltMatchPeriods.MatchPeriod;
-import frc.robot.commands.indexer.SpinIndexerForeward;
-import frc.robot.commands.intake.RunIntake;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
-import swervelib.SwerveInputStream;
 
 public class RobotContainer {
 
@@ -35,7 +33,7 @@ public class RobotContainer {
     // private final TurretSubsystem turret = new TurretSubsystem();
     private final IndexerSubsystem indexer = new IndexerSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
-    // private final ClimberSubsystem climber = new ClimberSubsystem();
+    private final ClimberSubsystem climber = new ClimberSubsystem();
 
     private final LEDSubsystem leds = new LEDSubsystem();
     private final VisionSubsystem vision = new VisionSubsystem();
@@ -45,11 +43,11 @@ public class RobotContainer {
     // private final TurretShoot turretShoot = new TurretShoot(turret, 1);
     // private final TurretToHub turretToHub = new TurretToHub(turret, 0.5);
 
-    private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
-    private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -1);
+    // private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
+    // private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -1);
 
-    private final RunIntake runIntake = new RunIntake(intake, 0.5);
-    private final RunIntake runOuttake = new RunIntake(intake, -0.5);
+    // private final RunIntake runIntake = new RunIntake(intake, 0.5);
+    // private final RunIntake runOuttake = new RunIntake(intake, -0.5);
 
     // private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
     // private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
@@ -58,8 +56,8 @@ public class RobotContainer {
     // private final RetractHook retractHook = new RetractHook(climber);
     // private final SetToZero setToZero = new SetToZero(climber);
 
-    SwerveInputStream swerveInput = swerve.getDirectAngleFieldRelativeInputStream(driverController);
-    Command swerveCommand = swerve.driveFieldOriented(swerveInput);
+    // SwerveInputStream swerveInput = swerve.getDirectAngleFieldRelativeInputStream(driverController);
+    // Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
@@ -78,7 +76,7 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
-        swerve.setDefaultCommand(swerveCommand);
+        // swerve.setDefaultCommand(swerveCommand);
 
         // Setup timer
 
@@ -113,16 +111,16 @@ public class RobotContainer {
         // to change.
 
         // Left Trigger: Spins the intake wheel & spindexer foreward
-        driverController.leftTrigger().whileTrue(runIntake);
-        driverController.leftTrigger().whileTrue(spindexerForeward);
+        // driverController.leftTrigger().whileTrue(runIntake);
+        // driverController.leftTrigger().whileTrue(spindexerForeward);
 
         // Left Bumper: Spins the intake wheel & spindexer backward
-        driverController.leftBumper().whileTrue(runOuttake);
-        driverController.leftBumper().whileTrue(spindexerBackward);
+        // driverController.leftBumper().whileTrue(runOuttake);
+        // driverController.leftBumper().whileTrue(spindexerBackward);
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
         // driverController.rightTrigger().whileTrue(turretShoot);
-        driverController.rightTrigger().whileTrue(spindexerForeward);
+        // driverController.rightTrigger().whileTrue(spindexerForeward);
 
         // Right Bumper: Sets the turret to face a specific direction (Pointing toward
         // the hub, or whatever specified) and setting the hood
@@ -150,14 +148,14 @@ public class RobotContainer {
 
         // placeholder button: If the intake is at the stowed position, pressing x will
         // set it to the active position, and vise-versa
-        driverController.leftTrigger().onTrue(
-                Commands.runEnd(() -> {
-                    intake.setActive();
-                    intake.setIntakeVoltage(5);
-                }, () -> {
-                    intake.setStowed();
-                    intake.setIntakeVoltage(0);
-                }, intake));
+        // driverController.leftTrigger().onTrue(
+        //         Commands.runEnd(() -> {
+        //             intake.setActive();
+        //             intake.setIntakeVoltage(5);
+        //         }, () -> {
+        //             intake.setStowed();
+        //             intake.setIntakeVoltage(0);
+        //         }, intake));
 
         driverController.rightTrigger().onTrue(
                 leds.setLEDState(LEDState.SHOOTER));
@@ -167,8 +165,8 @@ public class RobotContainer {
     }
 
     public void periodic() {
-        swerve.getSwerveDrive().updateOdometry();
-        vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
+        // swerve.getSwerveDrive().updateOdometry();
+        // vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
 
         int leftTrigger = (int) (buttonBoxController.getHID().getLeftTriggerAxis() * 32);
 
@@ -190,10 +188,10 @@ public class RobotContainer {
         SmartDashboard.putBoolean("Enabled/IndexerIntake", indexerIntakeEnabled);
         SmartDashboard.putBoolean("Enabled/Climber", climberEnabled);
 
-        swerve.setEnabled(swerveEnabled);
+        // swerve.setEnabled(swerveEnabled);
         // turret.setEnabled(turretEnabled);
-        indexer.setEnabled(indexerIntakeEnabled);
-        intake.setEnabled(indexerIntakeEnabled);
+        // indexer.setEnabled(indexerIntakeEnabled);
+        // intake.setEnabled(indexerIntakeEnabled);
         // climber.setEnabled(climberEnabled);
 
         updateShuffleboardTimers();
@@ -240,7 +238,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return swerve.getAutonomousCommand(autoChooser.getSelected());
+        return null;
+        // return swerve.getAutonomousCommand(autoChooser.getSelected());
     }
 
 }
