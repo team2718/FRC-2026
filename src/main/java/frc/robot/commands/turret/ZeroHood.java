@@ -1,6 +1,9 @@
 package frc.robot.commands.turret;
 
 import frc.robot.subsystems.TurretSubsystem;
+
+import static edu.wpi.first.units.Units.Amps;
+
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class ZeroHood extends Command {
@@ -18,20 +21,20 @@ public class ZeroHood extends Command {
 
     @Override
     public void execute() {
-        // Set a small negative voltage
-        turret.setTurretHood(-0.2);
+        // Set a small negative speed
+        turret.setHoodSpeedUnchecked(-0.2);
     }
 
     @Override
     public boolean isFinished() {
         // Check if the current is near the stall limit
-        return (turret.getTurretHoodCurrent() >= 8);
+        return (turret.getTurretHoodCurrent().in(Amps) >= 8);
     }
 
     @Override
     public void end(boolean interuppted) {
         // Stop the motor and reset the encoder position to zero
-        turret.setTurretHood(0);
+        turret.stopHood();
         turret.resetHoodPosition();
     }
 }

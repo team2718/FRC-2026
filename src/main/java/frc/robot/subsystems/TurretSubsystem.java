@@ -1,10 +1,11 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -12,7 +13,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -25,6 +28,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretshooterRight;
     @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
+
+    private final Angle hoodMinAngle = Degrees.of(0); // TODO: Set to the "true" angle when at the
 
     // private double turretDistanceToRobotCenter = 0.5;
     // private double turretDegreeFromRobotCenter = 40;
@@ -72,8 +77,12 @@ public class TurretSubsystem extends SubsystemBase {
 
         turretshooterconfig.Slot0.kG = 0.0;
         turretshooterconfig.Slot0.kS = 0.0;
-        turretshooterconfig.Slot0.kV = 0.12;
-        turretshooterconfig.Slot0.kA = 0.0;
+        // kV is is in V/rps. kV given is in RPM/V.
+        // (1 / (RPM/V)) gives us V/RPM, and multiplying by 60 gives us V/rps.
+        // 485.6 is kV of Kraken x60 in FOC. Use 509.3 for non-FOC.
+        // See https://www.reca.lc/motors
+        turretshooterconfig.Slot0.kV = 1.0 / 485.6 * 60.0;
+        turretshooterconfig.Slot0.kA = 0.19; // TODO: Tune, this value is from reca.lc
 
         turretshooterconfig.Slot0.kP = 0.0;
         turretshooterconfig.Slot0.kI = 0.0;
@@ -95,9 +104,9 @@ public class TurretSubsystem extends SubsystemBase {
         turrethoodconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         turrethoodconfig.Slot0.kG = 0.0;
         turrethoodconfig.Slot0.kS = 0.0;
-        turrethoodconfig.Slot0.kV = 0.0;
+        turrethoodconfig.Slot0.kV = 1.0 / 620.0 * 60.0;
         turrethoodconfig.Slot0.kA = 0.0;
-        turrethoodconfig.Slot0.kP = 3.0;
+        turrethoodconfig.Slot0.kP = 2.0;
         turrethoodconfig.Slot0.kI = 0.0;
         turrethoodconfig.Slot0.kD = 0.0;
 
@@ -238,22 +247,21 @@ public class TurretSubsystem extends SubsystemBase {
     // }
 
     // sets rotational speed of the hood
-    public void setTurretHood(double power) {
+    public void setHoodAngle(Angle angle) {
         if (!turretEnabled) {
             return;
         }
 
-        if ((power > 0 && getTurretHood() > 80) || (power < 0 && getTurretHood() < 42)) {
-            turrethood.set(0);
-            return;
-        }
+        // The hood is at position 0 at the bottom.
+        // So a target angle of 45 degrees would be 45 - hoodMinAngle
+        // where hoodMinAngle is the angle of the hood when it's at position 0
+        turrethood.setControl(new MotionMagicVoltage(angle.minus(hoodMinAngle)));
 
-        turrethood.set(power);
         return;
 
     }
 
-    public void setTurretHoodUnchecked(double power) {
+    public void setHoodSpeedUnchecked(double power) {
         if (!turretEnabled) {
             return;
         }
@@ -261,8 +269,12 @@ public class TurretSubsystem extends SubsystemBase {
         turrethood.set(power);
     }
 
-    public double getTurretHoodCurrent() {
-        return turrethood.getStatorCurrent().getValue().in(Amps);
+    public void stopHood() {
+        turrethood.stopMotor();
+    }
+
+    public Current getTurretHoodCurrent() {
+        return turrethood.getStatorCurrent().getValue();
     }
 
     public void resetHoodPosition() {
@@ -270,8 +282,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     // returns the current position of the hood
-    public double getTurretHood() {
-        return (turrethood.getPosition().getValueAsDouble() / 29.5 % 360);
+    public Angle getTurretHood() {
+        return turrethood.getPosition().getValue().minus(hoodMinAngle);
     }
 
     // Estimates the angle we want to shoot the fuel at based on the turret's
@@ -279,27 +291,27 @@ public class TurretSubsystem extends SubsystemBase {
     // degrees, not sure what is actually is)
     // The numbers used here arised from tinkering around to get an accurate
     // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
-    public double targetHoodAngle(double distance) {
-        return 80 - 20 - ((28500 / (Math.pow(distance + 25, 2))) + 46.25);
+    public Angle targetHoodAngle(double distance) {
+        return Degrees.of(80 - 20 - ((28500 / (Math.pow(distance + 25, 2))) + 46.25));
     }
 
     // Estimates the speed we want to shoot the fuel at based on the turret's
     // distance to the hub
-    public double targetShooterSpeed(double distance) {
-        return (((Math.pow(distance + 12, 2)) * 0.0094) + 20.3)
-                + (1 / (distance - 2.15));
+    public AngularVelocity targetShooterSpeed(double distance) {
+        return RPM.of((((Math.pow(distance + 12, 2)) * 0.0094) + 20.3)
+                + (1 / (distance - 2.15)));
     }
 
-    public void setHoodToAngle(double angle) {
+    // public void setHoodToAngle(double angle) {
 
-        if (Math.abs(getWrappedAngleDifference(getTurretHood(), angle)) < 0.3) {
-            setTurretHood(0);
-            return;
-        }
+    //     if (Math.abs(getWrappedAngleDifference(getTurretHood(), angle)) < 0.3) {
+    //         setTurretHood(0);
+    //         return;
+    //     }
 
-        setTurretHood(1 * getWrappedAngleDifference(getTurretHood(), angle));
+    //     setTurretHood(1 * getWrappedAngleDifference(getTurretHood(), angle));
 
-    }
+    // }
 
     @Override
     public void periodic() {

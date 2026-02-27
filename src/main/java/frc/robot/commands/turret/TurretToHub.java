@@ -37,7 +37,7 @@ public class TurretToHub extends Command {
         // }
 
         // TODO: Replace 10 with the actual distance to the target, which can be obtained from the vision system
-        shooter.setHoodToAngle(shooter.targetHoodAngle(10));
+        shooter.setHoodAngle(shooter.targetHoodAngle(10));
 
     }
 
