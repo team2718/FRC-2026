@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.RPM;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,7 +21,7 @@ import frc.robot.commands.climber.RetractHook;
 import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
-import frc.robot.commands.turret.TurretShoot;
+import frc.robot.commands.turret.TurretShootFixedVelocity;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -42,26 +44,26 @@ public class RobotContainer {
 
     @NotLogged
     private final SwerveSubsystem swerve = new SwerveSubsystem();
-
-    @Logged(name="Turret")
+    
+    @Logged(name = "Turret")
     private final TurretSubsystem turret = new TurretSubsystem();
-    @Logged(name="Indexer")
+    @Logged(name = "Indexer")
     private final IndexerSubsystem indexer = new IndexerSubsystem();
-    @Logged(name="Intake")
+    @Logged(name = "Intake")
     private final IntakeSubsystem intake = new IntakeSubsystem();
-    @Logged(name="Climber")
+    @Logged(name = "Climber")
     private final ClimberSubsystem climber = new ClimberSubsystem();
 
     // private final LEDSubsystem leds = new LEDSubsystem();
-    @Logged(name="Vision")
+    @Logged(name = "Vision")
     private final VisionSubsystem vision = new VisionSubsystem();
 
     // ** Commands **
 
-    private final TurretShoot turretShoot = new TurretShoot(turret, 1);
-    private final TurretToHub turretToHub = new TurretToHub(turret, 0.5);
+    private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, indexer, RPM.of(3000));
+    // private final TurretToHub turretToHub = new TurretToHub(turret, 0.5);
 
-    private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
+    // private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
     // private final SpinIndexerForeward spindexerBackward = new
     // SpinIndexerForeward(indexer, -1);
 
@@ -154,14 +156,14 @@ public class RobotContainer {
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
         driverController.rightTrigger().whileTrue(turretShoot);
-        driverController.rightTrigger().whileTrue(spindexerForeward);
+        // driverController.rightTrigger().whileTrue(spindexerForeward);
 
         driverController.a().whileTrue(retractHook);
         driverController.b().whileTrue(extendHook);
 
         // Right Bumper: Sets the turret to face a specific direction (Pointing toward
         // the hub, or whatever specified) and setting the hood
-        driverController.rightBumper().onTrue(turretToHub);
+        // driverController.rightBumper().onTrue(turretToHub);
         // (Concept) Left Trigger: Sets intake setup to intake position, or starting
         // position depending on where it is
 

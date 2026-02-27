@@ -18,7 +18,9 @@ import frc.robot.Constants;
 @Logged
 public class IndexerSubsystem extends SubsystemBase {
 
+    @Logged(name = "Indexer Motor")
     private final SparkMax indexerMotor;
+    @Logged(name = "Portal Motor")
     private final TalonFX portalMotor;
 
     private boolean enabled = true;
@@ -41,6 +43,18 @@ public class IndexerSubsystem extends SubsystemBase {
         portalMotor.getConfigurator().apply(portalMotorConfig);
     }
 
+    public void runIndexing() {
+        if (enabled) {
+            indexerMotor.setVoltage(6);
+            portalMotor.setVoltage(6);
+        }
+    }
+
+    public void stopIndexing() {
+        indexerMotor.stopMotor();
+        portalMotor.stopMotor();
+    }
+
     public void setIndexerSpeed(double speed) {
         if (enabled) {
             indexerMotor.set(speed);
@@ -56,6 +70,12 @@ public class IndexerSubsystem extends SubsystemBase {
     public void setPortalVoltage(double voltage) {
         if (enabled) {
             portalMotor.setVoltage(voltage);
+        }
+    }
+
+    public void setPortalSpeed(double speed) {
+        if (enabled) {
+            portalMotor.set(speed);
         }
     }
 

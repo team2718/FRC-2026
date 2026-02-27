@@ -17,6 +17,7 @@ import frc.robot.Constants;
 @Logged
 public class ClimberSubsystem extends SubsystemBase {
     // Fields
+    @Logged(name = "Climb Motor")
     private final SparkMax climbMotor;
     private SparkMaxConfig climbMotorConfig;
     private Alert climbMotorAlert;

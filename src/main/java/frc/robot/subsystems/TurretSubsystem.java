@@ -12,21 +12,24 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 @Logged
 public class TurretSubsystem extends SubsystemBase {
 
+    @Logged(name = "Left Shooter Motor")
     private final TalonFX turretshooterLeft;
+    @Logged(name = "Right Shooter Motor")
     private final TalonFX turretshooterRight;
+    @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
 
-    private double turretDistanceToRobotCenter = 0.5;
-    private double turretDegreeFromRobotCenter = 40;
+    // private double turretDistanceToRobotCenter = 0.5;
+    // private double turretDegreeFromRobotCenter = 40;
 
-    SwerveSubsystem swerve;
+    // TODO: Compute based on our alliance
     private final Translation2d hubCenterLocation = new Translation2d(11.92, 4.03);
 
     // double robotAngleFromTag9 =
@@ -191,18 +194,37 @@ public class TurretSubsystem extends SubsystemBase {
         return diff;
     }
 
-    // sets speed of the shooter
-    public void setShooterSpeedRPM(double rpm) {
+    public void setShooterSpeed(AngularVelocity angularVelocity) {
         if (!turretEnabled) {
             return;
         }
 
-        turretshooterLeft.setControl(new MotionMagicVelocityVoltage(RPM.of(rpm)));
-        turretshooterRight.setControl(new MotionMagicVelocityVoltage(RPM.of(rpm)));
+        turretshooterLeft.setControl(new MotionMagicVelocityVoltage(angularVelocity));
+        turretshooterRight.setControl(new MotionMagicVelocityVoltage(angularVelocity));
     }
 
-    public double getShooter() {
-        return turretshooterLeft.getPosition().getValueAsDouble() / 1.5;
+    // sets speed of the shooter
+    public void setShooterSpeedRPM(double rpm) {
+        setShooterSpeed(RPM.of(rpm));
+    }
+
+    public void stopShooter() {
+        // Should we do this or should we use stopMotor() on each motor?
+        // Using the closed loop gives us smoother deceleration
+        setShooterSpeedRPM(0);
+    }
+
+    // Return the average RPM of the two shooter motors (should be the same, but
+    // just in case)
+    public double getShooterRPM() {
+        return (turretshooterLeft.getVelocity().getValue().in(RPM)
+                + turretshooterRight.getVelocity().getValue().in(RPM)) / 2;
+    }
+
+    public boolean shooterAtSpeed() {
+        double targetRPM = turretshooterLeft.getClosedLoopReference().getValue();
+        double currentRPM = getShooterRPM();
+        return Math.abs(currentRPM - targetRPM) < 300;
     }
 
     // // sets rotational speed of the turret
@@ -281,8 +303,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Left Shooter RPM", turretshooterLeft.getVelocity().getValue().in(RPM));
-        SmartDashboard.putNumber("Right Shooter RPM", turretshooterRight.getVelocity().getValue().in(RPM));
+        // SmartDashboard.putNumber("Left Shooter RPM",
+        // turretshooterLeft.getVelocity().getValue().in(RPM));
+        // SmartDashboard.putNumber("Right Shooter RPM",
+        // turretshooterRight.getVelocity().getValue().in(RPM));
 
         if (!turretEnabled) {
             turrethood.set(0);

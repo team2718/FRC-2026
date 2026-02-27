@@ -18,7 +18,9 @@ import frc.robot.Constants;
 @Logged
 public class IntakeSubsystem extends SubsystemBase {
 
+    @Logged(name = "Intake Motor")
     private final TalonFX intakeMotor;
+    @Logged(name = "Slapdown Motor")
     private final SparkMax slapdownMotor;
 
     private final double stowedAngle = 0;
