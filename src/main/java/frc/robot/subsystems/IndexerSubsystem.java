@@ -22,8 +22,8 @@ public class IndexerSubsystem extends SubsystemBase {
     private boolean enabled = true;
 
     public IndexerSubsystem() {
-        indexerMotor = new SparkMax(Constants.IndexerConstants.indexerMotorID, SparkLowLevel.MotorType.kBrushless);
-        portalMotor = new TalonFX(Constants.IndexerConstants.portalMotorID);
+        indexerMotor = new SparkMax(Constants.IndexerConstants.INDEXER_MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+        portalMotor = new TalonFX(Constants.IndexerConstants.PORTAL_MOTOR_ID);
 
         SparkMaxConfig indexerMotorConfig = new SparkMaxConfig();
         indexerMotorConfig.inverted(false);
@@ -37,6 +37,12 @@ public class IndexerSubsystem extends SubsystemBase {
 
         indexerMotor.configure(indexerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         portalMotor.getConfigurator().apply(portalMotorConfig);
+    }
+
+    public void setIndexerSpeed(double speed) {
+        if (enabled) {
+            indexerMotor.set(speed);
+        }
     }
 
     public void setIndexerVoltage(double voltage) {

@@ -25,8 +25,8 @@ public class LEDSubsystem extends SubsystemBase {
 
   private LEDState m_state = LEDState.RAINBOW;
 
-  private final SK6812RGBW m_led = new SK6812RGBW(Constants.LEDS.PWMPort);
-  private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDS.Length);
+  private final SK6812RGBW m_led = new SK6812RGBW(Constants.LEDS.PWM_PORT);
+  private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDS.NUM_LEDS);
   private final Distance kLedSpacing = Meters.of(1 / 60.0);
 
   private final LinearVelocity kScrollingSpeed = MetersPerSecond.of(0.1);

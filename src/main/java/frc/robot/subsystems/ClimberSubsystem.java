@@ -23,6 +23,8 @@ public class ClimberSubsystem extends SubsystemBase {
     private double robotElevation = 0;
     private double hookElevation = 0;
 
+    private boolean enabled = true;
+
     // Getters and Setters
     public void setCurrentLimit(int amps) {
         climbMotorConfig.smartCurrentLimit(amps);
@@ -35,10 +37,14 @@ public class ClimberSubsystem extends SubsystemBase {
         return climbMotor.getEncoder().getPosition();
     }
     public void setClimbMotorVoltage(double voltage) {
-        climbMotor.setVoltage(voltage);
+        if (enabled) {
+            climbMotor.setVoltage(voltage);
+        }
     }
     public void setClimbMotor(double speed){
-        climbMotor.set(speed);
+        if (enabled) {
+            climbMotor.set(speed);
+        }
     }
     public double getRobotElevation() {
         return robotElevation;
@@ -47,7 +53,7 @@ public class ClimberSubsystem extends SubsystemBase {
         return hookElevation;
     }
     public void resetHookElevation() {
-        hookElevation = Constants.ClimberConstants.HOOK_BASE_ELEVATION;
+        climbMotor.getEncoder().setPosition(0);
     }
     public int getDesiredLevel() {
         return desiredLevel;
@@ -67,11 +73,11 @@ public class ClimberSubsystem extends SubsystemBase {
 
     // Constructors
     public ClimberSubsystem() {
-        climbMotor = new SparkMax(Constants.ClimberConstants.climbMotorID, MotorType.kBrushless);
+        climbMotor = new SparkMax(Constants.ClimberConstants.MOTOR_ID, MotorType.kBrushless);
         climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake);
-        climbMotorConfig.inverted(false);
-        climbMotorConfig.smartCurrentLimit(40);
+        climbMotorConfig.inverted(false); // Up should be positive
+        climbMotorConfig.smartCurrentLimit(Constants.ClimberConstants.CURRENT_LIMIT);
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         climbMotorAlert = new Alert("Motor \"Climb Motor\" is faulting!", AlertType.kError);
     }
@@ -82,17 +88,18 @@ public class ClimberSubsystem extends SubsystemBase {
         hookElevation = Constants.ClimberConstants.HOOK_BASE_ELEVATION + getClimbMotorPosition();
     }
     public void periodic() {
-        setAlerts();
-        updateElevations();
-        SmartDashboard.putNumber("ClimbMotor Encoder", getClimbMotorPosition());
-        SmartDashboard.putBoolean("Climbing?", climbing);
-        SmartDashboard.putBoolean("Releasing?", releasing);
+        SmartDashboard.putNumber("Climber Current", climbMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Climber Output", climbMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Climber Input Voltage", climbMotor.getBusVoltage());
+
+        if (!enabled) {
+            climbMotor.set(0);
+        }
     }
     public void setAlerts(){
         climbMotorAlert.set(climbMotor.hasActiveFault());
     }
     public void setEnabled(boolean climberEnabled) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setEnabled'");
+        enabled = climberEnabled;
     }
 }
