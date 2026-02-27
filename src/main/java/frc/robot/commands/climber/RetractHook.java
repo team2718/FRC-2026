@@ -8,6 +8,7 @@ public class RetractHook extends Command {
 
     public RetractHook(ClimberSubsystem climber) {
         this.climber = climber;
+        addRequirements(climber);
     }
 
     @Override

@@ -8,6 +8,7 @@ public class ZeroHood extends Command {
 
     public ZeroHood(TurretSubsystem turret) {
         this.turret = turret;
+        addRequirements(turret);
     }
 
     @Override

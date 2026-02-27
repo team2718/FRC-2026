@@ -12,7 +12,7 @@ public class TurretShoot extends Command {
         this.shooter = shooter;
 
         this.speedcontrol = speedcontrol;
-
+        addRequirements(shooter);
     }
 
     @Override

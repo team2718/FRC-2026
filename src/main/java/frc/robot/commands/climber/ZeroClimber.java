@@ -9,6 +9,7 @@ public class ZeroClimber extends Command {
 
     public ZeroClimber(ClimberSubsystem climber) {
         this.climber = climber;
+        addRequirements(climber);
     }
 
     @Override

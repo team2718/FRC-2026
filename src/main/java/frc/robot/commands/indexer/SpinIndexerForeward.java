@@ -6,28 +6,30 @@ import frc.robot.subsystems.IndexerSubsystem;
 public class SpinIndexerForeward extends Command {
     private final IndexerSubsystem indexer;
     // private final LEDSubsystem LEDs;
-    private double speed;
+    private double voltage;
 
-    public SpinIndexerForeward(IndexerSubsystem indexer,  double speed) {
+    public SpinIndexerForeward(IndexerSubsystem indexer, double voltage) {
         this.indexer = indexer;
-      
-        this.speed = speed;
+        this.voltage = voltage;
+        addRequirements(indexer);
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public void execute() {
 
-        //Set indexer Speed
-        indexer.setIndexerSpeed(speed);
-        
+        // Set indexer Speed
+        indexer.setIndexerVoltage(voltage);
+        indexer.setPortalVoltage(voltage);
     }
 
     @Override
     public void end(boolean interuppted) {
-        indexer.setIndexerSpeed(0);
+        indexer.setIndexerVoltage(0);
+        indexer.setPortalVoltage(0);
     }
 
     @Override

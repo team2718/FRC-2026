@@ -13,6 +13,7 @@ public final class ClimbToLevel extends Command {
     public ClimbToLevel(ClimberSubsystem climber, int level){
         this.climber = climber;
         this.level = level;
+        addRequirements(climber);
     }
 
     // Method Definition

@@ -8,22 +8,22 @@ public class RunIntake extends Command {
     // private final LEDSubsystem LEDs;
     private double speed;
 
-    public RunIntake(IntakeSubsystem intake,  double speed) {
+    public RunIntake(IntakeSubsystem intake, double speed) {
         this.intake = intake;
-      
         this.speed = speed;
+        addRequirements(intake);
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public void execute() {
 
-        //Sets the speed of the intake foreward
+        // Sets the speed of the intake foreward
         intake.setIntakeSpeed(speed);
 
-        
     }
 
     @Override

@@ -7,6 +7,7 @@ public class TurretToHub extends Command {
     private final TurretSubsystem shooter;
     public TurretToHub(TurretSubsystem shooter, double speed) {
         this.shooter = shooter;
+        addRequirements(shooter);
     }
 
     public static double getWrappedAngleDifference(double source, double target) {

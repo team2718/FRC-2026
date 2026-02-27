@@ -8,6 +8,7 @@ public class ExtendHook extends Command {
 
     public ExtendHook(ClimberSubsystem climber) {
         this.climber = climber;
+        addRequirements(climber);
     }
 
     @Override
