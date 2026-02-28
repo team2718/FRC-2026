@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StartThenShoot"
+            "pathName": "FRC_26_StartThenShootInverted"
           }
         },
         {
@@ -19,19 +19,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ShootThenOutpost"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_OutpostToShoot"
+            "pathName": "FRC_26_ShootToNeutralZoneInverted"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoShoot"
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_NeutralZoneToShootInverted"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
           }
         },
         {

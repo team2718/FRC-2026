@@ -18,6 +18,7 @@ import frc.robot.commands.climber.ExtendHook;
 import frc.robot.commands.climber.RetractHook;
 import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.indexer.SpinIndexerForeward;
+import frc.robot.commands.intake.AutoRunIntake;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
@@ -91,9 +92,12 @@ public class RobotContainer {
                                               // at the start of the match
 
     public RobotContainer() {
-        // Create auto chooser
-        autoChooser.setDefaultOption("An Auto", "An Auto");
-        autoChooser.addOption("Another Auto", "Another Auto");
+        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
+
+        driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
+
+        autoChooser.setDefaultOption("FRC_26_MajorGreediness", "FRC_26_MajorGreediness");
+        autoChooser.addOption("FRC_26_NeutralZoneAutoInverted", "FRC_26_NeutralZoneAutoInverted");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
@@ -138,6 +142,29 @@ public class RobotContainer {
 
         // Configure button bindings
         configureBindings();
+        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
+
+         //Testing some auto commands (values to change once we have values needed)
+            NamedCommands.registerCommand("AutoShoot",
+        new TurretShoot(m_turret, 0.5)); 
+
+            NamedCommands.registerCommand("RunIntake", 
+        new AutoRunIntake(m_intake,0.5));
+
+            //NamedCommands.registerCommand("RunOuttake",
+        //new RunOuttake(m_intake, 0.5));
+
+            NamedCommands.registerCommand("SpinIndexerForward",
+        new SpinIndexerForeward(m_indexer,.5));
+
+            NamedCommands.registerCommand("ExtendHook", 
+        new ExtendHook(m_climber));
+
+            NamedCommands.registerCommand("RetractHook", 
+        new RetractHook(m_climber));
+        
+            NamedCommands.registerCommand("TurretToHub",
+        new TurretToHub(m_turret,0.5));
     }
 
     private void configureBindings() {

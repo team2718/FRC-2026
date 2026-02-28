@@ -17,15 +17,27 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "FRC_26_ShootThenOutpost"
+            "name": "RunIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_OutpostToShoot"
+            "pathName": "FRC_26_ToDepot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_DepotToShoot"
           }
         },
         {
@@ -37,25 +49,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ShootThenClimbInverted"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendHook"
+            "pathName": "FRC_26_ShootThenClimb"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ClimbInverted"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RetractHook"
+            "pathName": "FRC_26_Climb"
           }
         }
       ]
