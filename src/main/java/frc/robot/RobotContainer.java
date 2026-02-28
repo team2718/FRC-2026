@@ -29,6 +29,7 @@ import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.turret.TurretToHub;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.intake.RunOuttake;
@@ -118,6 +119,9 @@ public class RobotContainer {
 
             NamedCommands.registerCommand("RetractHook", 
         new RetractHook(m_climber));
+        
+            NamedCommands.registerCommand("TurretToHub",
+        new TurretToHub(m_turret,0.5));
     }
 
     private void configureBindings() {
