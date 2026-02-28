@@ -12,6 +12,7 @@ import frc.robot.commands.AlignWithHubFront;
 import frc.robot.commands.climber.ExtendHook;
 import frc.robot.commands.climber.RetractHook;
 import frc.robot.commands.indexer.SpinIndexerForeward;
+import frc.robot.commands.intake.AutoRunIntake;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.intake.RunOuttake;
 import frc.robot.commands.turret.TurretShoot;
@@ -92,8 +93,8 @@ public class RobotContainer {
 
         driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
 
-        autoChooser.setDefaultOption("FRC_26_HumanOutpostAuto", "FRC_26_HumanOutpostAuto");
-        autoChooser.addOption("Another Auto", "Another Auto");
+        autoChooser.setDefaultOption("FRC_26_MajorGreediness", "FRC_26_MajorGreediness");
+        autoChooser.addOption("FRC_26_NeutralZoneAutoInverted", "FRC_26_NeutralZoneAutoInverted");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         configureBindings();
@@ -104,10 +105,10 @@ public class RobotContainer {
         new TurretShoot(m_turret, 0.5)); 
 
             NamedCommands.registerCommand("RunIntake", 
-        new RunIntake(m_intake,0.5));
+        new AutoRunIntake(m_intake,0.5));
 
-            NamedCommands.registerCommand("RunOuttake",
-        new RunOuttake(m_intake, 0.5));
+            //NamedCommands.registerCommand("RunOuttake",
+        //new RunOuttake(m_intake, 0.5));
 
             NamedCommands.registerCommand("SpinIndexerForward",
         new SpinIndexerForeward(m_indexer,.5));
