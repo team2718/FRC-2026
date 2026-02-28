@@ -32,6 +32,11 @@ public class ClimberSubsystem extends SubsystemBase {
     // Getters and Setters
     public void setCurrentLimit(int amps) {
         climbMotorConfig.smartCurrentLimit(amps);
+        if (amps <= 30) {
+            climbMotorConfig.openLoopRampRate(0.8);
+        } else {
+            climbMotorConfig.openLoopRampRate(0.2);
+        }
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -65,6 +70,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public void resetHookElevation() {
         climbMotor.getEncoder().setPosition(0);
+        System.out.println("Hook position reset!");
     }
 
     public int getDesiredLevel() {
@@ -92,8 +98,9 @@ public class ClimberSubsystem extends SubsystemBase {
         climbMotor = new SparkMax(Constants.ClimberConstants.MOTOR_ID, MotorType.kBrushless);
         climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake);
-        climbMotorConfig.inverted(false); // Up should be positive
+        climbMotorConfig.inverted(true); // Up should be positive
         climbMotorConfig.smartCurrentLimit(Constants.ClimberConstants.CURRENT_LIMIT);
+        climbMotorConfig.openLoopRampRate(0.25);
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         climbMotorAlert = new Alert("Motor \"Climb Motor\" is faulting!", AlertType.kError);
     }

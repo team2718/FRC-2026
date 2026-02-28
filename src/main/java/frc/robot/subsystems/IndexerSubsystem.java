@@ -31,12 +31,12 @@ public class IndexerSubsystem extends SubsystemBase {
 
         SparkMaxConfig indexerMotorConfig = new SparkMaxConfig();
         indexerMotorConfig.inverted(false);
-        indexerMotorConfig.smartCurrentLimit(30);
+        indexerMotorConfig.smartCurrentLimit(40);
         indexerMotorConfig.idleMode(IdleMode.kCoast);
 
         TalonFXConfiguration portalMotorConfig = new TalonFXConfiguration();
-        portalMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        portalMotorConfig.CurrentLimits.StatorCurrentLimit = 15;
+        portalMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        portalMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
         portalMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         indexerMotor.configure(indexerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -45,8 +45,8 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public void runIndexing() {
         if (enabled) {
-            indexerMotor.setVoltage(6);
-            portalMotor.setVoltage(6);
+            indexerMotor.setVoltage(8);
+            portalMotor.setVoltage(8);
         }
     }
 

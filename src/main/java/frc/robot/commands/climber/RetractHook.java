@@ -21,7 +21,7 @@ public class RetractHook extends Command {
     public void execute() {
         // Set PID to inverse; use a stronger P than for extension, to account for the robot weight
         // climber.setClimbMotor((climber.getHookElevation() - Constants.ClimberConstants.HOOK_BASE_ELEVATION) * -1 * Constants.ClimberConstants.RETRACT_P);
-        climber.setClimbMotor(0.7);
+        climber.setClimbMotor(-0.7);
     }
 
     @Override

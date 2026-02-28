@@ -1,5 +1,7 @@
 package frc.robot.commands.turret;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -20,10 +22,12 @@ public class TurretShootFixedVelocity extends Command {
 
     @Override
     public void initialize() {
+        
     }
 
     @Override
     public void execute() {
+        shooter.setHoodAngle(Degrees.of(10));
         shooter.setShooterSpeed(angularVelocity);
 
         if (shooter.shooterAtSpeed()) {

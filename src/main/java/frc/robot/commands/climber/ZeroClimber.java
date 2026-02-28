@@ -16,19 +16,19 @@ public class ZeroClimber extends Command {
     public void initialize() {
         // Set desired level to 0, and reduce current limit
         // climber.setDesiredLevel(0);
-        climber.setCurrentLimit(10);
+        climber.setCurrentLimit(20);
     }
 
     @Override
     public void execute() {
         // Set a small negative voltage
-        climber.setClimbMotorVoltage(-5);
+        climber.setClimbMotorVoltage(-3);
     }
 
     @Override
     public boolean isFinished() {
         // Check if the current is near the stall limit
-        return (climber.getAmps() >= 9);
+        return (climber.getAmps() >= 18);
     }
 
     @Override

@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RPM;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -29,13 +31,10 @@ public class TurretSubsystem extends SubsystemBase {
     @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
 
-    private final Angle hoodMinAngle = Degrees.of(0); // TODO: Set to the "true" angle when at the
+    private final Angle hoodMinAngle = Degrees.of(80); // TODO: Set to the "true" angle when at the
 
     // private double turretDistanceToRobotCenter = 0.5;
     // private double turretDegreeFromRobotCenter = 40;
-
-    // TODO: Compute based on our alliance
-    private final Translation2d hubCenterLocation = new Translation2d(11.92, 4.03);
 
     // double robotAngleFromTag9 =
     // hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
@@ -79,16 +78,16 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterconfig.Slot0.kS = 0.0;
         // kV is is in V/rps. kV given is in RPM/V.
         // (1 / (RPM/V)) gives us V/RPM, and multiplying by 60 gives us V/rps.
-        // 485.6 is kV of Kraken x60 in FOC. Use 509.3 for non-FOC.
+        // 485.6 is kV of Kraken x60 in FOC. Use 500.0 for non-FOC.
         // See https://www.reca.lc/motors
-        turretshooterconfig.Slot0.kV = 1.0 / 485.6 * 60.0;
+        turretshooterconfig.Slot0.kV = 1.0 / 500.0 * 60.0;
         turretshooterconfig.Slot0.kA = 0.19; // TODO: Tune, this value is from reca.lc
 
         turretshooterconfig.Slot0.kP = 0.0;
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
         turretshooterconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
-        turretshooterconfig.MotionMagic.MotionMagicAcceleration = 1000;
+        turretshooterconfig.MotionMagic.MotionMagicAcceleration = 2000;
         turretshooterconfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
         turretshooterconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -100,19 +99,22 @@ public class TurretSubsystem extends SubsystemBase {
         TalonFXConfiguration turrethoodconfig = new TalonFXConfiguration();
 
         turrethoodconfig.CurrentLimits.StatorCurrentLimit = 10;
+        // turrethoodconfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.3;
         turrethoodconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        turrethoodconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        turrethoodconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         turrethoodconfig.Slot0.kG = 0.0;
         turrethoodconfig.Slot0.kS = 0.0;
-        turrethoodconfig.Slot0.kV = 1.0 / 620.0 * 60.0;
+        // turrethoodconfig.Slot0.kV = 1.0 / 620.0 * 60.0;
         turrethoodconfig.Slot0.kA = 0.0;
-        turrethoodconfig.Slot0.kP = 2.0;
+        turrethoodconfig.Slot0.kP = 3.0;
         turrethoodconfig.Slot0.kI = 0.0;
         turrethoodconfig.Slot0.kD = 0.0;
+        turrethoodconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+        turrethoodconfig.MotionMagic.MotionMagicAcceleration = 500;
 
         turrethood.getConfigurator().apply(turrethoodconfig);
 
-        turrethood.getPosition().setUpdateFrequency(100);
+        // turrethood.getPosition().setUpdateFrequency(100);
 
         // // Field
         // //
@@ -231,8 +233,15 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public boolean shooterAtSpeed() {
-        double targetRPM = turretshooterLeft.getClosedLoopReference().getValue();
+        double targetRPM = turretshooterLeft.getClosedLoopReference().getValue() * 60.0;
+
+        if (targetRPM < 100) {
+            return false;
+        }
+
         double currentRPM = getShooterRPM();
+        // SmartDashboard.putNumber("Shooter At Speed Target RPM", targetRPM);
+        // SmartDashboard.putNumber("Shooter At Speed Current RPM", currentRPM);
         return Math.abs(currentRPM - targetRPM) < 300;
     }
 
@@ -255,7 +264,8 @@ public class TurretSubsystem extends SubsystemBase {
         // The hood is at position 0 at the bottom.
         // So a target angle of 45 degrees would be 45 - hoodMinAngle
         // where hoodMinAngle is the angle of the hood when it's at position 0
-        turrethood.setControl(new MotionMagicVoltage(angle.minus(hoodMinAngle)));
+        SmartDashboard.putNumber("Hood Target Position", hoodMinAngle.minus(angle).times(50.57).in(Degrees));
+        turrethood.setControl(new PositionVoltage(hoodMinAngle.minus(angle).times(50.57)));
 
         return;
 
@@ -279,6 +289,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void resetHoodPosition() {
         turrethood.setPosition(0);
+        System.out.println("Hood position reset!");
     }
 
     // returns the current position of the hood
@@ -292,14 +303,19 @@ public class TurretSubsystem extends SubsystemBase {
     // The numbers used here arised from tinkering around to get an accurate
     // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
     public Angle targetHoodAngle(double distance) {
-        return Degrees.of(80 - 20 - ((28500 / (Math.pow(distance + 25, 2))) + 46.25));
+        // return Degrees.of(80 - 20 - ((28500 / (Math.pow(distance + 25, 2))) + 46.25));
+        distance = Math.min(distance, 20);
+        return Degrees.of(75.0 - 1.2 * distance);
     }
 
     // Estimates the speed we want to shoot the fuel at based on the turret's
     // distance to the hub
     public AngularVelocity targetShooterSpeed(double distance) {
-        return RPM.of((((Math.pow(distance + 12, 2)) * 0.0094) + 20.3)
-                + (1 / (distance - 2.15)));
+        // TODO: adjust
+        return RPM.of(1800 + 65 * distance);
+
+        // return RPM.of((((Math.pow(distance + 12, 2)) * 0.0094) + 20.3)
+        //         + (1 / (distance - 2.15)));
     }
 
     // public void setHoodToAngle(double angle) {

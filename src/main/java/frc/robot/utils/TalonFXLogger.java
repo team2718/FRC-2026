@@ -2,6 +2,7 @@ package frc.robot.utils;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -34,6 +35,7 @@ public class TalonFXLogger extends ClassSpecificLogger<TalonFX> {
     backend.log("Stator Current (A)", motor.getStatorCurrent().getValue().in(Amps));
     backend.log("Supply Current (A)", motor.getSupplyCurrent().getValue().in(Amps));
     backend.log("Velocity (RPM)", motor.getVelocity().getValue().in(RPM));
+    backend.log("Position (degrees)", motor.getPosition().getValue().in(Degrees));
 
     if (!Epilogue.shouldLog(Logged.Importance.DEBUG)) {
       return;

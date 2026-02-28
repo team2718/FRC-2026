@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RPM;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,8 +17,9 @@ import frc.robot.Constants.RebuiltMatchPeriods.MatchPeriod;
 import frc.robot.commands.climber.ExtendHook;
 import frc.robot.commands.climber.RetractHook;
 import frc.robot.commands.climber.ZeroClimber;
+import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.RunIntake;
-import frc.robot.commands.turret.TurretShootFixedVelocity;
+import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -58,15 +57,12 @@ public class RobotContainer {
 
     // ** Commands **
 
-    private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, indexer, RPM.of(3000));
-    // private final TurretToHub turretToHub = new TurretToHub(turret, 0.5);
-
+    // private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, indexer, RPM.of(2000));
     // private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
-    // private final SpinIndexerForeward spindexerBackward = new
-    // SpinIndexerForeward(indexer, -1);
+    private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
 
-    private final RunIntake runIntake = new RunIntake(intake, 0.5);
-    private final RunIntake runOuttake = new RunIntake(intake, -0.5);
+    private final RunIntake runIntake = new RunIntake(intake, 0.75);
+    private final RunIntake runOuttake = new RunIntake(intake, -0.75);
 
     // private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
     // private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
@@ -78,6 +74,9 @@ public class RobotContainer {
     SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
     Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
+    private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
+
+
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     private final Timer matchTimer = new Timer();
@@ -88,7 +87,7 @@ public class RobotContainer {
     private boolean climberEnabled = true;
     private boolean allEnabled = true;
 
-    private boolean hasRanCalibration = true; // Set to true for testing, but should be false for comp so that it runs
+    private boolean hasRanCalibration = false; // Set to true for testing, but should be false for comp so that it runs
                                               // at the start of the match
 
     public RobotContainer() {
@@ -134,6 +133,9 @@ public class RobotContainer {
             matchTimer.stop();
         }));
 
+        SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
+        SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
+
         // Configure button bindings
         configureBindings();
     }
@@ -149,15 +151,18 @@ public class RobotContainer {
         // driverController.leftTrigger().whileTrue(spindexerForeward);
 
         // Left Bumper: Spins the intake wheel & spindexer backward
-        driverController.leftBumper().whileTrue(runOuttake);
-        // driverController.leftBumper().whileTrue(spindexerBackward);
+        // driverController.leftBumper().whileTrue(runOuttake);
+        driverController.leftBumper().whileTrue(spindexerBackward);
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
-        driverController.rightTrigger().whileTrue(turretShoot);
+        driverController.rightTrigger().whileTrue(turretToHub);
         // driverController.rightTrigger().whileTrue(spindexerForeward);
 
         driverController.a().whileTrue(retractHook);
         driverController.b().whileTrue(extendHook);
+
+        driverController.x().onTrue(Commands.runOnce(() -> intake.setActive(), intake));
+        driverController.y().onTrue(Commands.runOnce(() -> intake.setStowed(), intake));
 
         // Right Bumper: Sets the turret to face a specific direction (Pointing toward
         // the hub, or whatever specified) and setting the hood

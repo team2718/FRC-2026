@@ -5,6 +5,8 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.FeetPerSecond;
+
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
 
@@ -22,10 +24,16 @@ import edu.wpi.first.units.measure.LinearVelocity;
  */
 public final class Constants {
 
-  // Set to true if performance or space become an issue. This will disable all telemetry except for critical errors and warnings.
+  // Set to true if performance or space become an issue. This will disable all
+  // telemetry except for critical errors and warnings.
   public static final boolean REDUCED_TELEMETRY = false;
 
   public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(14.0);
+
+  public static class FieldConstants {
+    // TODO: Compute based on our alliance
+    public static final Translation2d hubCenterLocation = new Translation2d(11.92, 4.03);
+  }
 
   public static class OperatorConstants {
     public static final double SPEED_MULTIPLIER = 0.4;
@@ -42,7 +50,7 @@ public final class Constants {
 
   public static final class ClimberConstants {
     public static final int MOTOR_ID = 10;
-    public static final int CURRENT_LIMIT = 20;
+    public static final int CURRENT_LIMIT = 40;
 
     public static final double BAR1_ELEVATION = Units.inchesToMeters(27.0);
     public static final double BAR2_ELEVATION = Units.inchesToMeters(45.0);

@@ -22,11 +22,11 @@ public class VisionSubsystem extends SubsystemBase {
       new Rotation3d(
           Units.degreesToRadians(0),
           Units.degreesToRadians(-50),
-          Units.degreesToRadians(0)),
+          Units.degreesToRadians(270)),
       new Translation3d(
-          Units.inchesToMeters(13.16),
-          Units.inchesToMeters(0.5),
-          Units.inchesToMeters(6)));
+          Units.inchesToMeters(-6.5),
+          Units.inchesToMeters(-13.14),
+          Units.inchesToMeters(16.13)));
 
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout
       .loadField(AprilTagFields.k2026RebuiltWelded);
