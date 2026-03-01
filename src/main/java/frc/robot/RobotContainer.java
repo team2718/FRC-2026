@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,7 +44,7 @@ public class RobotContainer {
 
     @NotLogged
     private final SwerveSubsystem swerve = new SwerveSubsystem();
-    
+
     @Logged(name = "Turret")
     private final TurretSubsystem turret = new TurretSubsystem();
     @Logged(name = "Indexer")
@@ -58,8 +60,10 @@ public class RobotContainer {
 
     // ** Commands **
 
-    // private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, indexer, RPM.of(2000));
-    // private final SpinIndexerForeward spindexerForeward = new SpinIndexerForeward(indexer, 1);
+    // private final TurretShootFixedVelocity turretShoot = new
+    // TurretShootFixedVelocity(turret, indexer, RPM.of(2000));
+    // private final SpinIndexerForeward spindexerForeward = new
+    // SpinIndexerForeward(indexer, 1);
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
 
     private final RunIntake runIntake = new RunIntake(intake, 0.75);
@@ -77,7 +81,6 @@ public class RobotContainer {
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
 
-
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     private final Timer matchTimer = new Timer();
@@ -89,14 +92,13 @@ public class RobotContainer {
     private boolean allEnabled = true;
 
     private boolean hasRanCalibration = false; // Set to true for testing, but should be false for comp so that it runs
-                                              // at the start of the match
+                                               // at the start of the match
 
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.drive(driveAngularVelocityRobotRelative));
+        swerve.setDefaultCommand(swerve.driveFieldOriented(swerveInput));
 
-        driverController.a().onTrue(Commands.runOnce(swerve::zeroGyro));
-
-        autoChooser.setDefaultOption("FRC_26_MajorGreediness", "FRC_26_MajorGreediness");
+        autoChooser.setDefaultOption("Just Score", "Just Score");
+        autoChooser.addOption("FRC_26_MajorGreediness", "FRC_26_MajorGreediness");
         autoChooser.addOption("FRC_26_NeutralZoneAutoInverted", "FRC_26_NeutralZoneAutoInverted");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
@@ -140,31 +142,30 @@ public class RobotContainer {
         SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
         SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
 
+        // Testing some auto commands (values to change once we have values needed)
+        // NamedCommands.registerCommand("AutoShoot",
+        //         new TurretShoot(turret, 0.5));
+
+        NamedCommands.registerCommand("RunIntake",
+                new AutoRunIntake(intake, 0.5));
+
+        // NamedCommands.registerCommand("RunOuttake",
+        // new RunOuttake(m_intake, 0.5));
+
+        NamedCommands.registerCommand("SpinIndexerForward",
+                new SpinIndexerForeward(indexer, .5));
+
+        NamedCommands.registerCommand("ExtendHook",
+                new ExtendHook(climber));
+
+        NamedCommands.registerCommand("RetractHook",
+                new RetractHook(climber));
+
+        NamedCommands.registerCommand("TurretToHub",
+                new TurretToHub(turret, swerve, indexer, swerveInput));
+
         // Configure button bindings
         configureBindings();
-        driverController.b().whileTrue(new AlignWithHubFront(swerve, driveAngularVelocityRobotRelative));
-
-         //Testing some auto commands (values to change once we have values needed)
-            NamedCommands.registerCommand("AutoShoot",
-        new TurretShoot(m_turret, 0.5)); 
-
-            NamedCommands.registerCommand("RunIntake", 
-        new AutoRunIntake(m_intake,0.5));
-
-            //NamedCommands.registerCommand("RunOuttake",
-        //new RunOuttake(m_intake, 0.5));
-
-            NamedCommands.registerCommand("SpinIndexerForward",
-        new SpinIndexerForeward(m_indexer,.5));
-
-            NamedCommands.registerCommand("ExtendHook", 
-        new ExtendHook(m_climber));
-
-            NamedCommands.registerCommand("RetractHook", 
-        new RetractHook(m_climber));
-        
-            NamedCommands.registerCommand("TurretToHub",
-        new TurretToHub(m_turret,0.5));
     }
 
     private void configureBindings() {
