@@ -448,4 +448,22 @@ public class SwerveSubsystem extends SubsystemBase {
         .headingWhile(true)
         .allianceRelativeControl(true);
   }
+
+  public static ChassisSpeeds applyAccelLimit(ChassisSpeeds currentSpeeds, ChassisSpeeds targetSpeeds, double accelLimit) {
+    // Apply rampRate considering the total magnitude of the speed change, not just individual components
+    double currentMagnitude = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    double targetMagnitude = Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond);
+    double magnitudeDifference = targetMagnitude - currentMagnitude;
+
+    if (Math.abs(magnitudeDifference) > accelLimit) {
+      double scale = (currentMagnitude + Math.signum(magnitudeDifference) * accelLimit) / targetMagnitude;
+      return new ChassisSpeeds(
+          targetSpeeds.vxMetersPerSecond * scale,
+          targetSpeeds.vyMetersPerSecond * scale,
+          targetSpeeds.omegaRadiansPerSecond
+      );
+    } else {
+      return targetSpeeds;
+    }
+  }
 }

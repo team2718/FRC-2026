@@ -22,6 +22,7 @@ import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.AutoRunIntake;
 import frc.robot.commands.intake.RunIntake;
+import frc.robot.commands.turret.TurretShootFixedVelocity;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -60,14 +61,13 @@ public class RobotContainer {
 
     // ** Commands **
 
-    // private final TurretShootFixedVelocity turretShoot = new
-    // TurretShootFixedVelocity(turret, indexer, RPM.of(2000));
+    private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, indexer, swerve);
     // private final SpinIndexerForeward spindexerForeward = new
     // SpinIndexerForeward(indexer, 1);
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
 
     private final RunIntake runIntake = new RunIntake(intake, 0.75);
-    private final RunIntake runOuttake = new RunIntake(intake, -0.75);
+    // private final RunIntake runOuttake = new RunIntake(intake, -0.75);
 
     // private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
     // private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);

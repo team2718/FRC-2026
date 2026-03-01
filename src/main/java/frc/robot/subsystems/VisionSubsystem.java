@@ -4,8 +4,6 @@ import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -27,9 +25,6 @@ public class VisionSubsystem extends SubsystemBase {
           Units.inchesToMeters(-6.5),
           Units.inchesToMeters(-13.14),
           Units.inchesToMeters(16.13)));
-
-  public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout
-      .loadField(AprilTagFields.k2026RebuiltWelded);
 
   @Logged(name = "Last Estimated Pose")
   private Pose3d lastEstimatedPose = new Pose3d();

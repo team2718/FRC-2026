@@ -3,14 +3,13 @@ package frc.robot.commands.turret;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RPM;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.Strategy;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -23,6 +22,7 @@ public class TurretToHub extends Command {
     private final IndexerSubsystem indexer;
 
     private ChassisSpeeds lastSwerveSpeeds = new ChassisSpeeds();
+    private double MAX_SPEED_BETWEEN_UPDATES = 0.05;
     private double MAX_SPEED_WHILE_SHOOTING = 0.7;
 
     public TurretToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
@@ -66,42 +66,48 @@ public class TurretToHub extends Command {
     @Override
     public void execute() {
 
-        Translation2d hubLocation = Constants.FieldConstants.hubCenterLocation;
-        ChassisSpeeds robotChassisSpeeds = lastSwerveSpeeds;
-        Translation2d robotVelocity = new Translation2d(robotChassisSpeeds.vxMetersPerSecond, robotChassisSpeeds.vyMetersPerSecond);
-        hubLocation = hubLocation.minus(robotVelocity.times(1.3)); // Lead the target by 100ms based on current velocity
+        Pose2d turretPose = shooter.getTurretPoseFromRobotPose(swerve.getPose());
 
-        Distance distance = Meters.of(hubLocation.getDistance(swerve.getPose().getTranslation()));
+        Translation2d locationTarget = Strategy.getLocationTarget(swerve.getPose().getTranslation());
+        Translation2d robotVelocity = new Translation2d(lastSwerveSpeeds.vxMetersPerSecond,
+                lastSwerveSpeeds.vyMetersPerSecond);
 
-        SmartDashboard.putNumber("Distance to Hub (Feet)", distance.in(Feet));
-        SmartDashboard.putNumber("Target Hood Angle (Degrees)", shooter.targetHoodAngle(distance.in(Feet)).in(Degrees));
-        SmartDashboard.putNumber("Target Shooter Speed (RPM)", shooter.targetShooterSpeed(distance.in(Feet)).in(RPM));
+        // Move the target back by 1.3 seconds worth of velocity to allow for shooting
+        // while moving
+        // TODO: Calculate time based on distance to target (??)
+        locationTarget = locationTarget.minus(robotVelocity.times(1.3));
 
-        shooter.setHoodAngle(shooter.targetHoodAngle(distance.in(Feet)));
-        shooter.setShooterSpeed(shooter.targetShooterSpeed(distance.in(Feet)));
+        Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
+
+        shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
+        shooter.setShooterSpeed(shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet)));
 
         ChassisSpeeds swerveSpeeds = swerveInput.get();
 
         double angleError = getWrappedAngleDifference(
-                swerve.getPose().getRotation().getDegrees(),
-                hubLocation.minus(swerve.getPose().getTranslation()).getAngle()
-                        .getDegrees() + 85);
+                turretPose.getRotation().getDegrees(),
+                locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
 
         double turnSpeed = clamp(-3.0, 3.0, angleError * 0.15);
 
         swerveSpeeds.omegaRadiansPerSecond = turnSpeed;
-        swerveSpeeds.vxMetersPerSecond = swerveSpeeds.vxMetersPerSecond * 0.15 + lastSwerveSpeeds.vxMetersPerSecond * 0.85;
-        swerveSpeeds.vyMetersPerSecond = swerveSpeeds.vyMetersPerSecond * 0.15 + lastSwerveSpeeds.vyMetersPerSecond * 0.85;
+
+        swerveSpeeds = SwerveSubsystem.applyAccelLimit(lastSwerveSpeeds, swerveSpeeds, MAX_SPEED_BETWEEN_UPDATES);
+
+        // Limit the speed while shooting to prevent overshooting the target
         double swerveSpeedMagnitude = Math.hypot(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
         if (swerveSpeedMagnitude > MAX_SPEED_WHILE_SHOOTING) {
-            swerveSpeeds.vxMetersPerSecond = swerveSpeeds.vxMetersPerSecond / swerveSpeedMagnitude * MAX_SPEED_WHILE_SHOOTING;
-            swerveSpeeds.vyMetersPerSecond = swerveSpeeds.vyMetersPerSecond / swerveSpeedMagnitude * MAX_SPEED_WHILE_SHOOTING;
+            swerveSpeeds.vxMetersPerSecond = swerveSpeeds.vxMetersPerSecond / swerveSpeedMagnitude
+                    * MAX_SPEED_WHILE_SHOOTING;
+            swerveSpeeds.vyMetersPerSecond = swerveSpeeds.vyMetersPerSecond / swerveSpeedMagnitude
+                    * MAX_SPEED_WHILE_SHOOTING;
         }
+
         lastSwerveSpeeds = swerveSpeeds;
 
         swerve.driveFieldOriented(swerveSpeeds);
 
-        if (shooter.shooterAtSpeed() && Math.abs(angleError) < 15.0) {
+        if (shooter.shooterAtSpeed(300) && Math.abs(angleError) < 15.0) {
             indexer.runIndexing();
         } else {
             indexer.stopIndexing();

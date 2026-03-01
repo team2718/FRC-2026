@@ -1,11 +1,11 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -13,10 +13,14 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -31,7 +35,12 @@ public class TurretSubsystem extends SubsystemBase {
     @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
 
-    private final Angle hoodMinAngle = Degrees.of(80); // TODO: Set to the "true" angle when at the
+    private final static Angle hoodMinAngle = Degrees.of(80); // TODO: Set to the "true" angle when at the
+
+    private final static Distance turretX = Inches.of(-5.75);
+    private final static Distance turretY = Inches.of(-5);
+    private final static Angle turretAngle = Degrees.of(85);
+    private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretAngle.in(Degrees)));
 
     // private double turretDistanceToRobotCenter = 0.5;
     // private double turretDegreeFromRobotCenter = 40;
@@ -210,6 +219,13 @@ public class TurretSubsystem extends SubsystemBase {
             return;
         }
 
+        // Clamp from 0 to 5000 RPM
+        if (angularVelocity.in(RPM) < 0) {
+            angularVelocity = RPM.of(0);
+        } else if (angularVelocity.in(RPM) > 5000) {
+            angularVelocity = RPM.of(5000);
+        }
+
         turretshooterLeft.setControl(new MotionMagicVelocityVoltage(angularVelocity));
         turretshooterRight.setControl(new MotionMagicVelocityVoltage(angularVelocity));
     }
@@ -232,7 +248,7 @@ public class TurretSubsystem extends SubsystemBase {
                 + turretshooterRight.getVelocity().getValue().in(RPM)) / 2;
     }
 
-    public boolean shooterAtSpeed() {
+    public boolean shooterAtSpeed(double tolerance) {
         double targetRPM = turretshooterLeft.getClosedLoopReference().getValue() * 60.0;
 
         if (targetRPM < 100) {
@@ -242,7 +258,7 @@ public class TurretSubsystem extends SubsystemBase {
         double currentRPM = getShooterRPM();
         // SmartDashboard.putNumber("Shooter At Speed Target RPM", targetRPM);
         // SmartDashboard.putNumber("Shooter At Speed Current RPM", currentRPM);
-        return Math.abs(currentRPM - targetRPM) < 300;
+        return Math.abs(currentRPM - targetRPM) < tolerance;
     }
 
     // // sets rotational speed of the turret
@@ -259,6 +275,13 @@ public class TurretSubsystem extends SubsystemBase {
     public void setHoodAngle(Angle angle) {
         if (!turretEnabled) {
             return;
+        }
+
+        // Clamp angle from 45 degrees to 80 degrees
+        if (angle.in(Degrees) < 45) {
+            angle = Degrees.of(45);
+        } else if (angle.in(Degrees) > 80) {
+            angle = Degrees.of(80);
         }
 
         // The hood is at position 0 at the bottom.
@@ -303,7 +326,8 @@ public class TurretSubsystem extends SubsystemBase {
     // The numbers used here arised from tinkering around to get an accurate
     // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
     public Angle targetHoodAngle(double distance) {
-        // return Degrees.of(80 - 20 - ((28500 / (Math.pow(distance + 25, 2))) + 46.25));
+        // return Degrees.of(80 - 20 - ((28500 / (Math.pow(distance + 25, 2))) +
+        // 46.25));
         distance = Math.min(distance, 20);
         return Degrees.of(75.0 - 1.2 * distance);
     }
@@ -315,17 +339,17 @@ public class TurretSubsystem extends SubsystemBase {
         return RPM.of(1800 + 65 * distance);
 
         // return RPM.of((((Math.pow(distance + 12, 2)) * 0.0094) + 20.3)
-        //         + (1 / (distance - 2.15)));
+        // + (1 / (distance - 2.15)));
     }
 
     // public void setHoodToAngle(double angle) {
 
-    //     if (Math.abs(getWrappedAngleDifference(getTurretHood(), angle)) < 0.3) {
-    //         setTurretHood(0);
-    //         return;
-    //     }
+    // if (Math.abs(getWrappedAngleDifference(getTurretHood(), angle)) < 0.3) {
+    // setTurretHood(0);
+    // return;
+    // }
 
-    //     setTurretHood(1 * getWrappedAngleDifference(getTurretHood(), angle));
+    // setTurretHood(1 * getWrappedAngleDifference(getTurretHood(), angle));
 
     // }
 
@@ -345,6 +369,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void setEnabled(boolean turretEnabled) {
         this.turretEnabled = turretEnabled;
+    }
+
+    public Pose2d getTurretPoseFromRobotPose(Pose2d robotPose) {
+        return robotPose.plus(turretLocation);
     }
 
 }

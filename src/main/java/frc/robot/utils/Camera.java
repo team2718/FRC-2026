@@ -19,7 +19,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.Constants;
 
 public class Camera {
 
@@ -40,7 +40,7 @@ public class Camera {
 
     robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
-    poseEstimator = new PhotonPoseEstimator(VisionSubsystem.fieldLayout, robotToCamTransform);
+    poseEstimator = new PhotonPoseEstimator(Constants.fieldLayout, robotToCamTransform);
   }
 
   /**
