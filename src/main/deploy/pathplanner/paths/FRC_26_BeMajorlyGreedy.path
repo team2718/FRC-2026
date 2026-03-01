@@ -118,7 +118,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "MajorlyGreedyPaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -90.0

@@ -2,7 +2,15 @@
   "robotWidth": 0.865,
   "robotLength": 0.865,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "ClimberPathsForLater",
+    "DepotPaths",
+    "MajorlyGreedyPaths",
+    "MinorlyGreedyPaths",
+    "NeutralZonePaths",
+    "JustShootPath",
+    "OutpostPaths"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 2.25,
   "defaultMaxAccel": 2.25,

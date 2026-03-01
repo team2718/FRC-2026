@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoShoot"
+            "name": "TurretToHub3"
           }
         },
         {
@@ -43,31 +43,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_ShootThenClimb"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendHook"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_Climb"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RetractHook"
+            "name": "TurretToHub6"
           }
         }
       ]

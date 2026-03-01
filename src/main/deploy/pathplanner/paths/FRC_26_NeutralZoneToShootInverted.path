@@ -114,7 +114,7 @@
     "rotation": 130.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "NeutralZonePaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0

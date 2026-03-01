@@ -45,7 +45,7 @@
     "rotation": 41.2847108945712
   },
   "reversed": false,
-  "folder": null,
+  "folder": "JustShootPath",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 41.76029970389785

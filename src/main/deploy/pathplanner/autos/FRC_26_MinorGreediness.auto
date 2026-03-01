@@ -31,19 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ExtendHook"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_ClimbInverted"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RetractHook"
+            "name": "TurretToHub6"
           }
         }
       ]
