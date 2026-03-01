@@ -22,8 +22,8 @@ public class TurretToHub extends Command {
     private final IndexerSubsystem indexer;
 
     private ChassisSpeeds lastSwerveSpeeds = new ChassisSpeeds();
-    private double MAX_SPEED_BETWEEN_UPDATES = 0.05;
-    private double MAX_SPEED_WHILE_SHOOTING = 0.7;
+    private double MAX_SPEED_BETWEEN_UPDATES = 0.03;
+    private double MAX_SPEED_WHILE_SHOOTING = 1.0;
 
     public TurretToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
             SwerveInputStream swerveInput) {
@@ -68,7 +68,8 @@ public class TurretToHub extends Command {
 
         Pose2d turretPose = shooter.getTurretPoseFromRobotPose(swerve.getPose());
 
-        Translation2d locationTarget = Strategy.getLocationTarget(swerve.getPose().getTranslation());
+        Strategy.StrategyConfig strategyConfig = Strategy.getLocationTarget(swerve.getPose().getTranslation());
+        Translation2d locationTarget = strategyConfig.targetLocation;
         Translation2d robotVelocity = new Translation2d(lastSwerveSpeeds.vxMetersPerSecond,
                 lastSwerveSpeeds.vyMetersPerSecond);
 

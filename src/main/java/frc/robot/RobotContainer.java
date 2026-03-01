@@ -25,6 +25,7 @@ import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.AutoRunIntake;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.TurretShootFixedVelocity;
+import frc.robot.commands.turret.TurretShootFixedVelocityBad;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -63,7 +64,6 @@ public class RobotContainer {
 
     // ** Commands **
 
-    private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, indexer, swerve);
     // private final SpinIndexerForeward spindexerForeward = new
     // SpinIndexerForeward(indexer, 1);
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
@@ -82,6 +82,7 @@ public class RobotContainer {
     Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
+    // private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, swerve, indexer, swerveInput);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
@@ -188,6 +189,7 @@ public class RobotContainer {
         driverController.leftBumper().whileTrue(spindexerBackward);
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
+        // driverController.rightTrigger().whileTrue(turretToHub);
         driverController.rightTrigger().whileTrue(turretToHub);
         // driverController.rightTrigger().whileTrue(spindexerForeward);
 
@@ -268,6 +270,9 @@ public class RobotContainer {
         indexer.setEnabled(indexerIntakeEnabled);
         intake.setEnabled(indexerIntakeEnabled);
         climber.setEnabled(climberEnabled);
+
+        SmartDashboard.putString("Robor Pos", swerve.getPose().toString());
+        SmartDashboard.putString("Turret Pose, ", turret.getTurretPoseFromRobotPose(swerve.getPose()).toString());
 
         updateShuffleboardTimers();
     }

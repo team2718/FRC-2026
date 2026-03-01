@@ -19,7 +19,7 @@ public class VisionSubsystem extends SubsystemBase {
   private final Camera frontCamera = new Camera("FrontAprilCamera",
       new Rotation3d(
           Units.degreesToRadians(0),
-          Units.degreesToRadians(-50),
+          Units.degreesToRadians(-30),
           Units.degreesToRadians(270)),
       new Translation3d(
           Units.inchesToMeters(-6.5),

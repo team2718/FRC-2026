@@ -39,7 +39,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final static Distance turretX = Inches.of(-5.75);
     private final static Distance turretY = Inches.of(-5);
-    private final static Angle turretAngle = Degrees.of(85);
+    private final static Angle turretAngle = Degrees.of(-85);
     private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretAngle.in(Degrees)));
 
     // private double turretDistanceToRobotCenter = 0.5;
@@ -92,7 +92,7 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterconfig.Slot0.kV = 1.0 / 500.0 * 60.0;
         turretshooterconfig.Slot0.kA = 0.19; // TODO: Tune, this value is from reca.lc
 
-        turretshooterconfig.Slot0.kP = 0.0;
+        turretshooterconfig.Slot0.kP = 0.1;
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
         turretshooterconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
@@ -334,9 +334,14 @@ public class TurretSubsystem extends SubsystemBase {
 
     // Estimates the speed we want to shoot the fuel at based on the turret's
     // distance to the hub
-    public AngularVelocity targetShooterSpeed(double distance) {
+    public AngularVelocity targetShooterSpeed(double distanceFeet) {
         // TODO: adjust
-        return RPM.of(1800 + 65 * distance);
+        if (distanceFeet < 8) {
+            return RPM.of(2400);
+        }
+        return RPM.of(2400 + 35 * (distanceFeet - 8));
+
+        // return RPM.of(1800 + 65 * distance);
 
         // return RPM.of((((Math.pow(distance + 12, 2)) * 0.0094) + 20.3)
         // + (1 / (distance - 2.15)));
