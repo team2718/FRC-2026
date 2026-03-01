@@ -29,15 +29,20 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private boolean enabled = true;
 
-    // Getters and Setters
-    public void setCurrentLimit(int amps) {
-        climbMotorConfig.smartCurrentLimit(amps);
-        if (amps <= 30) {
-            climbMotorConfig.openLoopRampRate(0.8);
-        } else {
-            climbMotorConfig.openLoopRampRate(0.2);
-        }
-        climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    public void applyStandardMotorConfig() {
+        climbMotorConfig.smartCurrentLimit(Constants.ClimberConstants.CURRENT_LIMIT);
+        climbMotorConfig.openLoopRampRate(0.25);
+        climbMotorConfig.softLimit.forwardSoftLimitEnabled(true);
+        climbMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+        climbMotor.configure(climbMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+
+    public void applyZeroingMotorConfig() {
+        climbMotorConfig.smartCurrentLimit(20);
+        climbMotorConfig.openLoopRampRate(0.8);
+        climbMotorConfig.softLimit.forwardSoftLimitEnabled(false);
+        climbMotorConfig.softLimit.reverseSoftLimitEnabled(false);
+        climbMotor.configure(climbMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     public double getAmps() {
@@ -101,6 +106,12 @@ public class ClimberSubsystem extends SubsystemBase {
         climbMotorConfig.inverted(true); // Up should be positive
         climbMotorConfig.smartCurrentLimit(Constants.ClimberConstants.CURRENT_LIMIT);
         climbMotorConfig.openLoopRampRate(0.25);
+
+        climbMotorConfig.softLimit.forwardSoftLimit(Constants.ClimberConstants.FORWARD_SOFT_LIMIT);
+        climbMotorConfig.softLimit.reverseSoftLimit(0.0);
+        climbMotorConfig.softLimit.forwardSoftLimitEnabled(true);
+        climbMotorConfig.softLimit.reverseSoftLimitEnabled(true);
+
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         climbMotorAlert = new Alert("Motor \"Climb Motor\" is faulting!", AlertType.kError);
     }

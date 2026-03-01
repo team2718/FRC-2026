@@ -60,6 +60,7 @@ public final class Constants {
     public static final double RETRACT_P = 0.06;
     public static final double HOOK_BASE_ELEVATION = Units.inchesToMeters(19); // Estimated value
     public static final double CLIMB_TOLERANCE = 0.1;
+    public static final double FORWARD_SOFT_LIMIT = 42.0; // TODO: Determine actual soft limit values
   }
 
   public static final class IndexerConstants {

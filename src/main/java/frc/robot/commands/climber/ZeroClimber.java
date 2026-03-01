@@ -1,6 +1,5 @@
 package frc.robot.commands.climber;
 
-import frc.robot.Constants;
 import frc.robot.subsystems.ClimberSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -16,7 +15,7 @@ public class ZeroClimber extends Command {
     public void initialize() {
         // Set desired level to 0, and reduce current limit
         // climber.setDesiredLevel(0);
-        climber.setCurrentLimit(20);
+        climber.applyZeroingMotorConfig();
     }
 
     @Override
@@ -34,7 +33,7 @@ public class ZeroClimber extends Command {
     @Override
     public void end(boolean interuppted) {
         // Stop the motor, reset the current limit, and set the default hook elevation
-        climber.setCurrentLimit(Constants.ClimberConstants.CURRENT_LIMIT);
+        climber.applyStandardMotorConfig();
         climber.setClimbMotor(0);
         climber.resetHookElevation();
     }
