@@ -43,12 +43,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
         SparkMaxConfig slapdownMotorConfig = new SparkMaxConfig();
         slapdownMotorConfig.inverted(true);
-        slapdownMotorConfig.smartCurrentLimit(25);
+        slapdownMotorConfig.smartCurrentLimit(30);
         slapdownMotorConfig.idleMode(IdleMode.kCoast);
         slapdownMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         slapdownMotorConfig.absoluteEncoder.zeroCentered(true);
         slapdownMotorConfig.absoluteEncoder.zeroOffset(0.412); // TODO: find the
-        slapdownMotorConfig.closedLoop.pid(1.5, 0.0, 0.0).outputRange(-0.1, 0.8); // TODO: tune the PID
+        slapdownMotorConfig.closedLoop.pid(2.0, 0.0, 0.0).outputRange(-0.1, 0.9); // TODO: tune the PID
         slapdownMotorConfig.closedLoop.maxMotion.cruiseVelocity(RotationsPerSecond.of(1).in(RPM));
         slapdownMotorConfig.closedLoop.maxMotion.maxAcceleration(RotationsPerSecondPerSecond.of(5).in(RPM.per(Second)));
         slapdownMotor.configure(slapdownMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

@@ -14,22 +14,18 @@ public class AutoRunIntake extends Command {
 
     @Override
     public void initialize() {
-        intake.setIntakeSpeed(0.8);
-        // if(intake.getIntakeSpeed() < 0.1) {
-        // intake.setSpeed(speed);
-        // } else {
-        // intake.stopIntake();
-        // }
+        intake.setActive();
+        intake.setIntakeSpeed(speed);
     }
 
     @Override
     public void end(boolean interrupted) {
-        intake.setIntakeSpeed(0);
+        // intake.setIntakeSpeed(0);
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        return true;
     }
 
 }

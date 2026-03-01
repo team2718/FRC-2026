@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub3"
+            "name": "TurretToHub4"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "RunIntake"
+            "name": "StopIntake"
           }
         },
         {
@@ -50,6 +50,12 @@
           "type": "named",
           "data": {
             "name": "TurretToHub6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
           }
         }
       ]

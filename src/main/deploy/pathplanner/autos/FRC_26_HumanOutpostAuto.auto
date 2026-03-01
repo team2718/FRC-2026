@@ -13,13 +13,31 @@
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub3"
+            "name": "TurretToHub4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "FRC_26_ShootThenOutpost"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {

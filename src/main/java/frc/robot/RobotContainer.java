@@ -82,7 +82,8 @@ public class RobotContainer {
     Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
-    // private final TurretShootFixedVelocity turretShoot = new TurretShootFixedVelocity(turret, swerve, indexer, swerveInput);
+    // private final TurretShootFixedVelocity turretShoot = new
+    // TurretShootFixedVelocity(turret, swerve, indexer, swerveInput);
 
     private SendableChooser<String> autoChooser = new SendableChooser<String>();
 
@@ -101,8 +102,8 @@ public class RobotContainer {
         swerve.setDefaultCommand(swerve.driveFieldOriented(swerveInput));
 
         autoChooser.setDefaultOption("Just Score", "Just Score");
-        autoChooser.addOption("FRC_26_MajorGreediness", "FRC_26_MajorGreediness");
-        autoChooser.addOption("FRC_26_NeutralZoneAutoInverted", "FRC_26_NeutralZoneAutoInverted");
+        autoChooser.addOption("FRC_26_Depot", "FRC_26_Depot");
+        autoChooser.addOption("FRC_26_HumanOutpostAuto", "FRC_26_HumanOutpostAuto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
@@ -147,10 +148,12 @@ public class RobotContainer {
 
         // Testing some auto commands (values to change once we have values needed)
         // NamedCommands.registerCommand("AutoShoot",
-        //         new TurretShoot(turret, 0.5));
+        // new TurretShoot(turret, 0.5));
 
         NamedCommands.registerCommand("RunIntake",
-                new AutoRunIntake(intake, 0.5));
+                new AutoRunIntake(intake, 0.75));
+
+        NamedCommands.registerCommand("StopIntake", Commands.runOnce(() -> intake.setIntakeSpeed(0), intake));
 
         // NamedCommands.registerCommand("RunOuttake",
         // new RunOuttake(m_intake, 0.5));
@@ -166,12 +169,20 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("TurretToHub",
                 new ParallelDeadlineGroup(
-                    new WaitCommand(5),
-                    new TurretToHub(turret, swerve, indexer, swerveInput)
-                ));
+                        new WaitCommand(5),
+                        new TurretToHub(turret, swerve, indexer, swerveInput)));
+
+        // Register turret to hub for 1 to 9 seconds
+        for (int i = 1; i <= 9; i++) {
+            NamedCommands.registerCommand(
+                    "TurretToHub" + i,
+                    new ParallelDeadlineGroup(new WaitCommand(i),
+                            new TurretToHub(turret, swerve, indexer, swerveInput)));
+        }
 
         // Configure button bindings
         configureBindings();
+
     }
 
     private void configureBindings() {

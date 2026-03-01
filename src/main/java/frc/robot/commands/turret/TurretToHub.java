@@ -108,7 +108,7 @@ public class TurretToHub extends Command {
 
         swerve.driveFieldOriented(swerveSpeeds);
 
-        if (shooter.shooterAtSpeed(300) && Math.abs(angleError) < 15.0) {
+        if (shooter.shooterAtSpeed(200) && Math.abs(angleError) < 15.0) {
             indexer.runIndexing();
         } else {
             indexer.stopIndexing();
