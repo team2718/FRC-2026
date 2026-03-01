@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoShoot"
+            "name": "TurretToHub3"
           }
         },
         {
@@ -43,19 +43,13 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoShoot"
+            "name": "RunIntake"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "FRC_26_ShootThenClimb"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_Climb"
+            "name": "TurretToHub6"
           }
         }
       ]

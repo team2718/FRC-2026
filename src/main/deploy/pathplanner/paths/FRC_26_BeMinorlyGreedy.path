@@ -45,7 +45,7 @@
     "rotation": -89.7814017905986
   },
   "reversed": false,
-  "folder": null,
+  "folder": "MinorlyGreedyPaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -89.82130029245707

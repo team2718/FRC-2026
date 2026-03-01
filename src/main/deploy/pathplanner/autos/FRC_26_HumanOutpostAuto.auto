@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StartThenShoot"
+            "pathName": "FRC_26_StartThenShootInverted"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoShoot"
+            "name": "TurretToHub3"
           }
         },
         {
@@ -31,31 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_ShootThenClimbInverted"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ExtendHook"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_ClimbInverted"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RetractHook"
+            "name": "TurretToHub6"
           }
         }
       ]

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.28282347786985,
-        "y": 5.850605846075493
+        "x": 2.2834756446867557,
+        "y": 5.844504211728863
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 5.98
       },
       "prevControl": {
-        "x": 0.2015391690115989,
-        "y": 5.952301345437853
+        "x": 0.20117121205520924,
+        "y": 5.9558290610458275
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "DepotPaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 55.0
