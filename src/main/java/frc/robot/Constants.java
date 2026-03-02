@@ -34,7 +34,7 @@ public final class Constants {
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
   public static class OperatorConstants {
-    public static final double SPEED_MULTIPLIER = 0.4;
+    public static final double SPEED_MULTIPLIER = 0.6;
     public static final double ROTATION_MULTIPLIER = 0.5;
     public static final double DEADBAND = 0.1;
   }

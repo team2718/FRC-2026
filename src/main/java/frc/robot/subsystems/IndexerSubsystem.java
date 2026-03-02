@@ -45,8 +45,8 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public void runIndexing() {
         if (enabled) {
-            indexerMotor.setVoltage(9);
-            portalMotor.setVoltage(9);
+            indexerMotor.setVoltage(10);
+            portalMotor.setVoltage(10);
         }
     }
 

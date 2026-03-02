@@ -3,6 +3,7 @@ package frc.robot.commands.turret;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -10,6 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Strategy;
+import frc.robot.Strategy.StrategyType;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -22,8 +24,8 @@ public class TurretToHub extends Command {
     private final IndexerSubsystem indexer;
 
     private ChassisSpeeds lastSwerveSpeeds = new ChassisSpeeds();
-    private double MAX_SPEED_BETWEEN_UPDATES = 0.03;
-    private double MAX_SPEED_WHILE_SHOOTING = 1.0;
+    private double MAX_SPEED_BETWEEN_UPDATES = 0.01;
+    private double MAX_SPEED_WHILE_SHOOTING = 0.8;
 
     public TurretToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
             SwerveInputStream swerveInput) {
@@ -80,8 +82,13 @@ public class TurretToHub extends Command {
 
         Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
 
-        shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
-        shooter.setShooterSpeed(shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet)));
+        if (strategyConfig.strategyType == StrategyType.HUB_SHOT) {
+            shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
+            shooter.setShooterSpeed(shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet)));
+        } else {
+            shooter.setHoodAngle(Degrees.of(45));
+            shooter.setShooterSpeed(shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet)));
+        }
 
         ChassisSpeeds swerveSpeeds = swerveInput.get();
 
