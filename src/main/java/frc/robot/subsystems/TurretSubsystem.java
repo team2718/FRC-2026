@@ -28,7 +28,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -42,7 +41,9 @@ public class TurretSubsystem extends SubsystemBase {
     @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
 
-    private final static Angle hoodMinAngle = Degrees.of(80); // TODO: Set to the "true" angle when at the
+    private final static Angle hoodZeroAngle = Degrees.of(82.3);
+    private final static Angle hoodRangeOfMotion = Degrees.of(40);
+    private final static double hoodGearRatio = 472/32 * 48/14;
 
     private final static Distance turretX = Inches.of(-5.75);
     private final static Distance turretY = Inches.of(-5);
@@ -130,6 +131,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         turrethood.getConfigurator().apply(turrethoodconfig);
 
+        // Make sure frequency is high enough for follower to follow
+        turretshooterLeft.getMotorVoltage().setUpdateFrequency(100);
         turretshooterRight.setControl(new Follower(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
     }
 
@@ -185,20 +188,8 @@ public class TurretSubsystem extends SubsystemBase {
         }
 
         double currentRPM = getShooterRPM();
-        // SmartDashboard.putNumber("Shooter At Speed Target RPM", targetRPM);
-        // SmartDashboard.putNumber("Shooter At Speed Current RPM", currentRPM);
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
-
-    // // sets rotational speed of the turret
-    // public void setTurretPosition(double power) {
-    // turretspinner.set(power);
-    // }
-
-    // // returns the current rotational position of the turret
-    // public double getTurretPosition() {
-    // return turretspinner.getEncoder().getPosition();
-    // }
 
     // sets rotational speed of the hood
     public void setHoodAngle(Angle angle) {
@@ -206,18 +197,17 @@ public class TurretSubsystem extends SubsystemBase {
             return;
         }
 
-        // Clamp angle from 45 degrees to 80 degrees
-        if (angle.in(Degrees) < 45) {
-            angle = Degrees.of(45);
-        } else if (angle.in(Degrees) > 80) {
-            angle = Degrees.of(80);
+        // Clamp angle from ~42 degrees to ~82 degrees
+        if (angle.in(Degrees) < hoodZeroAngle.minus(hoodRangeOfMotion).in(Degrees)) {
+            angle = hoodZeroAngle.minus(hoodRangeOfMotion);
+        } else if (angle.in(Degrees) > hoodZeroAngle.in(Degrees)) {
+            angle = hoodZeroAngle;
         }
 
         // The hood is at position 0 at the bottom.
-        // So a target angle of 45 degrees would be 45 - hoodMinAngle
+        // So a target angle of 45 degrees would be hoodMinAngle - 45
         // where hoodMinAngle is the angle of the hood when it's at position 0
-        SmartDashboard.putNumber("Hood Target Position", hoodMinAngle.minus(angle).times(50.57).in(Degrees));
-        turrethood.setControl(new PositionVoltage(hoodMinAngle.minus(angle).times(50.57)));
+        turrethood.setControl(new PositionVoltage(hoodZeroAngle.minus(angle).times(hoodGearRatio)));
 
         return;
 
@@ -245,8 +235,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     // returns the current position of the hood
-    public Angle getTurretHood() {
-        return turrethood.getPosition().getValue().minus(hoodMinAngle);
+    public double getTurretHoodAngleDegrees() {
+        return hoodZeroAngle.minus(Degree.of(turrethood.getPosition().getValueAsDouble() / hoodGearRatio)).in(Degrees);
     }
 
     // Estimates the angle we want to shoot the fuel at based on the turret's
@@ -272,21 +262,10 @@ public class TurretSubsystem extends SubsystemBase {
         return Seconds.of(distanceFeet * 0.02 + 0.8);
     }
 
-    // public void setHoodToAngle(double angle) {
-
-    // if (Math.abs(getWrappedAngleDifference(getTurretHood(), angle)) < 0.3) {
-    // setTurretHood(0);
-    // return;
-    // }
-
-    // setTurretHood(1 * getWrappedAngleDifference(getTurretHood(), angle));
-
-    // }
-
     @Override
     public void periodic() {
         if (!turretEnabled) {
-            turrethood.set(0);
+            turrethood.setControl(new NeutralOut());
             turretshooterLeft.setControl(new NeutralOut());
         }
     }

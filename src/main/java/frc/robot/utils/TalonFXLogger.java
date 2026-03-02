@@ -37,6 +37,10 @@ public class TalonFXLogger extends ClassSpecificLogger<TalonFX> {
     backend.log("Velocity (RPM)", motor.getVelocity().getValue().in(RPM));
     backend.log("Position (degrees)", motor.getPosition().getValue().in(Degrees));
 
+    if (motor.getMotionMagicIsRunning().getValue()) {
+      backend.log("Motion Magic Closed Loop Reference", motor.getClosedLoopReference().getValue());
+    }
+
     if (!Epilogue.shouldLog(Logged.Importance.DEBUG)) {
       return;
     }
