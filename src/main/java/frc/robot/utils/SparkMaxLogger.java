@@ -46,6 +46,7 @@ public class SparkMaxLogger extends ClassSpecificLogger<SparkMax> {
     backend.log("Bus Voltage (V)", motor.getBusVoltage());
     backend.log("Output Current (A)", motor.getOutputCurrent());
     backend.log("Velocity (RPM)", motor.getEncoder().getVelocity());
+    backend.log("Position (Rotations)", motor.getEncoder().getPosition());
 
     if (!Epilogue.shouldLog(Logged.Importance.DEBUG)) {
       return;

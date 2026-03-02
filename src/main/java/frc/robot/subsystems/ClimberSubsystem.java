@@ -108,7 +108,7 @@ public class ClimberSubsystem extends SubsystemBase {
         climbMotorConfig.openLoopRampRate(0.25);
 
         climbMotorConfig.softLimit.forwardSoftLimit(Constants.ClimberConstants.FORWARD_SOFT_LIMIT);
-        climbMotorConfig.softLimit.reverseSoftLimit(0.0);
+        climbMotorConfig.softLimit.reverseSoftLimit(0.1);
         climbMotorConfig.softLimit.forwardSoftLimitEnabled(true);
         climbMotorConfig.softLimit.reverseSoftLimitEnabled(true);
 

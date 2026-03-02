@@ -3,6 +3,7 @@ package frc.robot.commands.turret;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -11,7 +12,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Strategy;
 import frc.robot.Strategy.StrategyType;
@@ -21,13 +24,13 @@ import frc.robot.subsystems.TurretSubsystem;
 import swervelib.SwerveInputStream;
 
 public class TurretToHub extends Command {
-    private static final double ACCEL_LIMIT_WHILE_SHOOTING = 0.5 * 0.02;
+    private static final double ACCEL_LIMIT_WHILE_SHOOTING = 1.2 * 0.02;
     private static final double VEL_LIMIT_WHILE_SHOOTING = 0.8;
 
-    private static final double LEAD_TIME_LATENCY_SECONDS = 0.3;
+    private static final double LEAD_TIME_LATENCY_SECONDS = 0.2;
     
-    private static final double MAX_ANGLE_ERROR_RADIANS = Degrees.of(15).in(Radians);
-    private static final double MAX_RPM_ERROR = 50;
+    private static final double MAX_ANGLE_ERROR_RADIANS = Degrees.of(5).in(Radians);
+    private static final double MAX_RPM_ERROR = 30;
 
     private final TurretSubsystem shooter;
     private final SwerveSubsystem swerve;
@@ -36,8 +39,8 @@ public class TurretToHub extends Command {
 
     private ChassisSpeeds lastSwerveSpeeds = new ChassisSpeeds();
 
-    private ProfiledPIDController turnController = new ProfiledPIDController(8, 0, 0,
-            new TrapezoidProfile.Constraints(5, 2));
+    private ProfiledPIDController turnController = new ProfiledPIDController(10, 0, 0,
+            new TrapezoidProfile.Constraints(10, 3));
 
     private boolean isSpunUp = false;
 
@@ -49,6 +52,8 @@ public class TurretToHub extends Command {
         this.indexer = indexer;
 
         turnController.enableContinuousInput(-Math.PI, Math.PI);
+
+        SmartDashboard.putNumber("Target RPM", 2000);
 
         addRequirements(shooter, swerve, indexer);
     }
@@ -111,25 +116,33 @@ public class TurretToHub extends Command {
         locationTarget = locationTarget.minus(commandedRobotVelocity.times(leadTimeSeconds));
         distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
 
+        SmartDashboard.putNumber("TurretToHub/distanceToTarget", distanceToLocationTarget.in(Feet));
+
+        AngularVelocity targetShooterSpeed = shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet));
+        // AngularVelocity targetShooterSpeed = RPM.of(SmartDashboard.getNumber("Target RPM", 2000));
+        shooter.setShooterSpeed(targetShooterSpeed);
+        SmartDashboard.putNumber("TurretToHub/shooterSpeed", targetShooterSpeed.in(RPM));
+
         if (strategyConfig.strategyType == StrategyType.HUB_SHOT) {
             shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
-            shooter.setShooterSpeed(shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet)));
+            SmartDashboard.putNumber("TurretToHub/hoodAngle", shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)).in(Degrees));
         } else {
             shooter.setHoodAngle(Degrees.of(45));
-            shooter.setShooterSpeed(shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet)));
         }
+
+        SmartDashboard.putNumber("TurretToHub/angleError", turnController.getPositionError());
 
         swerveSpeeds.omegaRadiansPerSecond = turnController.calculate(
                 turretPose.getRotation().getRadians(),
                 locationTarget.minus(turretPose.getTranslation()).getAngle().getRadians());
 
-        if (isSpunUp && commandedRobotVelocity.getNorm() < 0.1 && Math.abs(swerveSpeeds.omegaRadiansPerSecond) < 0.1) {
+        if (isSpunUp && commandedRobotVelocity.getNorm() < 0.1 && Math.abs(swerveSpeeds.omegaRadiansPerSecond) < 0.01) {
             swerve.lock(); // if we're not trying to move, lock the wheels to prevent being pushed
         } else {
             swerve.driveFieldOriented(swerveSpeeds);
         }
 
-        if (isSpunUp || shooter.shooterAtSpeed(MAX_RPM_ERROR) && Math.abs(turnController.getPositionError()) < MAX_ANGLE_ERROR_RADIANS) {
+        if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR) && Math.abs(turnController.getPositionError()) < MAX_ANGLE_ERROR_RADIANS)) {
             isSpunUp = true;
             indexer.runIndexing();
         } else {

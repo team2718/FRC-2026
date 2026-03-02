@@ -118,7 +118,7 @@ public class TurretShootFixedVelocity extends Command {
 
         swerve.driveFieldOriented(swerveSpeeds);
 
-        if (shooter.shooterAtSpeed(300) && Math.abs(angleError) < 15.0) {
+        if (shooter.shooterAtSpeed(angularVelocity.in(RPM), 50) && Math.abs(angleError) < 15.0) {
             indexer.runIndexing();
         } else {
             indexer.stopIndexing();

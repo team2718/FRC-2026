@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -41,7 +42,7 @@ public class TurretSubsystem extends SubsystemBase {
     @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
 
-    private final static Angle hoodZeroAngle = Degrees.of(82.3);
+    private final static Angle hoodZeroAngle = Degrees.of(86);
     private final static Angle hoodRangeOfMotion = Degrees.of(40);
     private final static double hoodGearRatio = 472/32 * 48/14;
 
@@ -88,7 +89,7 @@ public class TurretSubsystem extends SubsystemBase {
         // Configuring motor variables (The current limit is set to 5 amps for now)
 
         TalonFXConfiguration turretshooterconfig = new TalonFXConfiguration();
-        turretshooterconfig.CurrentLimits.StatorCurrentLimit = 5; // TODO: increase back to 25
+        turretshooterconfig.CurrentLimits.StatorCurrentLimit = 30; // TODO: increase back to 25
         turretshooterconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         turretshooterconfig.Slot0.kG = 0.0;
@@ -180,10 +181,8 @@ public class TurretSubsystem extends SubsystemBase {
         return turretshooterLeft.getVelocity().getValue().in(RPM);
     }
 
-    public boolean shooterAtSpeed(double tolerance) {
-        double targetRPM = turretshooterLeft.getClosedLoopReference().getValue() * 60.0;
-
-        if (targetRPM < 100) {
+    public boolean shooterAtSpeed(double targetRPM, double tolerance) {
+        if (targetRPM < 200) {
             return false;
         }
 
@@ -236,7 +235,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // returns the current position of the hood
     public double getTurretHoodAngleDegrees() {
-        return hoodZeroAngle.minus(Degree.of(turrethood.getPosition().getValueAsDouble() / hoodGearRatio)).in(Degrees);
+        return hoodZeroAngle.minus(Rotations.of(turrethood.getPosition().getValueAsDouble() / hoodGearRatio)).in(Degrees);
     }
 
     // Estimates the angle we want to shoot the fuel at based on the turret's
@@ -255,7 +254,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         // Adjust the below numbers based on testing.
         // The 110 is a conversion factor to convert from ft/s to RPM, and the 0.0 is just a constant to adjust the speed up or down.
-        return RPM.of(velocityFtps * 110 + 0.0);
+        return RPM.of(velocityFtps * 98 + 100);
     }
 
     public Time timeUntilHit(double distanceFeet) {

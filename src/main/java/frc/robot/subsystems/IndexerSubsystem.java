@@ -31,7 +31,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
         SparkMaxConfig indexerMotorConfig = new SparkMaxConfig();
         indexerMotorConfig.inverted(false);
-        indexerMotorConfig.smartCurrentLimit(40);
+        indexerMotorConfig.smartCurrentLimit(50);
         indexerMotorConfig.idleMode(IdleMode.kCoast);
 
         TalonFXConfiguration portalMotorConfig = new TalonFXConfiguration();

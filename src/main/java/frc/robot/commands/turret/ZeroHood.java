@@ -22,13 +22,13 @@ public class ZeroHood extends Command {
     @Override
     public void execute() {
         // Set a small negative speed
-        turret.setHoodSpeedUnchecked(-0.2);
+        turret.setHoodSpeedUnchecked(-0.05);
     }
 
     @Override
     public boolean isFinished() {
         // Check if the current is near the stall limit
-        return (turret.getTurretHoodCurrent().in(Amps) >= 8);
+        return (turret.getTurretHoodCurrent().in(Amps) >= 3);
     }
 
     @Override
