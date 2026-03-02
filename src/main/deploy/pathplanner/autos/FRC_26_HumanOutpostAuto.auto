@@ -7,37 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StartThenShootInverted"
+            "pathName": "FRC_26_OutpostStart"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
+            "name": "TurretToHub3"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "FRC_26_ShootThenOutpost"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
           }
         },
         {
@@ -50,6 +32,12 @@
           "type": "named",
           "data": {
             "name": "TurretToHub6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_OutpostGetOutOfWay"
           }
         }
       ]

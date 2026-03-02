@@ -7,18 +7,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StartThenShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "FRC_26_ShootToNeutralZone"
           }
         },

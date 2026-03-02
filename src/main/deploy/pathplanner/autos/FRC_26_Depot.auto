@@ -7,31 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StartThenShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "FRC_26_ToDepot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StopIntake"
+            "name": "RunIntake"
           }
         },
         {
@@ -53,9 +35,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "StopIntake"
+            "pathName": "FRC_26_DepotMoveAway"
           }
         }
       ]
