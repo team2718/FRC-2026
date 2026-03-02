@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_OutpostStart"
+            "pathName": "FRC_26_ShootThenOutpost"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub3"
+            "name": "RunIntake"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "FRC_26_ShootThenOutpost"
+            "name": "RunIntake"
           }
         },
         {
