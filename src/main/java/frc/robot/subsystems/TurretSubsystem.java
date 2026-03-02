@@ -1,15 +1,21 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
@@ -21,6 +27,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -71,16 +78,16 @@ public class TurretSubsystem extends SubsystemBase {
 
         // Motors-----------------------------------------------------------------------------------------------------------------------------------
 
+        //Tthe left turret shooter is the primary motor and the right shooter follows it
+
         turretshooterLeft = new TalonFX(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID);
-        // turretspinner = new SparkMax(Constants.TurretConstants.turretspinnerID,
-        // SparkLowLevel.MotorType.kBrushless);
         turretshooterRight = new TalonFX(Constants.TurretConstants.RIGHT_SHOOTER_MOTOR_ID);
         turrethood = new TalonFX(Constants.TurretConstants.HOOD_MOTOR_ID);
 
         // Configuring motor variables (The current limit is set to 5 amps for now)
 
         TalonFXConfiguration turretshooterconfig = new TalonFXConfiguration();
-        turretshooterconfig.CurrentLimits.StatorCurrentLimit = 25;
+        turretshooterconfig.CurrentLimits.StatorCurrentLimit = 5; // TODO: increase back to 25
         turretshooterconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         turretshooterconfig.Slot0.kG = 0.0;
@@ -123,83 +130,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         turrethood.getConfigurator().apply(turrethoodconfig);
 
-        // turrethood.getPosition().setUpdateFrequency(100);
-
-        // // Field
-        // //
-        // Positions-----------------------------------------------------------------------------------------------------------------------------------
-
-        // robotAngleFromTag9 =
-        // hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
-
-        // robotDistanceToTag9 = Math.sqrt(Math.pow(swerve.getPose().getX() -
-        // hubCenterLocation.getX(), 2)
-        // + Math.pow(swerve.getPose().getY() - hubCenterLocation.getY(), 2));
-
-        // // Calculates the position of the turret on the field by taking the turret's
-        // // distance and angle (relative to the where the robot's facing) from the
-        // center
-        // // point of the robot
-        // turretPositionX = swerve.getPose().getX()
-        // + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() +
-        // turretDegreeFromRobotCenter)
-        // * turretDistanceToRobotCenter;
-        // turretPositionY = swerve.getPose().getY()
-        // + Math.sin(swerve.getPose().getTranslation().getAngle().getDegrees() +
-        // turretDegreeFromRobotCenter)
-        // * turretDistanceToRobotCenter;
-
-        // turretAngleFromTag9 = Math.atan2(hubCenterLocation.getX() - turretPositionX,
-        // hubCenterLocation.getY() - turretPositionY);
-
-        // turretDistanceToTag9 = Math.sqrt(Math.pow(turretPositionX -
-        // hubCenterLocation.getX(), 2)
-        // + Math.pow(turretPositionY - hubCenterLocation.getY(), 2));
-
-        // /*
-        // * When we shoot fuel while the robot is moving, the fuel's speed moves
-        // relative
-        // * to the robot's speed, throwing us off.
-        // * To counteract this, we can calculate the time it will take for the fuel to
-        // * reach the goal, and project the robot's position at that point. (current
-        // * position + ( current velocity * the fuel goal time ))
-        // * If we point the turret in the direction of the hub based from that position
-        // * instead of it's current position, it should line up.
-        // */
-
-        // // Projects the time it will take for the feul to reach the goal when the
-        // robot
-        // // shoots
-        // projectedTime = robotDistanceToTag9 * Math.cos(getTurretHood());
-
-        // // Projects the turret's projected location relative to the field
-        // projectedTurretPositionX = swerve.getPose().getX()
-        // + (swerve.getRobotVelocity().vxMetersPerSecond * projectedTime)
-        // + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() +
-        // turretDegreeFromRobotCenter)
-        // * turretDistanceToRobotCenter;
-        // projectedTurretPositionY = swerve.getPose().getY()
-        // + (swerve.getRobotVelocity().vyMetersPerSecond * projectedTime)
-        // + Math.cos(swerve.getPose().getTranslation().getAngle().getDegrees() +
-        // turretDegreeFromRobotCenter)
-        // * turretDistanceToRobotCenter;
-
-        // // Projects the turret's angle from the hub
-        // projectedTurretAngleFromTag9 = Math.atan2(hubCenterLocation.getX() -
-        // projectedTurretPositionX,
-        // hubCenterLocation.getY() - projectedTurretPositionY);
-        // // Projects the turret's distance to the hub
-        // projectedTurretDistanceToTag9 = Math.sqrt(Math.pow(projectedTurretPositionX -
-        // hubCenterLocation.getX(), 2)
-        // + Math.pow(projectedTurretPositionY - hubCenterLocation.getY(), 2));
-
-        // getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(),
-        // projectedTurretAngleFromTag9);
-
-        // // set turret hood target position (Rudimentary calculation)
-        // if (projectedTurretDistanceToTag9 < 1) {
-        // } else {
-        // }
+        turretshooterRight.setControl(new Follower(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
     }
 
     public static double getWrappedAngleDifference(double source, double target) {
@@ -227,7 +158,6 @@ public class TurretSubsystem extends SubsystemBase {
         }
 
         turretshooterLeft.setControl(new MotionMagicVelocityVoltage(angularVelocity));
-        turretshooterRight.setControl(new MotionMagicVelocityVoltage(angularVelocity));
     }
 
     // sets speed of the shooter
@@ -244,8 +174,7 @@ public class TurretSubsystem extends SubsystemBase {
     // Return the average RPM of the two shooter motors (should be the same, but
     // just in case)
     public double getShooterRPM() {
-        return (turretshooterLeft.getVelocity().getValue().in(RPM)
-                + turretshooterRight.getVelocity().getValue().in(RPM)) / 2;
+        return turretshooterLeft.getVelocity().getValue().in(RPM);
     }
 
     public boolean shooterAtSpeed(double tolerance) {
@@ -326,25 +255,21 @@ public class TurretSubsystem extends SubsystemBase {
     // The numbers used here arised from tinkering around to get an accurate
     // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
     public Angle targetHoodAngle(double distance) {
-        // return Degrees.of(80 - 20 - ((28500 / (Math.pow(distance + 25, 2))) +
-        // 46.25));
-        distance = Math.min(distance, 20);
-        return Degrees.of(75.0 - 1.2 * distance);
+        return Degree.of(107 * Math.pow(distance, -0.228));
     }
 
     // Estimates the speed we want to shoot the fuel at based on the turret's
     // distance to the hub
     public AngularVelocity targetShooterSpeed(double distanceFeet) {
-        // TODO: adjust
-        if (distanceFeet < 8) {
-            return RPM.of(2400);
-        }
-        return RPM.of(2400 + 35 * (distanceFeet - 8));
+        double velocityFtps = 17.5 + 0.54 * distanceFeet;
 
-        // return RPM.of(1800 + 65 * distance);
+        // Adjust the below numbers based on testing.
+        // The 110 is a conversion factor to convert from ft/s to RPM, and the 0.0 is just a constant to adjust the speed up or down.
+        return RPM.of(velocityFtps * 110 + 0.0);
+    }
 
-        // return RPM.of((((Math.pow(distance + 12, 2)) * 0.0094) + 20.3)
-        // + (1 / (distance - 2.15)));
+    public Time timeUntilHit(double distanceFeet) {
+        return Seconds.of(distanceFeet * 0.02 + 0.8);
     }
 
     // public void setHoodToAngle(double angle) {
@@ -360,15 +285,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // SmartDashboard.putNumber("Left Shooter RPM",
-        // turretshooterLeft.getVelocity().getValue().in(RPM));
-        // SmartDashboard.putNumber("Right Shooter RPM",
-        // turretshooterRight.getVelocity().getValue().in(RPM));
-
         if (!turretEnabled) {
             turrethood.set(0);
-            turretshooterLeft.set(0);
-            turretshooterRight.set(0);
+            turretshooterLeft.setControl(new NeutralOut());
         }
     }
 

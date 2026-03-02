@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -24,8 +26,7 @@ import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.AutoRunIntake;
 import frc.robot.commands.intake.RunIntake;
-import frc.robot.commands.turret.TurretShootFixedVelocity;
-import frc.robot.commands.turret.TurretShootFixedVelocityBad;
+import frc.robot.commands.turret.SpinUpTurret;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -64,28 +65,20 @@ public class RobotContainer {
 
     // ** Commands **
 
-    // private final SpinIndexerForeward spindexerForeward = new
-    // SpinIndexerForeward(indexer, 1);
+    private Command pathPlannerAutoCommand; // This will hold the currently selected auto command from the chooser
+
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
-
     private final RunIntake runIntake = new RunIntake(intake, 0.75);
-    // private final RunIntake runOuttake = new RunIntake(intake, -0.75);
-
-    // private final ClimbToLevel climbToLevel1 = new ClimbToLevel(m_climber, 1);
-    // private final ClimbToLevel climbToLevel2 = new ClimbToLevel(m_climber, 2);
-    // private final ClimbToLevel climbToLevel3 = new ClimbToLevel(m_climber, 3);
     private final ExtendHook extendHook = new ExtendHook(climber);
     private final RetractHook retractHook = new RetractHook(climber);
-    // private final SetToZero setToZero = new SetToZero(climber);
+    private final SpinUpTurret spinUpTurret = new SpinUpTurret(turret, 1800);
 
-    SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
-    Command swerveCommand = swerve.driveFieldOriented(swerveInput);
+    private final SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
+    private final Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
-    // private final TurretShootFixedVelocity turretShoot = new
-    // TurretShootFixedVelocity(turret, swerve, indexer, swerveInput);
 
-    private SendableChooser<String> autoChooser = new SendableChooser<String>();
+    private final SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     private final Timer matchTimer = new Timer();
 
@@ -117,12 +110,6 @@ public class RobotContainer {
         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(() -> {
             matchTimer.reset();
             matchTimer.start();
-
-            if (!hasRanCalibration) {
-                CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
-                CommandScheduler.getInstance().schedule(new ZeroHood(turret));
-                hasRanCalibration = true;
-            }
         }));
 
         // Start match time on teleop start
@@ -130,6 +117,7 @@ public class RobotContainer {
             matchTimer.reset();
             matchTimer.start();
 
+            // Run calibration in teleop in case it failed in auto
             if (!hasRanCalibration) {
                 CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
                 CommandScheduler.getInstance().schedule(new ZeroHood(turret));
@@ -143,20 +131,16 @@ public class RobotContainer {
             matchTimer.stop();
         }));
 
+        // Buttons to manually zero stuff as needed
         SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
         SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
-
-        // Testing some auto commands (values to change once we have values needed)
-        // NamedCommands.registerCommand("AutoShoot",
-        // new TurretShoot(turret, 0.5));
 
         NamedCommands.registerCommand("RunIntake",
                 new AutoRunIntake(intake, 0.75));
 
         NamedCommands.registerCommand("StopIntake", Commands.runOnce(() -> intake.setIntakeSpeed(0), intake));
 
-        // NamedCommands.registerCommand("RunOuttake",
-        // new RunOuttake(m_intake, 0.5));
+        NamedCommands.registerCommand("SpinUpTurret", spinUpTurret);
 
         NamedCommands.registerCommand("SpinIndexerForward",
                 new SpinIndexerForeward(indexer, .5));
@@ -330,9 +314,35 @@ public class RobotContainer {
         }
     }
 
-    public Command getAutonomousCommand() {
-        // return null;
-        return swerve.getAutonomousCommand(autoChooser.getSelected());
+    public void scheduleAutonomous() {
+        pathPlannerAutoCommand = swerve.getAutonomousCommand(autoChooser.getSelected());
+        if (pathPlannerAutoCommand != null) {
+            // run zeroing at the start of auto with a deadline of 1 second, then run the
+            // path planner command after that
+            CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
+                    new ParallelDeadlineGroup(
+                            new WaitCommand(1),
+                            new ZeroHood(turret),
+                            new ZeroClimber(climber)),
+                    pathPlannerAutoCommand));
+        } else {
+            // if no path planner command is found, just run the zeroing commands
+            CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
+                    new ZeroHood(turret),
+                    new ZeroClimber(climber)));
+        }
+    }
+
+    public void cancelAutonomous() {
+        if (pathPlannerAutoCommand != null) {
+            pathPlannerAutoCommand.cancel();
+        }
+
+        // Stop all subsystems just in case
+        turret.stopHood();
+        turret.stopShooter();
+        indexer.stopIndexing();
+        intake.stop();
     }
 
 }

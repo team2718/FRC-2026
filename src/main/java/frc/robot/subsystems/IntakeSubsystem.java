@@ -108,4 +108,8 @@ public class IntakeSubsystem extends SubsystemBase {
         this.enabled = indexerIntakeEnabled;
     }
 
+    public void stop() {
+        intakeMotor.stopMotor();
+    }
+
 }

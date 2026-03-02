@@ -449,21 +449,32 @@ public class SwerveSubsystem extends SubsystemBase {
         .allianceRelativeControl(true);
   }
 
-  public static ChassisSpeeds applyAccelLimit(ChassisSpeeds currentSpeeds, ChassisSpeeds targetSpeeds, double accelLimit) {
-    // Apply rampRate considering the total magnitude of the speed change, not just individual components
-    double currentMagnitude = Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    double targetMagnitude = Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond);
-    double magnitudeDifference = targetMagnitude - currentMagnitude;
+  public static ChassisSpeeds applyAccelLimit(ChassisSpeeds current, ChassisSpeeds target, double accelLimit) {
+    double dvx = target.vxMetersPerSecond - current.vxMetersPerSecond;
+    double dvy = target.vyMetersPerSecond - current.vyMetersPerSecond;
+    double dvMag = Math.hypot(dvx, dvy);
 
-    if (Math.abs(magnitudeDifference) > accelLimit) {
-      double scale = (currentMagnitude + Math.signum(magnitudeDifference) * accelLimit) / targetMagnitude;
+    if (dvMag > accelLimit) {
+      double scale = accelLimit / dvMag;
       return new ChassisSpeeds(
-          targetSpeeds.vxMetersPerSecond * scale,
-          targetSpeeds.vyMetersPerSecond * scale,
-          targetSpeeds.omegaRadiansPerSecond
+          current.vxMetersPerSecond + (dvx * scale),
+          current.vyMetersPerSecond + (dvy * scale),
+          target.omegaRadiansPerSecond // Usually omega has its own separate limit
       );
-    } else {
-      return targetSpeeds;
     }
+    return target;
+  }
+
+  public static ChassisSpeeds applyVelocityLimit(ChassisSpeeds target, double velocityLimit) {
+    double speed = Math.hypot(target.vxMetersPerSecond, target.vyMetersPerSecond);
+
+    if (speed > velocityLimit) {
+      double scale = velocityLimit / speed;
+      return new ChassisSpeeds(
+          target.vxMetersPerSecond * scale,
+          target.vyMetersPerSecond * scale,
+          target.omegaRadiansPerSecond);
+    }
+    return target;
   }
 }
