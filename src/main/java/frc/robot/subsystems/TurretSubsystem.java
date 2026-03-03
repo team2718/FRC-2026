@@ -51,6 +51,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final static Angle turretAngle = Degrees.of(-85);
     private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretAngle.in(Degrees)));
 
+    private double targetRPM = 0;
+
     // private double turretDistanceToRobotCenter = 0.5;
     // private double turretDegreeFromRobotCenter = 40;
 
@@ -89,7 +91,8 @@ public class TurretSubsystem extends SubsystemBase {
         // Configuring motor variables (The current limit is set to 5 amps for now)
 
         TalonFXConfiguration turretshooterconfig = new TalonFXConfiguration();
-        turretshooterconfig.CurrentLimits.StatorCurrentLimit = 30; // TODO: increase back to 25
+        turretshooterconfig.CurrentLimits.StatorCurrentLimit = 80;
+        turretshooterconfig.CurrentLimits.SupplyCurrentLimit = 60;
         turretshooterconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         turretshooterconfig.Slot0.kG = 0.0;
@@ -101,7 +104,7 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterconfig.Slot0.kV = 1.0 / 500.0 * 60.0;
         turretshooterconfig.Slot0.kA = 0.19; // TODO: Tune, this value is from reca.lc
 
-        turretshooterconfig.Slot0.kP = 0.1;
+        turretshooterconfig.Slot0.kP = 0.4;
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
         turretshooterconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
@@ -160,6 +163,8 @@ public class TurretSubsystem extends SubsystemBase {
         } else if (angularVelocity.in(RPM) > 5000) {
             angularVelocity = RPM.of(5000);
         }
+
+        targetRPM = angularVelocity.in(RPM);
 
         turretshooterLeft.setControl(new MotionMagicVelocityVoltage(angularVelocity));
     }

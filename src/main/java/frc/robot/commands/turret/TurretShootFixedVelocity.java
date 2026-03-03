@@ -35,7 +35,7 @@ public class TurretShootFixedVelocity extends Command {
         this.swerveInput = swerveInput;
         this.indexer = indexer;
 
-        SmartDashboard.putNumber("Target RPM", 2000);
+        // SmartDashboard.putNumber("Target RPM", 2000);
 
         addRequirements(shooter, swerve, indexer);
     }

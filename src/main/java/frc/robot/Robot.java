@@ -24,6 +24,14 @@ public class Robot extends TimedRobot {
   @Logged(name = "Robot Container")
   private final RobotContainer m_robotContainer;
 
+  public enum NoCameraMode {
+    DISABLED,
+    CLOSE_SHOT,
+    FAR_SHOT
+  }
+
+  public static NoCameraMode noCameraMode = NoCameraMode.DISABLED;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any

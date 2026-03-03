@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -82,6 +83,8 @@ public class RobotContainer {
 
     private final Timer matchTimer = new Timer();
 
+    private final Timer globalTimer = new Timer();
+
     private boolean swerveEnabled = true;
     private boolean turretEnabled = true;
     private boolean indexerIntakeEnabled = true;
@@ -105,6 +108,7 @@ public class RobotContainer {
         // Setup timer
 
         matchTimer.reset();
+        globalTimer.start();
 
         // Start match time on autonomous start
         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(() -> {
@@ -234,11 +238,44 @@ public class RobotContainer {
 
         // driverController.rightTrigger().onFalse(
         // leds.setLEDState(LEDState.RAINBOW));
+
+        buttonBoxController.a().onTrue(Commands.runOnce(() -> {
+            if (Robot.noCameraMode != Robot.NoCameraMode.CLOSE_SHOT) {
+                Robot.noCameraMode = Robot.NoCameraMode.CLOSE_SHOT;
+            } else {
+                Robot.noCameraMode = Robot.NoCameraMode.DISABLED;
+            }
+        }));
+
+        buttonBoxController.b().onTrue(Commands.runOnce(() -> {
+            if (Robot.noCameraMode != Robot.NoCameraMode.FAR_SHOT) {
+                Robot.noCameraMode = Robot.NoCameraMode.FAR_SHOT;
+            } else {
+                Robot.noCameraMode = Robot.NoCameraMode.DISABLED;
+            }
+        }));
+    }
+
+    private int stateToButtonBox() {
+        int[] buttonBoxLEDs = { 0, 0, 0, 0, 1, 1, 1, 1 };
+
+        if (Robot.noCameraMode == Robot.NoCameraMode.CLOSE_SHOT) {
+            buttonBoxLEDs[0] = globalTimer.get() % 0.5 < 0.25 ? 1 : 0;
+        }
+
+        if (Robot.noCameraMode == Robot.NoCameraMode.FAR_SHOT) {
+            buttonBoxLEDs[1] = globalTimer.get() % 0.5 < 0.25 ? 1 : 0;
+        }
+
+        return buttonBoxLEDs[0] * 1 + buttonBoxLEDs[1] * 2 + buttonBoxLEDs[2] * 4 + buttonBoxLEDs[3] * 8
+                + buttonBoxLEDs[4] * 16 + buttonBoxLEDs[5] * 32 + buttonBoxLEDs[6] * 64 + buttonBoxLEDs[7] * 128;
     }
 
     public void periodic() {
         swerve.getSwerveDrive().updateOdometry();
         vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
+
+        buttonBoxController.setRumble(RumbleType.kBothRumble, stateToButtonBox() / 255.0);
 
         int leftTrigger = (int) (buttonBoxController.getHID().getLeftTriggerAxis() * 32);
 

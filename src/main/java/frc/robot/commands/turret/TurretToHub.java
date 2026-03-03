@@ -16,7 +16,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
 import frc.robot.Strategy;
+import frc.robot.Robot.NoCameraMode;
 import frc.robot.Strategy.StrategyType;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -52,8 +54,6 @@ public class TurretToHub extends Command {
         this.indexer = indexer;
 
         turnController.enableContinuousInput(-Math.PI, Math.PI);
-
-        SmartDashboard.putNumber("Target RPM", 2000);
 
         addRequirements(shooter, swerve, indexer);
     }
@@ -92,6 +92,11 @@ public class TurretToHub extends Command {
     // activated
     @Override
     public void execute() {
+
+        if (!(Robot.noCameraMode == NoCameraMode.DISABLED)) {
+            runNoCameraShot();
+            return;
+        }
 
         // Limit the velocity and acceleration of the robot to help out shoot while
         // moving
@@ -161,5 +166,27 @@ public class TurretToHub extends Command {
     @Override
     public boolean isFinished() {
         return false;
+    }
+
+    private void runNoCameraShot() {
+        swerve.lock();
+        double targetShooterSpeed = 0;
+
+        if (Robot.noCameraMode == NoCameraMode.CLOSE_SHOT) {
+            shooter.setHoodAngle(Degrees.of(70));
+            targetShooterSpeed = 1965;
+        } else if (Robot.noCameraMode == NoCameraMode.FAR_SHOT) {
+            shooter.setHoodAngle(Degrees.of(63));
+            targetShooterSpeed = 2234;
+        }
+
+        shooter.setShooterSpeed(RPM.of(targetShooterSpeed));
+
+        if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed, MAX_RPM_ERROR))) {
+            isSpunUp = true;
+            indexer.runIndexing();
+        } else {
+            indexer.stopIndexing();
+        }
     }
 }

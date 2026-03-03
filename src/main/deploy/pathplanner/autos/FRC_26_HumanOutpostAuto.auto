@@ -23,15 +23,15 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.8
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "SpinUpTurret"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.8
           }
         },
         {
@@ -50,6 +50,12 @@
           "type": "named",
           "data": {
             "name": "TurretToHub9"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
           }
         }
       ]
