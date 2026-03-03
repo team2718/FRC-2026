@@ -321,7 +321,7 @@ public class RobotContainer {
             // path planner command after that
             CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
                     new ParallelDeadlineGroup(
-                            new WaitCommand(1),
+                            new WaitCommand(0.5),
                             new ZeroHood(turret),
                             new ZeroClimber(climber)),
                     pathPlannerAutoCommand));

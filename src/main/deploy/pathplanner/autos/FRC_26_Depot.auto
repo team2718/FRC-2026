@@ -25,19 +25,13 @@
         {
           "type": "named",
           "data": {
-            "name": "RunIntake"
+            "name": "StopIntake"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "TurretToHub6"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_DepotMoveAway"
           }
         }
       ]

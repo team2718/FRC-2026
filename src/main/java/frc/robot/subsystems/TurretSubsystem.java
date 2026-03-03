@@ -254,7 +254,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         // Adjust the below numbers based on testing.
         // The 110 is a conversion factor to convert from ft/s to RPM, and the 0.0 is just a constant to adjust the speed up or down.
-        return RPM.of(velocityFtps * 98 + 100);
+        return RPM.of(velocityFtps * 95 + 50);
     }
 
     public Time timeUntilHit(double distanceFeet) {

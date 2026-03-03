@@ -22,7 +22,7 @@ public class ZeroHood extends Command {
     @Override
     public void execute() {
         // Set a small negative speed
-        turret.setHoodSpeedUnchecked(-0.05);
+        turret.setHoodSpeedUnchecked(-0.1);
     }
 
     @Override

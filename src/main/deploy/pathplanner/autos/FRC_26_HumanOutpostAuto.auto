@@ -5,21 +5,33 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "FRC_26_ShootThenOutpost"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "RunIntake"
+            "waitTime": 1.8
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "RunIntake"
+            "name": "SpinUpTurret"
           }
         },
         {
@@ -31,13 +43,13 @@
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub6"
+            "name": "RunIntake"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "FRC_26_OutpostGetOutOfWay"
+            "name": "TurretToHub9"
           }
         }
       ]
