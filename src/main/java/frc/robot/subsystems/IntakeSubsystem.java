@@ -55,7 +55,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
         intakeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 30;
+        intakeMotorConfig.CurrentLimits.StatorCurrentLimit = 40;
         intakeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         intakeMotor.getConfigurator().apply(intakeMotorConfig);
     }

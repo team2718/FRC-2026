@@ -179,6 +179,8 @@ public class RobotContainer {
         // the thought is to spin it in the direction we want the fuel to go in. Subject
         // to change.
 
+        driverController.a().onTrue(Commands.runOnce(() -> swerve.zeroGyro()));
+
         // Left Trigger: Spins the intake wheel & spindexer foreward
         driverController.leftTrigger().whileTrue(runIntake);
         // driverController.leftTrigger().whileTrue(spindexerForeward);
@@ -192,8 +194,8 @@ public class RobotContainer {
         driverController.rightTrigger().whileTrue(turretToHub);
         // driverController.rightTrigger().whileTrue(spindexerForeward);
 
-        driverController.a().whileTrue(retractHook);
-        driverController.b().whileTrue(extendHook);
+        driverController.povDown().whileTrue(retractHook);
+        driverController.povUp().whileTrue(extendHook);
 
         driverController.x().onTrue(Commands.runOnce(() -> intake.setActive(), intake));
         driverController.y().onTrue(Commands.runOnce(() -> intake.setStowed(), intake));

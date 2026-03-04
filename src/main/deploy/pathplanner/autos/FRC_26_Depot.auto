@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "FRC_26_ToDepot"
@@ -13,7 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "RunIntake"
+            "name": "SpinUpTurret"
           }
         },
         {
@@ -25,13 +31,13 @@
         {
           "type": "named",
           "data": {
-            "name": "StopIntake"
+            "name": "TurretToHub9"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub6"
+            "name": "StopIntake"
           }
         }
       ]
