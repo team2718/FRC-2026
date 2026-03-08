@@ -74,6 +74,8 @@ public class RobotContainer {
     private final RetractHook retractHook = new RetractHook(climber);
     private final SpinUpTurret spinUpTurret = new SpinUpTurret(turret, 1800);
 
+    private final ZeroHood zeroHood = new ZeroHood(turret);
+
     private final SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
     private final Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
@@ -100,6 +102,7 @@ public class RobotContainer {
         autoChooser.setDefaultOption("Just Score", "Just Score");
         autoChooser.addOption("FRC_26_Depot", "FRC_26_Depot");
         autoChooser.addOption("FRC_26_HumanOutpostAuto", "FRC_26_HumanOutpostAuto");
+        autoChooser.addOption("FRC_26_NeutralZoneAuto", "FRC_26_NeutralZoneAuto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
@@ -124,7 +127,7 @@ public class RobotContainer {
             // Run calibration in teleop in case it failed in auto
             if (!hasRanCalibration) {
                 CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
-                CommandScheduler.getInstance().schedule(new ZeroHood(turret));
+                CommandScheduler.getInstance().schedule(zeroHood);
                 hasRanCalibration = true;
             }
         }));
@@ -192,6 +195,8 @@ public class RobotContainer {
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
         // driverController.rightTrigger().whileTrue(turretToHub);
         driverController.rightTrigger().whileTrue(turretToHub);
+        // driverController.rightTrigger().onFalse(new WaitCommand(0.1).andThen(zeroHood));
+        
         // driverController.rightTrigger().whileTrue(spindexerForeward);
 
         driverController.povDown().whileTrue(retractHook);
@@ -256,6 +261,8 @@ public class RobotContainer {
                 Robot.noCameraMode = Robot.NoCameraMode.DISABLED;
             }
         }));
+
+        buttonBoxController.x().onTrue(zeroHood);
     }
 
     private int stateToButtonBox() {

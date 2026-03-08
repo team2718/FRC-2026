@@ -17,7 +17,7 @@ public class SpinUpTurret extends Command {
 
     @Override
     public void initialize() {
-        shooter.setShooterSpeed(RPM.of(targetRPM));
+        // shooter.setShooterSpeed(RPM.of(targetRPM));
     }
 
     @Override

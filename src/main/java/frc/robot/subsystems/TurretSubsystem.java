@@ -44,7 +44,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final static Angle hoodZeroAngle = Degrees.of(86);
     private final static Angle hoodRangeOfMotion = Degrees.of(40);
-    private final static double hoodGearRatio = 472/32 * 48/14;
+    private final static double hoodGearRatio = 291/24 * 48/14;
 
     private final static Distance turretX = Inches.of(-5.75);
     private final static Distance turretY = Inches.of(-5);
