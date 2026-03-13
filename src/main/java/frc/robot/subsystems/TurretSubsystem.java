@@ -10,9 +10,9 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -107,8 +107,8 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterconfig.Slot0.kP = 0.4;
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
-        turretshooterconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
-        turretshooterconfig.MotionMagic.MotionMagicAcceleration = 2000;
+        // turretshooterconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+        // turretshooterconfig.MotionMagic.MotionMagicAcceleration = 2000;
         turretshooterconfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
         turretshooterconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -166,7 +166,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         targetRPM = angularVelocity.in(RPM);
 
-        turretshooterLeft.setControl(new MotionMagicVelocityVoltage(angularVelocity));
+        turretshooterLeft.setControl(new VelocityVoltage(angularVelocity).withEnableFOC(true));
     }
 
     // sets speed of the shooter
@@ -177,7 +177,7 @@ public class TurretSubsystem extends SubsystemBase {
     public void stopShooter() {
         // Should we do this or should we use stopMotor() on each motor?
         // Using the closed loop gives us smoother deceleration
-        setShooterSpeedRPM(0);
+        turretshooterLeft.setControl(new NeutralOut());
     }
 
     // Return the average RPM of the two shooter motors (should be the same, but

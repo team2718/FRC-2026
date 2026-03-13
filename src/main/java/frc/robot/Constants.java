@@ -29,7 +29,7 @@ public final class Constants {
   // telemetry except for critical errors and warnings.
   public static final boolean REDUCED_TELEMETRY = false;
 
-  public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(14.0);
+  public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(14.9);
 
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
