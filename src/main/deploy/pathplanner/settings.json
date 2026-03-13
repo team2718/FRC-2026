@@ -5,10 +5,13 @@
   "pathFolders": [
     "ClimberPathsForLater",
     "DepotPaths",
+    "DoubleNeutralZonePaths",
+    "JustShootPath",
     "MajorlyGreedyPaths",
     "MinorlyGreedyPaths",
     "NeutralZonePaths",
-    "JustShootPath",
+    "NeutralZoneAndOutpostPaths",
+    "OutpostAndDepotPaths",
     "OutpostPaths"
   ],
   "autoFolders": [],
