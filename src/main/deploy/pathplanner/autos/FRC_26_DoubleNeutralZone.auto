@@ -1,0 +1,79 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_GoToNeutralZone"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpinUpTurret"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_NeutralZoneToShootDouble"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretToHub6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_GoBackToNeutralZone"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_NeutralZoneToShootDouble2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpinUpTurret"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretToHub6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

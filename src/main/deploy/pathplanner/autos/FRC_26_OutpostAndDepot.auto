@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpinUpTurret"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_ToOutpost"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretToHub6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FRC_26_OutpostToDepot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretToHub6"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
