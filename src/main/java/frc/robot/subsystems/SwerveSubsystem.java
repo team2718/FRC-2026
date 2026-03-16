@@ -450,6 +450,8 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public static ChassisSpeeds applyAccelLimit(ChassisSpeeds current, ChassisSpeeds target, double accelLimit) {
+    accelLimit = accelLimit * 0.02; // Convert from m/s^2 to m/s per 20ms loop
+
     double dvx = target.vxMetersPerSecond - current.vxMetersPerSecond;
     double dvy = target.vyMetersPerSecond - current.vyMetersPerSecond;
     double dvMag = Math.hypot(dvx, dvy);

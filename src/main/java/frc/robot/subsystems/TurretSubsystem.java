@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
@@ -24,6 +23,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -44,37 +44,47 @@ public class TurretSubsystem extends SubsystemBase {
 
     private final static Angle hoodZeroAngle = Degrees.of(86);
     private final static Angle hoodRangeOfMotion = Degrees.of(40);
-    private final static double hoodGearRatio = 291/24 * 48/14;
+    private final static double hoodGearRatio = (291.0 / 24.0) * (48.0 / 14.0);
 
     private final static Distance turretX = Inches.of(-5.75);
     private final static Distance turretY = Inches.of(-5);
     private final static Angle turretAngle = Degrees.of(-85);
-    private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretAngle.in(Degrees)));
+    private final static Transform2d turretLocation = new Transform2d(
+            new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretAngle.in(Degrees)));
 
-    private double targetRPM = 0;
+    // Determine values empirically by testing
+    // hood_deg should not be changed as it was determined from simulation
+    // and should always be
+    // hood_deg = 107 * Math.pow(dist_ft, -0.228)
+    // flight_sec is hard to measure but should be close to
+    // flight_sec = dist_ft * 0.02 + 0.8
+    private static final double[][] SHOT_TABLE = {
+            // dist_ft hood_deg rpm flight_sec
+            { 4.0, 73.5, 1880.0, 0.88 },
+            { 6.0, 69.0, 2000.0, 0.92 },
+            { 8.0, 65.0, 2150.0, 0.96 },
+            { 10.0, 62.0, 2290.0, 1.00 },
+            { 12.0, 59.5, 2430.0, 1.04 },
+            { 14.0, 57.5, 2570.0, 1.08 },
+            { 16.0, 56.0, 2710.0, 1.12 },
+            { 18.0, 54.5, 2850.0, 1.16 },
+            { 20.0, 53.5, 2990.0, 1.20 },
+    };
 
-    // private double turretDistanceToRobotCenter = 0.5;
-    // private double turretDegreeFromRobotCenter = 40;
+    // InterpolatingDoubleTreeMap performs linear interpolation to give us values
+    // for distances that aren't in the shot table
+    private static final InterpolatingDoubleTreeMap hoodAngleMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap flightTimeMap = new InterpolatingDoubleTreeMap();
 
-    // double robotAngleFromTag9 =
-    // hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
-    // double robotDistanceToTag9 = Math.sqrt(Math.pow(swerve.getPose().getX() -
-    // hubCenterLocation.getX(), 2)
-    // + Math.pow(swerve.getPose().getY() - hubCenterLocation.getY(), 2));
-
-    // double turretPositionX;
-    // double turretPositionY;
-
-    // double turretAngleFromTag9;
-    // double turretDistanceToTag9;
-
-    // double projectedTime = Math.sqrt(robotDistanceToTag9);
-
-    // double projectedTurretPositionX;
-    // double projectedTurretPositionY;
-
-    // double projectedTurretAngleFromTag9;
-    // double projectedTurretDistanceToTag9;
+    static {
+        for (double[] row : SHOT_TABLE) {
+            double distFt = row[0];
+            hoodAngleMap.put(distFt, row[1]);
+            shooterSpeedMap.put(distFt, row[2]);
+            flightTimeMap.put(distFt, row[3]);
+        }
+    }
 
     private boolean turretEnabled = true;
 
@@ -82,7 +92,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         // Motors-----------------------------------------------------------------------------------------------------------------------------------
 
-        //Tthe left turret shooter is the primary motor and the right shooter follows it
+        // Tthe left turret shooter is the primary motor and the right shooter follows
+        // it
 
         turretshooterLeft = new TalonFX(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID);
         turretshooterRight = new TalonFX(Constants.TurretConstants.RIGHT_SHOOTER_MOTOR_ID);
@@ -137,19 +148,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         // Make sure frequency is high enough for follower to follow
         turretshooterLeft.getMotorVoltage().setUpdateFrequency(100);
-        turretshooterRight.setControl(new Follower(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
-    }
-
-    public static double getWrappedAngleDifference(double source, double target) {
-        double diff = (target - source) % 360;
-
-        if (diff >= 180) {
-            diff -= 360;
-        } else if (diff <= -180) {
-            diff += 360;
-        }
-
-        return diff;
+        turretshooterRight
+                .setControl(new Follower(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
     }
 
     public void setShooterSpeed(AngularVelocity angularVelocity) {
@@ -163,8 +163,6 @@ public class TurretSubsystem extends SubsystemBase {
         } else if (angularVelocity.in(RPM) > 5000) {
             angularVelocity = RPM.of(5000);
         }
-
-        targetRPM = angularVelocity.in(RPM);
 
         turretshooterLeft.setControl(new VelocityVoltage(angularVelocity).withEnableFOC(true));
     }
@@ -240,30 +238,23 @@ public class TurretSubsystem extends SubsystemBase {
 
     // returns the current position of the hood
     public double getTurretHoodAngleDegrees() {
-        return hoodZeroAngle.minus(Rotations.of(turrethood.getPosition().getValueAsDouble() / hoodGearRatio)).in(Degrees);
+        return hoodZeroAngle.minus(Rotations.of(turrethood.getPosition().getValueAsDouble() / hoodGearRatio))
+                .in(Degrees);
     }
 
-    // Estimates the angle we want to shoot the fuel at based on the turret's
-    // distance to the hub (20 = angle the ball shoots at when the hood is at 80
-    // degrees, not sure what is actually is)
-    // The numbers used here arised from tinkering around to get an accurate
-    // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
-    public Angle targetHoodAngle(double distance) {
-        return Degree.of(107 * Math.pow(distance, -0.228));
+    // Use the shot table to get the target hood angle using interpolation based on the distance to the target
+    public Angle targetHoodAngle(double distanceFeet) {
+        return Degrees.of(hoodAngleMap.get(distanceFeet));
     }
 
-    // Estimates the speed we want to shoot the fuel at based on the turret's
-    // distance to the hub
+    // Use the shot table to get the target shooter speed using interpolation based on the distance to the target
     public AngularVelocity targetShooterSpeed(double distanceFeet) {
-        double velocityFtps = 17.5 + 0.54 * distanceFeet;
-
-        // Adjust the below numbers based on testing.
-        // The 110 is a conversion factor to convert from ft/s to RPM, and the 0.0 is just a constant to adjust the speed up or down.
-        return RPM.of(velocityFtps * 95 + 50);
+        return RPM.of(shooterSpeedMap.get(distanceFeet));
     }
 
+    // Use the shot table to get the target flight time using interpolation based on the distance to the target
     public Time timeUntilHit(double distanceFeet) {
-        return Seconds.of(distanceFeet * 0.02 + 0.8);
+        return Seconds.of(flightTimeMap.get(distanceFeet));
     }
 
     @Override

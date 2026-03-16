@@ -16,6 +16,7 @@ import frc.robot.Strategy;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.utils.PossumUtils;
 import swervelib.SwerveInputStream;
 
 public class TurretShootFixedVelocity extends Command {
@@ -38,28 +39,6 @@ public class TurretShootFixedVelocity extends Command {
         // SmartDashboard.putNumber("Target RPM", 2000);
 
         addRequirements(shooter, swerve, indexer);
-    }
-
-    public static double getWrappedAngleDifference(double source, double target) {
-        double diff = (target - source) % 360;
-
-        if (diff >= 180) {
-            diff -= 360;
-        } else if (diff <= -180) {
-            diff += 360;
-        }
-
-        return diff;
-    }
-
-    public double clamp(double min, double max, double value) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
-        return value;
     }
 
     @Override
@@ -95,12 +74,11 @@ public class TurretShootFixedVelocity extends Command {
 
         ChassisSpeeds swerveSpeeds = swerveInput.get();
 
-        double angleError = getWrappedAngleDifference(
+        double angleError = PossumUtils.getWrappedAngleDifference(
                 turretPose.getRotation().getDegrees(),
                 locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
 
-        double turnSpeed = clamp(-3.0, 3.0, angleError * 0.15);
-
+        double turnSpeed = PossumUtils.clamp(-3.0, 3.0, angleError * 0.15);
         swerveSpeeds.omegaRadiansPerSecond = turnSpeed;
 
         swerveSpeeds = SwerveSubsystem.applyAccelLimit(lastSwerveSpeeds, swerveSpeeds, MAX_SPEED_BETWEEN_UPDATES);

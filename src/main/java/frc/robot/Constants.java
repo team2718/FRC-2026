@@ -37,6 +37,9 @@ public final class Constants {
     public static final double SPEED_MULTIPLIER = 0.6;
     public static final double ROTATION_MULTIPLIER = 0.5;
     public static final double DEADBAND = 0.1;
+
+    public static final double ACCEL_LIMIT_WHILE_SHOOTING = 1.2; // Meters per second^2
+    public static final double VEL_LIMIT_WHILE_SHOOTING = 0.8; // Meters per second
   }
 
   public static final class TurretConstants {
@@ -44,6 +47,8 @@ public final class Constants {
     public static final int HOOD_MOTOR_ID = 15;
     public static final int LEFT_SHOOTER_MOTOR_ID = 14;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 13;
+
+    public static final double SHOT_LEAD_TIME_LATENCY_SECONDS = 0.2;
   }
 
   public static final class ClimberConstants {

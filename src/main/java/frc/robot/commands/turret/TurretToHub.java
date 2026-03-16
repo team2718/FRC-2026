@@ -12,10 +12,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Strategy;
 import frc.robot.Robot.NoCameraMode;
@@ -25,12 +27,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import swervelib.SwerveInputStream;
 
-public class TurretToHub extends Command {
-    private static final double ACCEL_LIMIT_WHILE_SHOOTING = 1.2 * 0.02;
-    private static final double VEL_LIMIT_WHILE_SHOOTING = 0.8;
-
-    private static final double LEAD_TIME_LATENCY_SECONDS = 0.2;
-    
+public class TurretToHub extends Command {    
     private static final double MAX_ANGLE_ERROR_RADIANS = Degrees.of(5).in(Radians);
     private static final double MAX_RPM_ERROR = 30;
 
@@ -58,28 +55,6 @@ public class TurretToHub extends Command {
         addRequirements(shooter, swerve, indexer);
     }
 
-    public static double getWrappedAngleDifference(double source, double target) {
-        double diff = (target - source) % 360;
-
-        if (diff >= 180) {
-            diff -= 360;
-        } else if (diff <= -180) {
-            diff += 360;
-        }
-
-        return diff;
-    }
-
-    public double clamp(double min, double max, double value) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
-        return value;
-    }
-
     @Override
     public void initialize() {
         lastSwerveSpeeds = swerve.getFieldVelocity();
@@ -101,8 +76,8 @@ public class TurretToHub extends Command {
         // Limit the velocity and acceleration of the robot to help out shoot while
         // moving
         ChassisSpeeds swerveSpeeds = swerveInputFieldOriented.get();
-        swerveSpeeds = SwerveSubsystem.applyAccelLimit(lastSwerveSpeeds, swerveSpeeds, ACCEL_LIMIT_WHILE_SHOOTING);
-        swerveSpeeds = SwerveSubsystem.applyVelocityLimit(swerveSpeeds, VEL_LIMIT_WHILE_SHOOTING);
+        swerveSpeeds = SwerveSubsystem.applyAccelLimit(lastSwerveSpeeds, swerveSpeeds, Constants.OperatorConstants.ACCEL_LIMIT_WHILE_SHOOTING);
+        swerveSpeeds = SwerveSubsystem.applyVelocityLimit(swerveSpeeds, Constants.OperatorConstants.VEL_LIMIT_WHILE_SHOOTING);
         lastSwerveSpeeds = swerveSpeeds;
 
         Pose2d turretPose = shooter.getTurretPoseFromRobotPose(swerve.getPose());
@@ -112,13 +87,21 @@ public class TurretToHub extends Command {
         Translation2d commandedRobotVelocity = new Translation2d(swerveSpeeds.vxMetersPerSecond,
                 swerveSpeeds.vyMetersPerSecond);
 
-        // Calculate the lead time we need based on distance
-        // adjust the constant based on system latency
+        // Iteratively solve the shoot-while-moving lead problem.
+        // Each iteration recomputes the flight time from the updated (led) distance,
+        // then re-applies the lead until the distance converges.
         Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
-        double leadTimeSeconds = LEAD_TIME_LATENCY_SECONDS + shooter.timeUntilHit(distanceToLocationTarget.in(Feet)).in(Seconds);
-
-        // Lead the target based on our current velocity
-        locationTarget = locationTarget.minus(commandedRobotVelocity.times(leadTimeSeconds));
+        for (int i = 0; i < 4; i++) {
+            double leadTimeSeconds = Constants.TurretConstants.SHOT_LEAD_TIME_LATENCY_SECONDS + shooter.timeUntilHit(distanceToLocationTarget.in(Feet)).in(Seconds);
+            Translation2d newLocationTarget = strategyConfig.targetLocation.minus(commandedRobotVelocity.times(leadTimeSeconds));
+            Distance newDistance = Meters.of(newLocationTarget.getDistance(turretPose.getTranslation()));
+            locationTarget = newLocationTarget;
+            // Optional break-early logic
+            // if (Math.abs(newDistance.in(Feet) - distanceToLocationTarget.in(Feet)) < 1e-6) {
+            //     break;
+            // }
+            distanceToLocationTarget = newDistance;
+        }
         distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
 
         SmartDashboard.putNumber("TurretToHub/distanceToTarget", distanceToLocationTarget.in(Feet));
@@ -129,8 +112,9 @@ public class TurretToHub extends Command {
         SmartDashboard.putNumber("TurretToHub/shooterSpeed", targetShooterSpeed.in(RPM));
 
         if (strategyConfig.strategyType == StrategyType.HUB_SHOT) {
-            shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
-            SmartDashboard.putNumber("TurretToHub/hoodAngle", shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)).in(Degrees));
+            Angle targetHoodAngle = shooter.targetHoodAngle(distanceToLocationTarget.in(Feet));
+            shooter.setHoodAngle(targetHoodAngle);
+            SmartDashboard.putNumber("TurretToHub/hoodAngle", targetHoodAngle.in(Degrees));
         } else {
             shooter.setHoodAngle(Degrees.of(45));
         }
