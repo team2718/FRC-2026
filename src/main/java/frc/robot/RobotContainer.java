@@ -107,9 +107,13 @@ public class RobotContainer {
         swerve.setDefaultCommand(swerve.driveFieldOriented(swerveInput));
 
         autoChooser.setDefaultOption("Just Score", "Just Score");
-        autoChooser.addOption("FRC_26_Depot", "FRC_26_Depot");
-        autoChooser.addOption("FRC_26_HumanOutpostAuto", "FRC_26_HumanOutpostAuto");
-        autoChooser.addOption("FRC_26_NeutralZoneAuto", "FRC_26_NeutralZoneAuto");
+        autoChooser.addOption("DepotAuto", "DepotAuto");
+        autoChooser.addOption("HumanOutpostAuto", "HumanOutpostAuto");
+        autoChooser.addOption("NeutralZoneAuto", "NeutralZoneAuto");
+        autoChooser.addOption("NeutralZoneAndDepotAuto","NeutralZoneAndDepotAuto");
+        autoChooser.addOption("NeutralZoneAndOutpostAuto", "NeutralZoneAndOutpostAuto");
+        autoChooser.addOption("DoubleNeutralZoneAuto", "DoubleNeutralZoneAuto");
+        autoChooser.addOption("OutpostAndDepotAuto", "OutpostAndDepotAuto");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
