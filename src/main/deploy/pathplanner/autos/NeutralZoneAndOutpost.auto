@@ -19,31 +19,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ShootToNeutralZone"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpinUpTurret"
+            "pathName": "OutpostAndNeutralZoneStart"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_NeutralZoneToShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub9"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
+            "pathName": "NeutralZoneToOutpost"
           }
         }
       ]

@@ -5,33 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_StartBeingMinorlyGreedy"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "RunIntake"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "FRC_26_BeMinorlyGreedy"
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StopBeingMinorlyGreedy"
+            "pathName": "DepotStartToNeutralZone"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "TurretToHub6"
+            "pathName": "NeutralZoneToDepot"
           }
         }
       ]

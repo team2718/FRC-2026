@@ -5,45 +5,39 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "StartBeingMajorlyGreedy"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "RunIntake"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.0
+            "pathName": "BeMajorlyGreedy"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SpinUpTurret"
+            "name": "RunIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ToOutpost"
+            "pathName": "MajorGreedinessToShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub6"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_OutpostToDepot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub6"
+            "name": "TurretToHub"
           }
         }
       ]

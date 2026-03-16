@@ -17,12 +17,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_GoToNeutralZone"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "SpinUpTurret"
@@ -31,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_NeutralZoneToShootDouble"
+            "pathName": "ToOutpost"
           }
         },
         {
@@ -43,31 +37,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_GoBackToNeutralZone"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_NeutralZoneToShootDouble2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpinUpTurret"
+            "pathName": "OutpostToDepot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "TurretToHub6"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
           }
         }
       ]
