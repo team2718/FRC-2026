@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_StartBeingMajorlyGreedy"
+            "pathName": "StartBeingMinorlyGreedy"
           }
         },
         {
@@ -19,25 +19,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_BeMajorlyGreedy"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
+            "pathName": "BeMinorlyGreedy"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_MajorGreedinessToShoot"
+            "pathName": "StopBeingMinorlyGreedy"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub"
+            "name": "TurretToHub6"
           }
         }
       ]

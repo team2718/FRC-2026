@@ -5,39 +5,21 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "RunIntake"
+            "pathName": "StartThenShootInverted"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StopIntake"
+            "name": "TurretToHub3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FRC_26_ShootThenOutpost"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpinUpTurret"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.8
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "FRC_26_OutpostToShoot"
+            "pathName": "ShootToNeutralZoneInverted"
           }
         },
         {
@@ -47,15 +29,21 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "TurretToHub9"
+            "pathName": "NeutralZoneToShootInverted"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StopIntake"
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretToHub6"
           }
         }
       ]

@@ -1,0 +1,120 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.778,
+        "y": 7.173
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.799247252012579,
+        "y": 6.6955470790360785
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.597633333333333,
+        "y": 5.0191888888888885
+      },
+      "prevControl": {
+        "x": 8.324445338606294,
+        "y": 5.228786918837409
+      },
+      "nextControl": {
+        "x": 6.733092450324495,
+        "y": 4.769872608235883
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.892355555555555,
+        "y": 7.318877777777777
+      },
+      "prevControl": {
+        "x": 6.37342516582415,
+        "y": 7.113794834400862
+      },
+      "nextControl": {
+        "x": 5.429505574466483,
+        "y": 7.516193580808232
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.8618333333333332,
+        "y": 7.173
+      },
+      "prevControl": {
+        "x": 3.5938151841404835,
+        "y": 7.190400359464328
+      },
+      "nextControl": {
+        "x": 2.6119039393667975,
+        "y": 7.167058785349768
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.5913777777777778,
+        "y": 6.013122222222222
+      },
+      "prevControl": {
+        "x": 0.380204961911504,
+        "y": 5.879308763111754
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.5966804979253229,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "SpinUpTurret",
+      "waypointRelativePos": 1.5999999999999845,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "TurretToHub9",
+      "waypointRelativePos": 2.8228287841190993,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.25,
+    "maxAcceleration": 2.25,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "NeutralZoneAndDepotPaths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": true
+}
