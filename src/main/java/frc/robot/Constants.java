@@ -44,6 +44,7 @@ public final class Constants {
     public static final int HOOD_MOTOR_ID = 15;
     public static final int LEFT_SHOOTER_MOTOR_ID = 14;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 13;
+    public static final int TURRET_MOTOR_ID = 69420;
   }
 
   public static final class ClimberConstants {
