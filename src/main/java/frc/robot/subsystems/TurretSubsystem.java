@@ -270,8 +270,8 @@ public class TurretSubsystem extends SubsystemBase {
 
 
     //Sets the target turret angle based on where the turret is projected to be on the field when the fuel hits the hub
-    public Angle targetTurretAngle(double projectedDistanceX, double projectedDistanceY) {
-        return Degree.of(Math.atan2(projectedDistanceY, projectedDistanceX));
+    public Angle targetTurretAngle(double projectedDistance) {
+        return Degree.of(Math.atan(projectedDistance));
     }
 
     // Estimates the angle we want to shoot the fuel at based on the turret's

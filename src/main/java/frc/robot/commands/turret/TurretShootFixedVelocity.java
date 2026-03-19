@@ -17,6 +17,7 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import swervelib.SwerveInputStream;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class TurretShootFixedVelocity extends Command {
     private final TurretSubsystem shooter;
@@ -28,6 +29,8 @@ public class TurretShootFixedVelocity extends Command {
     private double MAX_SPEED_BETWEEN_UPDATES = 0.05;
     private double MAX_SPEED_WHILE_SHOOTING = 0.7;
 
+    private InterpolatingDoubleTreeMap table = new InterpolatingDoubleTreeMap();
+
     public TurretShootFixedVelocity(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
             SwerveInputStream swerveInput) {
         this.shooter = shooter;
@@ -38,6 +41,8 @@ public class TurretShootFixedVelocity extends Command {
         // SmartDashboard.putNumber("Target RPM", 2000);
 
         addRequirements(shooter, swerve, indexer);
+
+        table.put(1.0,10.0);
     }
 
     public static double getWrappedAngleDifference(double source, double target) {
@@ -88,12 +93,11 @@ public class TurretShootFixedVelocity extends Command {
 
         Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
         //I'm tryna to calculate the projected X and Y positions of the turret but idk how to get the velocities I need, there's probably 50 million better ways to program this <_<
-        Distance projectedDistancetoTargetX = Meters.of(locationTarget.getX() - (turretPose.getX() + (turretPose.getVelocityX() * shooter.timeUntilHit(MAX_SPEED_BETWEEN_UPDATES))));
-        Distance projectedDistancetoTargetY = Meters.of(locationTarget.getY() - (turretPose.getY() + (turretPose.getVelocityY() * shooter.timeUntilHit(MAX_SPEED_BETWEEN_UPDATES))));
+        double projectedDistance = locationTarget.getDistance(robotVelocity) /* - (turretPose + (turretPose.getVelocity() * shooter.timeUntilHit(MAX_SPEED_BETWEEN_UPDATES)))*/;
 
         SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
 
-        shooter.setTurretAngle(shooter.targetTurretAngle(projectedDistancetoTargetX, projectedDistancetoTargetY));
+        shooter.setTurretAngle(shooter.targetTurretAngle(projectedDistance));
         shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
         shooter.setShooterSpeed(angularVelocity);
 
