@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.RPM;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -17,7 +18,6 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import swervelib.SwerveInputStream;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 public class TurretShootFixedVelocity extends Command {
     private final TurretSubsystem shooter;
@@ -29,7 +29,9 @@ public class TurretShootFixedVelocity extends Command {
     private double MAX_SPEED_BETWEEN_UPDATES = 0.05;
     private double MAX_SPEED_WHILE_SHOOTING = 0.7;
 
-    private InterpolatingDoubleTreeMap table = new InterpolatingDoubleTreeMap();
+    private InterpolatingDoubleTreeMap shooterSpeeds = new InterpolatingDoubleTreeMap();
+
+    private InterpolatingDoubleTreeMap hoodAngles = new InterpolatingDoubleTreeMap();
 
     public TurretShootFixedVelocity(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
             SwerveInputStream swerveInput) {
@@ -42,7 +44,26 @@ public class TurretShootFixedVelocity extends Command {
 
         addRequirements(shooter, swerve, indexer);
 
-        table.put(1.0,10.0);
+        //Shooter Speed Values
+        shooterSpeeds.clear();
+        shooterSpeeds.put(2.5,24.9);
+        shooterSpeeds.put(5.0,23.3);
+        shooterSpeeds.put(10.0,24.8);
+        shooterSpeeds.put(15.0,27.4);
+        shooterSpeeds.put(20.0,29.9);
+        shooterSpeeds.put(25.0,32.0);
+        shooterSpeeds.put(30.0,35.1);
+
+        //Hood Angle Values
+        hoodAngles.clear();
+        hoodAngles.put(2.5,83.9);
+        hoodAngles.put(5.0,78.4);
+        hoodAngles.put(10.0,69.1);
+        hoodAngles.put(15.0,64.2);
+        hoodAngles.put(20.0,60.3);
+        hoodAngles.put(25.0,53.8);
+        hoodAngles.put(30.0,57.7);
+        
     }
 
     public static double getWrappedAngleDifference(double source, double target) {
@@ -98,8 +119,8 @@ public class TurretShootFixedVelocity extends Command {
         SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
 
         shooter.setTurretAngle(shooter.targetTurretAngle(projectedDistance));
-        shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
-        shooter.setShooterSpeed(angularVelocity);
+        shooter.setHoodAngle(shooter.targetHoodAngle(hoodAngles.get(distanceToLocationTarget.in(Feet))));
+        shooter.setShooterSpeed(RPM.of(shooterSpeeds.get(distanceToLocationTarget.in(Feet))));
 
         ChassisSpeeds swerveSpeeds = swerveInput.get();
 
