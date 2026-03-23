@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -82,6 +83,34 @@ public class TurretSubsystem extends SubsystemBase {
 
     // double projectedTurretAngleFromTag9;
     // double projectedTurretDistanceToTag9;
+
+    private static final double[][] DISTANCE_TABLE = {
+            // dist_ft hood_deg rpm flight_sec
+            { 4.0, 73.5, 1880.0, 0.88 },
+            { 6.0, 69.0, 2000.0, 0.92 },
+            { 8.0, 65.0, 2150.0, 0.96 },
+            { 10.0, 62.0, 2290.0, 1.00 },
+            { 12.0, 59.5, 2430.0, 1.04 },
+            { 14.0, 57.5, 2570.0, 1.08 },
+            { 16.0, 56.0, 2710.0, 1.12 },
+            { 18.0, 54.5, 2850.0, 1.16 },
+            { 20.0, 53.5, 2990.0, 1.20 },
+    };
+
+    // InterpolatingDoubleTreeMap performs linear interpolation to give us values
+    // for distances that aren't in the shot table
+    private static final InterpolatingDoubleTreeMap hoodAngleMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap flightTimeMap = new InterpolatingDoubleTreeMap();
+
+    static {
+        for (double[] row : DISTANCE_TABLE) {
+            double distFt = row[0];
+            hoodAngleMap.put(distFt, row[1]);
+            shooterSpeedMap.put(distFt, row[2]);
+            flightTimeMap.put(distFt, row[3]);
+        }
+    }
 
     private boolean turretEnabled = true;
 
@@ -279,18 +308,14 @@ public class TurretSubsystem extends SubsystemBase {
     // degrees, not sure what is actually is)
     // The numbers used here arised from tinkering around to get an accurate
     // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
-    public Angle targetHoodAngle(double distance) {
-        return Degree.of(107 * Math.pow(distance, -0.228));
+    public Angle targetHoodAngle(double distanceFeet) {
+        return Degree.of(hoodAngleMap.get(distanceFeet));
     }
 
     // Estimates the speed we want to shoot the fuel at based on the turret's
     // distance to the hub
     public AngularVelocity targetShooterSpeed(double distanceFeet) {
-        double velocityFtps = 17.5 + 0.54 * distanceFeet;
-
-        // Adjust the below numbers based on testing.
-        // The 110 is a conversion factor to convert from ft/s to RPM, and the 0.0 is just a constant to adjust the speed up or down.
-        return RPM.of(velocityFtps * 95 + 50);
+        return RPM.of(shooterSpeedMap.get(distanceFeet));
     }
 
     // sets rotational speed of the hood

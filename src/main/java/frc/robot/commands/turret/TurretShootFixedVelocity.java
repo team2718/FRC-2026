@@ -115,18 +115,20 @@ public class TurretShootFixedVelocity extends Command {
         Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
         //I'm tryna to calculate the projected X and Y positions of the turret but idk how to get the velocities I need, there's probably 50 million better ways to program this <_<
         double projectedDistance = locationTarget.getDistance(robotVelocity) /* - (turretPose + (turretPose.getVelocity() * shooter.timeUntilHit(MAX_SPEED_BETWEEN_UPDATES)))*/;
+        double projectedDistanceX = locationTarget.getX() - (turretPose.getX());
+
 
         SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
 
-        shooter.setTurretAngle(shooter.targetTurretAngle(projectedDistance));
+        double angleError = getWrappedAngleDifference(
+        turretPose.getRotation().getDegrees(),
+        locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
+
+        shooter.setTurretAngle(shooter.targetTurretAngle(angleError));
         shooter.setHoodAngle(shooter.targetHoodAngle(hoodAngles.get(distanceToLocationTarget.in(Feet))));
         shooter.setShooterSpeed(RPM.of(shooterSpeeds.get(distanceToLocationTarget.in(Feet))));
 
         ChassisSpeeds swerveSpeeds = swerveInput.get();
-
-        double angleError = getWrappedAngleDifference(
-                turretPose.getRotation().getDegrees(),
-                locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
 
         double turnSpeed = clamp(-3.0, 3.0, angleError * 0.15);
 
