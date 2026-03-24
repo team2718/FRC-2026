@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -41,10 +42,17 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretshooterRight;
     @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
+    @Logged(name = "Turret Motor")
+    private final TalonFX turretspinnyspinner;
 
     private final static Angle hoodZeroAngle = Degrees.of(86);
     private final static Angle hoodRangeOfMotion = Degrees.of(40);
     private final static double hoodGearRatio = 291/24 * 48/14;
+
+    //placeholders
+    private final static Angle turretZeroAngle = Degrees.of(0);
+    private final static Angle turretRangeOfMotion = Degrees.of(355);
+    private final static double turretGearRatio = 1;
 
     private final static Distance turretX = Inches.of(-5.75);
     private final static Distance turretY = Inches.of(-5);
@@ -76,6 +84,34 @@ public class TurretSubsystem extends SubsystemBase {
     // double projectedTurretAngleFromTag9;
     // double projectedTurretDistanceToTag9;
 
+    private static final double[][] DISTANCE_TABLE = {
+            // dist_ft hood_deg rpm flight_sec
+            { 4.0, 73.5, 1880.0, 0.88 },
+            { 6.0, 69.0, 2000.0, 0.92 },
+            { 8.0, 65.0, 2150.0, 0.96 },
+            { 10.0, 62.0, 2290.0, 1.00 },
+            { 12.0, 59.5, 2430.0, 1.04 },
+            { 14.0, 57.5, 2570.0, 1.08 },
+            { 16.0, 56.0, 2710.0, 1.12 },
+            { 18.0, 54.5, 2850.0, 1.16 },
+            { 20.0, 53.5, 2990.0, 1.20 },
+    };
+
+    // InterpolatingDoubleTreeMap performs linear interpolation to give us values
+    // for distances that aren't in the shot table
+    private static final InterpolatingDoubleTreeMap hoodAngleMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
+    private static final InterpolatingDoubleTreeMap flightTimeMap = new InterpolatingDoubleTreeMap();
+
+    static {
+        for (double[] row : DISTANCE_TABLE) {
+            double distFt = row[0];
+            hoodAngleMap.put(distFt, row[1]);
+            shooterSpeedMap.put(distFt, row[2]);
+            flightTimeMap.put(distFt, row[3]);
+        }
+    }
+
     private boolean turretEnabled = true;
 
     public TurretSubsystem() {
@@ -87,6 +123,7 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterLeft = new TalonFX(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID);
         turretshooterRight = new TalonFX(Constants.TurretConstants.RIGHT_SHOOTER_MOTOR_ID);
         turrethood = new TalonFX(Constants.TurretConstants.HOOD_MOTOR_ID);
+        turretspinnyspinner = new TalonFX(Constants.TurretConstants.TURRET_MOTOR_ID);
 
         // Configuring motor variables (The current limit is set to 5 amps for now)
 
@@ -134,6 +171,23 @@ public class TurretSubsystem extends SubsystemBase {
         turrethoodconfig.MotionMagic.MotionMagicAcceleration = 500;
 
         turrethood.getConfigurator().apply(turrethoodconfig);
+
+
+        TalonFXConfiguration turretspinnerconfig = new TalonFXConfiguration();
+
+        turretspinnerconfig.CurrentLimits.StatorCurrentLimit = 10;
+        turretspinnerconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        turretspinnerconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        turretspinnerconfig.Slot0.kG = 0.0;
+        turretspinnerconfig.Slot0.kS = 0.0;
+        turretspinnerconfig.Slot0.kA = 0.0;
+        turretspinnerconfig.Slot0.kP = 3.0;
+        turretspinnerconfig.Slot0.kI = 0.0;
+        turretspinnerconfig.Slot0.kD = 0.0;
+        turretspinnerconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
+        turretspinnerconfig.MotionMagic.MotionMagicAcceleration = 500;
+
+        turretspinnyspinner.getConfigurator().apply(turretspinnerconfig);
 
         // Make sure frequency is high enough for follower to follow
         turretshooterLeft.getMotorVoltage().setUpdateFrequency(100);
@@ -195,8 +249,77 @@ public class TurretSubsystem extends SubsystemBase {
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
 
-    // sets rotational speed of the hood
+    // sets rotational speed of the turret
     public void setHoodAngle(Angle angle) {
+        if (!turretEnabled) {
+            return;
+        }
+
+        // Clamp angle from ~0 degrees to ~355 degrees
+        if (angle.in(Degrees) < turretZeroAngle.minus(turretRangeOfMotion).in(Degrees)) {
+            angle = turretZeroAngle.minus(turretRangeOfMotion);
+        } else if (angle.in(Degrees) > turretZeroAngle.in(Degrees)) {
+            angle = turretZeroAngle;
+        }
+
+        // The turret is at position 0 at the bottom.
+        // So a target angle of 45 degrees would be turretMinAngle - 45
+        // where turretMinAngle is the angle of the turret when it's at position 0
+        turretspinnyspinner.setControl(new PositionVoltage(turretZeroAngle.minus(angle).times(turretGearRatio)));
+
+        return;
+
+    }
+
+    public void setTurretSpeedUnchecked(double power) {
+        if (!turretEnabled) {
+            return;
+        }
+
+        turretspinnyspinner.set(power);
+    }
+
+    public void stopTurret() {
+        turretspinnyspinner.stopMotor();
+    }
+
+    public Current getTurretSpinnerCurrent() {
+        return turretspinnyspinner.getStatorCurrent().getValue();
+    }
+
+    public void resetTurretPosition() {
+        turretspinnyspinner.setPosition(0);
+        System.out.println("Hood position reset!");
+    }
+
+    // returns the current position of the turret
+    public double getTurretAngleDegrees() {
+        return turretZeroAngle.minus(Rotations.of(turretspinnyspinner.getPosition().getValueAsDouble() / turretGearRatio)).in(Degrees);
+    }
+
+
+    //Sets the target turret angle based on where the turret is projected to be on the field when the fuel hits the hub
+    public Angle targetTurretAngle(double targetAngle) {
+        return Degree.of(targetAngle);
+    }
+
+    // Estimates the angle we want to shoot the fuel at based on the turret's
+    // distance to the hub (20 = angle the ball shoots at when the hood is at 80
+    // degrees, not sure what is actually is)
+    // The numbers used here arised from tinkering around to get an accurate
+    // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
+    public Angle targetHoodAngle(double distanceFeet) {
+        return Degree.of(hoodAngleMap.get(distanceFeet));
+    }
+
+    // Estimates the speed we want to shoot the fuel at based on the turret's
+    // distance to the hub
+    public AngularVelocity targetShooterSpeed(double distanceFeet) {
+        return RPM.of(shooterSpeedMap.get(distanceFeet));
+    }
+
+    // sets rotational speed of the hood
+    public void setTurretAngle(Angle angle) {
         if (!turretEnabled) {
             return;
         }
@@ -243,27 +366,10 @@ public class TurretSubsystem extends SubsystemBase {
         return hoodZeroAngle.minus(Rotations.of(turrethood.getPosition().getValueAsDouble() / hoodGearRatio)).in(Degrees);
     }
 
-    // Estimates the angle we want to shoot the fuel at based on the turret's
-    // distance to the hub (20 = angle the ball shoots at when the hood is at 80
-    // degrees, not sure what is actually is)
-    // The numbers used here arised from tinkering around to get an accurate
-    // estimate equasion (28500 / ("Distance To Hub" + 25) ^ 2) + 46.25
-    public Angle targetHoodAngle(double distance) {
-        return Degree.of(107 * Math.pow(distance, -0.228));
-    }
-
-    // Estimates the speed we want to shoot the fuel at based on the turret's
-    // distance to the hub
-    public AngularVelocity targetShooterSpeed(double distanceFeet) {
-        double velocityFtps = 17.5 + 0.54 * distanceFeet;
-
-        // Adjust the below numbers based on testing.
-        // The 110 is a conversion factor to convert from ft/s to RPM, and the 0.0 is just a constant to adjust the speed up or down.
-        return RPM.of(velocityFtps * 95 + 50);
-    }
-
+    //Should calculate the distance to the hub speed the fuel is going at parallel to the field floor
     public Time timeUntilHit(double distanceFeet) {
-        return Seconds.of(distanceFeet * 0.02 + 0.8);
+        //return Seconds.of(distanceFeet * 0.02 + 0.8);
+        return Seconds.of(distanceFeet / Math.cos(getTurretHoodAngleDegrees()) * getShooterRPM());
     }
 
     @Override

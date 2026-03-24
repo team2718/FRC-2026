@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.RPM;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -28,6 +29,10 @@ public class TurretShootFixedVelocity extends Command {
     private double MAX_SPEED_BETWEEN_UPDATES = 0.05;
     private double MAX_SPEED_WHILE_SHOOTING = 0.7;
 
+    private InterpolatingDoubleTreeMap shooterSpeeds = new InterpolatingDoubleTreeMap();
+
+    private InterpolatingDoubleTreeMap hoodAngles = new InterpolatingDoubleTreeMap();
+
     public TurretShootFixedVelocity(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
             SwerveInputStream swerveInput) {
         this.shooter = shooter;
@@ -38,6 +43,27 @@ public class TurretShootFixedVelocity extends Command {
         // SmartDashboard.putNumber("Target RPM", 2000);
 
         addRequirements(shooter, swerve, indexer);
+
+        //Shooter Speed Values
+        shooterSpeeds.clear();
+        shooterSpeeds.put(2.5,24.9);
+        shooterSpeeds.put(5.0,23.3);
+        shooterSpeeds.put(10.0,24.8);
+        shooterSpeeds.put(15.0,27.4);
+        shooterSpeeds.put(20.0,29.9);
+        shooterSpeeds.put(25.0,32.0);
+        shooterSpeeds.put(30.0,35.1);
+
+        //Hood Angle Values
+        hoodAngles.clear();
+        hoodAngles.put(2.5,83.9);
+        hoodAngles.put(5.0,78.4);
+        hoodAngles.put(10.0,69.1);
+        hoodAngles.put(15.0,64.2);
+        hoodAngles.put(20.0,60.3);
+        hoodAngles.put(25.0,53.8);
+        hoodAngles.put(30.0,57.7);
+        
     }
 
     public static double getWrappedAngleDifference(double source, double target) {
@@ -87,17 +113,22 @@ public class TurretShootFixedVelocity extends Command {
         locationTarget = locationTarget.minus(robotVelocity.times(1.3));
 
         Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
+        //I'm tryna to calculate the projected X and Y positions of the turret but idk how to get the velocities I need, there's probably 50 million better ways to program this <_<
+        double projectedDistance = locationTarget.getDistance(robotVelocity) /* - (turretPose + (turretPose.getVelocity() * shooter.timeUntilHit(MAX_SPEED_BETWEEN_UPDATES)))*/;
+        double projectedDistanceX = locationTarget.getX() - (turretPose.getX());
+
 
         SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
 
-        shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
-        shooter.setShooterSpeed(angularVelocity);
+        double angleError = getWrappedAngleDifference(
+        turretPose.getRotation().getDegrees(),
+        locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
+
+        shooter.setTurretAngle(shooter.targetTurretAngle(angleError));
+        shooter.setHoodAngle(shooter.targetHoodAngle(hoodAngles.get(distanceToLocationTarget.in(Feet))));
+        shooter.setShooterSpeed(RPM.of(shooterSpeeds.get(distanceToLocationTarget.in(Feet))));
 
         ChassisSpeeds swerveSpeeds = swerveInput.get();
-
-        double angleError = getWrappedAngleDifference(
-                turretPose.getRotation().getDegrees(),
-                locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
 
         double turnSpeed = clamp(-3.0, 3.0, angleError * 0.15);
 
