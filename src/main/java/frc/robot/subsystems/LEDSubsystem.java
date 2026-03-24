@@ -23,7 +23,8 @@ public class LEDSubsystem extends SubsystemBase {
 
   public enum LEDState {
     RAINBOW,
-    SHOOTER
+    BLUE,
+    GREEN
   }
 
   private LEDState m_state = LEDState.RAINBOW;
@@ -39,9 +40,13 @@ public class LEDSubsystem extends SubsystemBase {
 
   private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
   private final LEDPattern m_scrollingRainbow = m_rainbow.scrollAtAbsoluteSpeed(kScrollingSpeed, kLedSpacing);
+//For when the shooter is running
+  private final LEDPattern m_blue = LEDPattern.solid(new Color(0, 0, 255));
+  private final LEDPattern m_scrollingBlue = m_blue.mask(mask);
 
-  private final LEDPattern m_shooter = LEDPattern.solid(new Color(0, 0, 255));
-  private final LEDPattern m_scrollingShooter = m_shooter.mask(mask);
+//For when the shooter is not running
+  private final LEDPattern m_green = LEDPattern.solid(new Color(255, 0, 0));
+  private final LEDPattern m_scrollingGreen = m_green.mask(mask);
 
   public LEDSubsystem() {
     m_led.setLength(m_ledBuffer.getLength());
@@ -61,9 +66,11 @@ public class LEDSubsystem extends SubsystemBase {
       case RAINBOW:
         m_scrollingRainbow.applyTo(m_ledBuffer);
         break;
-      case SHOOTER:
-        m_scrollingShooter.applyTo(m_ledBuffer);
+      case BLUE:
+        m_scrollingBlue.applyTo(m_ledBuffer);
         break;
+      case GREEN:
+        m_scrollingGreen.applyTo(m_ledBuffer);
       default:
         m_scrollingRainbow.applyTo(m_ledBuffer);
         break;
