@@ -366,10 +366,14 @@ public class TurretSubsystem extends SubsystemBase {
         return hoodZeroAngle.minus(Rotations.of(turrethood.getPosition().getValueAsDouble() / hoodGearRatio)).in(Degrees);
     }
 
-    //Should calculate the distance to the hub speed the fuel is going at parallel to the field floor
+    // Gets the time it takes for the fuel to reach the hub based of distance
     public Time timeUntilHit(double distanceFeet) {
-        //return Seconds.of(distanceFeet * 0.02 + 0.8);
-        return Seconds.of(distanceFeet / Math.cos(getTurretHoodAngleDegrees()) * getShooterRPM());
+        /*return Seconds.of(distanceFeet * 0.02 + 0.8);
+        return Seconds.of(distanceFeet / Math.cos(getTurretHoodAngleDegrees()) * getShooterRPM()); */
+        
+        return Seconds.of(flightTimeMap.get(distanceFeet) // * [Current Shooter RPM] / [Shooter RPM used in these measurements]
+        
+        );
     }
 
     @Override
