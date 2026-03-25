@@ -33,6 +33,7 @@ import frc.robot.commands.turret.ZeroHood;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
@@ -76,10 +77,12 @@ public class RobotContainer {
 
     private final ZeroHood zeroHood = new ZeroHood(turret);
 
+    private final LEDSubsystem led = new LEDSubsystem();
+
     private final SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
     private final Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
-    private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
+    private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput, led);
 
     private final SendableChooser<String> autoChooser = new SendableChooser<String>();
 
@@ -161,14 +164,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("TurretToHub",
                 new ParallelDeadlineGroup(
                         new WaitCommand(5),
-                        new TurretToHub(turret, swerve, indexer, swerveInput)));
+                        new TurretToHub(turret, swerve, indexer, swerveInput, led)));
 
         // Register turret to hub for 1 to 9 seconds
         for (int i = 1; i <= 9; i++) {
             NamedCommands.registerCommand(
                     "TurretToHub" + i,
                     new ParallelDeadlineGroup(new WaitCommand(i),
-                            new TurretToHub(turret, swerve, indexer, swerveInput)));
+                            new TurretToHub(turret, swerve, indexer, swerveInput, led)));
         }
 
         // Configure button bindings

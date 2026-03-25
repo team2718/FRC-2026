@@ -2,18 +2,26 @@ package frc.robot.commands.climber;
 
 import frc.robot.Constants;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.LEDSubsystem;
 
 public final class ClimbToLevel extends Command {
     // Data Fields
     private ClimberSubsystem climber;
     private int level;
 
+    private final LEDSubsystem led;
+
     // Constructors
-    public ClimbToLevel(ClimberSubsystem climber, int level){
+    public ClimbToLevel(ClimberSubsystem climber, int level, LEDSubsystem led){
         this.climber = climber;
         this.level = level;
+        this.led = led;
         addRequirements(climber);
+
+        led = new LEDSubsystem();
+
     }
 
     // Method Definition
@@ -32,6 +40,8 @@ public final class ClimbToLevel extends Command {
         (climber.getDesiredLevel() > 1 && climber.getRobotElevation() < Constants.ClimberConstants.BAR1_ELEVATION)) {
             if (climber.getHookElevation() < Constants.ClimberConstants.BAR1_ELEVATION) {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR1_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.EXTEND_P);
+                //yellow LEDs = first level
+                led.setLEDState(LEDState.YELLOW);
             }
             else {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR1_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.RETRACT_P);
@@ -42,6 +52,8 @@ public final class ClimbToLevel extends Command {
         (climber.getDesiredLevel() > 2 && climber.getRobotElevation() < Constants.ClimberConstants.BAR2_ELEVATION)) {
             if (climber.getHookElevation() < Constants.ClimberConstants.BAR2_ELEVATION) {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.EXTEND_P);
+                //orange LEDs = second level
+                led.setLEDState(LEDState.ORANGE);
             }
             else {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.RETRACT_P);
@@ -51,6 +63,8 @@ public final class ClimbToLevel extends Command {
         else if (climber.getDesiredLevel() == 3 && climber.getRobotElevation() < Constants.ClimberConstants.L3_ELEVATION) {
             if (climber.getHookElevation() < Constants.ClimberConstants.BAR3_ELEVATION) {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR3_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.EXTEND_P);
+                //red LEDs = third level
+                led.setLEDState(LEDState.RED);
             }
             else {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR3_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.RETRACT_P);
