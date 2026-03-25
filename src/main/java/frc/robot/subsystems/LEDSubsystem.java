@@ -52,11 +52,11 @@ public class LEDSubsystem extends SubsystemBase {
   private final LEDPattern m_scrollingGreen = m_green.mask(mask);
 
 //first level of climber
-  private final LEDPattern m_yellow = LEDPattern.solid(new Color(0, 0, 0));
+  private final LEDPattern m_yellow = LEDPattern.solid(new Color(255, 255, 0));
   private final LEDPattern m_scrollingYellow = m_yellow.mask(mask);
 
 //second level of climber
-  private final LEDPattern m_orange = LEDPattern.solid(new Color(255, 0, 0));
+  private final LEDPattern m_orange = LEDPattern.solid(new Color(255, 165, 0));
   private final LEDPattern m_scrollingOrange = m_orange.mask(mask);
 
 //third level of climber
