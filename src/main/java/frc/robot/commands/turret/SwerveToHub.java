@@ -27,7 +27,7 @@ import frc.robot.subsystems.TurretSubsystem;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.LEDSubsystem;
 
-public class TurretToHub extends Command {
+public class SwerveToHub extends Command {
 
     // Setting variables for everything (constants, subsystems, motors)
 
@@ -51,7 +51,7 @@ public class TurretToHub extends Command {
 
     private boolean isSpunUp = false;
 
-    public TurretToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
+    public SwerveToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
             SwerveInputStream swerveInputFieldOriented) {
         this.shooter = shooter;
         this.swerve = swerve;
@@ -123,8 +123,6 @@ public class TurretToHub extends Command {
         Translation2d locationTarget = strategyConfig.targetLocation;
         Translation2d commandedRobotVelocity = new Translation2d(swerveSpeeds.vxMetersPerSecond,
                 swerveSpeeds.vyMetersPerSecond);
-        Translation2d robotVelocity = new Translation2d(lastSwerveSpeeds.vxMetersPerSecond,
-        lastSwerveSpeeds.vyMetersPerSecond);
 
         // Calculate the lead time we need based on distance
         // Adjust the constant based on system latency
@@ -150,25 +148,19 @@ public class TurretToHub extends Command {
             shooter.setHoodAngle(Degrees.of(45));
         }
 
-        // Calculating how to point the turret towards the hub.
-        double projectedDistance = locationTarget.getDistance(robotVelocity) /* - (turretPose + (turretPose.getVelocity() * shooter.timeUntilHit(MAX_SPEED_BETWEEN_UPDATES)))*/;
-        double projectedDistanceX = locationTarget.getX() - (turretPose.getX());
-
-
-        SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
-
-        double angleError = getWrappedAngleDifference(
-        turretPose.getRotation().getDegrees(),
-        locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
-
-        shooter.setTurretAngle(shooter.targetTurretAngle(angleError));
-
         SmartDashboard.putNumber("TurretToHub/angleError", turnController.getPositionError());
 
         // Calculate how many radians (180 / pi, 57.29578°) the robot is turning per second
         swerveSpeeds.omegaRadiansPerSecond = turnController.calculate(
                 turretPose.getRotation().getRadians(),
                 locationTarget.minus(turretPose.getTranslation()).getAngle().getRadians());
+
+        // If the robot is moving slow enough, stop moving so we're not waiting 
+        if (isSpunUp && commandedRobotVelocity.getNorm() < 0.1 && Math.abs(swerveSpeeds.omegaRadiansPerSecond) < 0.01) {
+            swerve.lock(); // if we're not trying to move, lock the wheels to prevent being pushed
+        } else {
+            swerve.driveFieldOriented(swerveSpeeds);
+        }
 
         // If the robot is spun up, spin indexer
         if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR) && Math.abs(turnController.getPositionError()) < MAX_ANGLE_ERROR_RADIANS)) {
@@ -196,6 +188,7 @@ public class TurretToHub extends Command {
 
     // Determines how the turret will work when the camera is disabled
     private void runNoCameraShot() {
+        swerve.lock();
         double targetShooterSpeed = 0;
 
         // Settings for if the robot is close to or far from the hub
