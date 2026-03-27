@@ -40,7 +40,7 @@ public final class Constants {
   }
 
   public static final class TurretConstants {
-    // public static final int turretSpinnerID = 17;
+    public static final int turretSpinnerID = 17;
     public static final int HOOD_MOTOR_ID = 15;
     public static final int LEFT_SHOOTER_MOTOR_ID = 14;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 13;

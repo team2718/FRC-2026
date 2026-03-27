@@ -137,17 +137,18 @@ public class TurretToHub extends Command {
 
         SmartDashboard.putNumber("TurretToHub/distanceToTarget", distanceToLocationTarget.in(Feet));
 
-        AngularVelocity targetShooterSpeed = shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet));
-        // AngularVelocity targetShooterSpeed = RPM.of(SmartDashboard.getNumber("Target RPM", 2000));
+        // AngularVelocity targetShooterSpeed = shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet));
+        AngularVelocity targetShooterSpeed = RPM.of(SmartDashboard.getNumber("Target RPM", 3300));
         shooter.setShooterSpeed(targetShooterSpeed);
         SmartDashboard.putNumber("TurretToHub/shooterSpeed", targetShooterSpeed.in(RPM));
 
         // If we're aiming for the hub, turn our turret to face: a. the hub, b. the hub, c. the sad reality we're gonna take it apart next season, d. the hub
         if (strategyConfig.strategyType == StrategyType.HUB_SHOT) {
-            shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
+            shooter.setHoodAngle(Degrees.of(70));
+            // shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
             SmartDashboard.putNumber("TurretToHub/hoodAngle", shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)).in(Degrees));
         } else {
-            shooter.setHoodAngle(Degrees.of(45));
+            shooter.setHoodAngle(Degrees.of(65));
         }
 
         // Calculating how to point the turret towards the hub.
@@ -157,21 +158,27 @@ public class TurretToHub extends Command {
 
         SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
 
-        double angleError = getWrappedAngleDifference(
-        turretPose.getRotation().getDegrees(),
-        locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
+        // double angleError = getWrappedAngleDifference(
+        // turretPose.getRotation().getDegrees(),
+        // locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
 
-        shooter.setTurretAngle(shooter.targetTurretAngle(angleError));
+        // shooter.setTurretAngle(shooter.targetTurretAngle(angleError));
 
-        SmartDashboard.putNumber("TurretToHub/angleError", turnController.getPositionError());
+        // SmartDashboard.putNumber("TurretToHub/angleError", turnController.getPositionError());
 
-        // Calculate how many radians (180 / pi, 57.29578°) the robot is turning per second
-        swerveSpeeds.omegaRadiansPerSecond = turnController.calculate(
-                turretPose.getRotation().getRadians(),
-                locationTarget.minus(turretPose.getTranslation()).getAngle().getRadians());
+        // swerveSpeeds.omegaRadiansPerSecond = turnController.calculate(
+        //         turretPose.getRotation().getRadians(),
+        //         locationTarget.minus(turretPose.getTranslation()).getAngle().getRadians());
 
-        // If the robot is spun up, spin indexer
-        if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR) && Math.abs(turnController.getPositionError()) < MAX_ANGLE_ERROR_RADIANS)) {
+        shooter.setAzimuthAngle(locationTarget.minus(turretPose.getTranslation()).getAngle().getMeasure());
+
+        if (isSpunUp && commandedRobotVelocity.getNorm() < 0.1 && Math.abs(swerveSpeeds.omegaRadiansPerSecond) < 0.01) {
+            swerve.lock(); // if we're not trying to move, lock the wheels to prevent being pushed
+        } else {
+            swerve.driveFieldOriented(swerveSpeeds);
+        }
+
+        if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR))) {
             isSpunUp = true;
             indexer.runIndexing();
         } else {
@@ -184,7 +191,9 @@ public class TurretToHub extends Command {
     public void end(boolean interuppted) {
         shooter.stopShooter();
         indexer.stopIndexing();
-        shooter.setHoodAngle(Degrees.of(80));
+        // shooter.setHoodAngle(Degrees.of(80));
+        shooter.dropHood();
+        shooter.stopTurret();
         isSpunUp = false;
     }
 

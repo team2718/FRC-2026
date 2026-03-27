@@ -57,8 +57,8 @@ public class RobotContainer {
     private final IndexerSubsystem indexer = new IndexerSubsystem();
     @Logged(name = "Intake")
     private final IntakeSubsystem intake = new IntakeSubsystem();
-    @Logged(name = "Climber")
-    private final ClimberSubsystem climber = new ClimberSubsystem();
+    // @Logged(name = "Climber")
+    // private final ClimberSubsystem climber = new ClimberSubsystem();
 
     // private final LEDSubsystem leds = new LEDSubsystem();
     @Logged(name = "Vision")
@@ -70,8 +70,8 @@ public class RobotContainer {
 
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
     private final RunIntake runIntake = new RunIntake(intake, 0.75);
-    private final ExtendHook extendHook = new ExtendHook(climber);
-    private final RetractHook retractHook = new RetractHook(climber);
+    // private final ExtendHook extendHook = new ExtendHook(climber);
+    // private final RetractHook retractHook = new RetractHook(climber);
     private final SpinUpTurret spinUpTurret = new SpinUpTurret(turret, 1800);
 
     private final ZeroHood zeroHood = new ZeroHood(turret);
@@ -126,7 +126,7 @@ public class RobotContainer {
 
             // Run calibration in teleop in case it failed in auto
             if (!hasRanCalibration) {
-                CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
+                // CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
                 CommandScheduler.getInstance().schedule(zeroHood);
                 hasRanCalibration = true;
             }
@@ -140,7 +140,7 @@ public class RobotContainer {
 
         // Buttons to manually zero stuff as needed
         SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
-        SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
+        // SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
 
         NamedCommands.registerCommand("RunIntake",
                 new AutoRunIntake(intake, 0.75));
@@ -152,11 +152,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("SpinIndexerForward",
                 new SpinIndexerForeward(indexer, .5));
 
-        NamedCommands.registerCommand("ExtendHook",
-                new ExtendHook(climber));
+        // NamedCommands.registerCommand("ExtendHook",
+        //         new ExtendHook(climber));
 
-        NamedCommands.registerCommand("RetractHook",
-                new RetractHook(climber));
+        // NamedCommands.registerCommand("RetractHook",
+        //         new RetractHook(climber));
 
         NamedCommands.registerCommand("TurretToHub",
                 new ParallelDeadlineGroup(
@@ -196,11 +196,11 @@ public class RobotContainer {
         // driverController.rightTrigger().whileTrue(turretToHub);
         driverController.rightTrigger().whileTrue(turretToHub);
         // driverController.rightTrigger().onFalse(new WaitCommand(0.1).andThen(zeroHood));
-        
+
         // driverController.rightTrigger().whileTrue(spindexerForeward);
 
-        driverController.povDown().whileTrue(retractHook);
-        driverController.povUp().whileTrue(extendHook);
+        // driverController.povDown().whileTrue(retractHook);
+        // driverController.povUp().whileTrue(extendHook);
 
         driverController.x().onTrue(Commands.runOnce(() -> intake.setActive(), intake));
         driverController.y().onTrue(Commands.runOnce(() -> intake.setStowed(), intake));
@@ -310,7 +310,7 @@ public class RobotContainer {
         turret.setEnabled(turretEnabled);
         indexer.setEnabled(indexerIntakeEnabled);
         intake.setEnabled(indexerIntakeEnabled);
-        climber.setEnabled(climberEnabled);
+        // climber.setEnabled(climberEnabled);
 
         SmartDashboard.putString("Robor Pos", swerve.getPose().toString());
         SmartDashboard.putString("Turret Pose, ", turret.getTurretPoseFromRobotPose(swerve.getPose()).toString());
@@ -368,14 +368,12 @@ public class RobotContainer {
             CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
                     new ParallelDeadlineGroup(
                             new WaitCommand(0.5),
-                            new ZeroHood(turret),
-                            new ZeroClimber(climber)),
+                            new ZeroHood(turret)),
                     pathPlannerAutoCommand));
         } else {
             // if no path planner command is found, just run the zeroing commands
             CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
-                    new ZeroHood(turret),
-                    new ZeroClimber(climber)));
+                    new ZeroHood(turret)));
         }
     }
 

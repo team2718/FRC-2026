@@ -16,24 +16,34 @@ import swervelib.SwerveDrive;
 @Logged
 public class VisionSubsystem extends SubsystemBase {
 
-  private final Camera frontCamera = new Camera("FrontAprilCamera",
+  private final Camera BackSideAprilCamera = new Camera("BackSideAprilCamera",
       new Rotation3d(
           Units.degreesToRadians(0),
-          Units.degreesToRadians(-30),
-          Units.degreesToRadians(270)),
+          Units.degreesToRadians(-22),
+          Units.degreesToRadians(-170)),
       new Translation3d(
-          Units.inchesToMeters(-6.5),
-          Units.inchesToMeters(-13.14),
-          Units.inchesToMeters(16.13)));
+          Units.inchesToMeters(-11.09),
+          Units.inchesToMeters(-13.03),
+          Units.inchesToMeters(15.87)));
+
+    private final Camera RightSideAprilCamera = new Camera("RightSideAprilCamera",
+      new Rotation3d(
+          Units.degreesToRadians(0),
+          Units.degreesToRadians(-22),
+          Units.degreesToRadians(-100)),
+      new Translation3d(
+          Units.inchesToMeters(-12.88),
+          Units.inchesToMeters(-11.06),
+          Units.inchesToMeters(15.87)));
 
   @Logged(name = "Last Estimated Pose")
   private Pose3d lastEstimatedPose = new Pose3d();
 
   public void updateSwervePoseFromVision(SwerveDrive swerveDrive) {
-    Optional<EstimatedRobotPose> frontCameraPose = frontCamera.getEstimatedGlobalPose();
+    Optional<EstimatedRobotPose> BackSideAprilCameraPose = BackSideAprilCamera.getEstimatedGlobalPose();
 
-    if (frontCameraPose.isPresent()) {
-      EstimatedRobotPose pose = frontCameraPose.get();
+    if (BackSideAprilCameraPose.isPresent()) {
+      EstimatedRobotPose pose = BackSideAprilCameraPose.get();
 
       // SmartDashboard.putNumber("Vision/Estimated Pose/X",
       // pose.estimatedPose.getX());
@@ -45,7 +55,25 @@ public class VisionSubsystem extends SubsystemBase {
       lastEstimatedPose = pose.estimatedPose;
 
       swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(), pose.timestampSeconds,
-          frontCamera.getCurStdDevs());
+          BackSideAprilCamera.getCurStdDevs());
+    }
+
+    Optional<EstimatedRobotPose> RightSideAprilCameraPose = RightSideAprilCamera.getEstimatedGlobalPose();
+
+    if (RightSideAprilCameraPose.isPresent()) {
+      EstimatedRobotPose pose = RightSideAprilCameraPose.get();
+
+      // SmartDashboard.putNumber("Vision/Estimated Pose/X",
+      // pose.estimatedPose.getX());
+      // SmartDashboard.putNumber("Vision/Estimated Pose/Y",
+      // pose.estimatedPose.getY());
+      // SmartDashboard.putNumber("Vision/Estimated Pose/Z",
+      // pose.estimatedPose.getZ());
+
+      lastEstimatedPose = pose.estimatedPose;
+
+      swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(), pose.timestampSeconds,
+          RightSideAprilCamera.getCurStdDevs());
     }
   }
 }

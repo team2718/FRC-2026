@@ -33,7 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final double stowedAngle = 96;
     private final double activeAngle = 0;
 
-    private boolean setStowed = true;
+    private boolean setStowed = false;
 
     private boolean enabled = true;
 

@@ -10,9 +10,9 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -42,47 +42,20 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretshooterRight;
     @Logged(name = "Hood Motor")
     private final TalonFX turrethood;
-    @Logged(name = "Turret Motor")
+    @Logged(name = "Turret Azimuth Motor")
     private final TalonFX turretspinnyspinner;
 
-    private final static Angle hoodZeroAngle = Degrees.of(86);
-    private final static Angle hoodRangeOfMotion = Degrees.of(40);
-    private final static double hoodGearRatio = 291/24 * 48/14;
+    private final static Angle hoodZeroAngle = Degrees.of(80);
+    private final static Angle hoodRangeOfMotion = Degrees.of(15);
+    private final static double hoodGearRatio = 286.0/22.0 * 30.0/12.0;
 
-    //placeholders
-    private final static Angle turretZeroAngle = Degrees.of(0);
-    private final static Angle turretRangeOfMotion = Degrees.of(355);
-    private final static double turretGearRatio = 1;
+    private final static Angle turretZeroAngle = Degrees.of(45);
+    private final static Angle turretRangeOfMotion = Degrees.of(200);
+    private final static double turretGearRatio = 160.0/16.0 * 30.0/16.0;
 
     private final static Distance turretX = Inches.of(-5.75);
     private final static Distance turretY = Inches.of(-5);
-    private final static Angle turretAngle = Degrees.of(-85);
-    private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretAngle.in(Degrees)));
-
-    private double targetRPM = 0;
-
-    // private double turretDistanceToRobotCenter = 0.5;
-    // private double turretDegreeFromRobotCenter = 40;
-
-    // double robotAngleFromTag9 =
-    // hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
-    // double robotDistanceToTag9 = Math.sqrt(Math.pow(swerve.getPose().getX() -
-    // hubCenterLocation.getX(), 2)
-    // + Math.pow(swerve.getPose().getY() - hubCenterLocation.getY(), 2));
-
-    // double turretPositionX;
-    // double turretPositionY;
-
-    // double turretAngleFromTag9;
-    // double turretDistanceToTag9;
-
-    // double projectedTime = Math.sqrt(robotDistanceToTag9);
-
-    // double projectedTurretPositionX;
-    // double projectedTurretPositionY;
-
-    // double projectedTurretAngleFromTag9;
-    // double projectedTurretDistanceToTag9;
+    private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretZeroAngle.in(Degrees)));
 
     private static final double[][] DISTANCE_TABLE = {
             // dist_ft hood_deg rpm flight_sec
@@ -114,6 +87,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     private boolean turretEnabled = true;
 
+    TalonFXConfiguration turretshooterconfig;
+    TalonFXConfiguration turrethoodconfig;
+
     public TurretSubsystem() {
 
         // Motors-----------------------------------------------------------------------------------------------------------------------------------
@@ -123,43 +99,36 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterLeft = new TalonFX(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID);
         turretshooterRight = new TalonFX(Constants.TurretConstants.RIGHT_SHOOTER_MOTOR_ID);
         turrethood = new TalonFX(Constants.TurretConstants.HOOD_MOTOR_ID);
-        turretspinnyspinner = new TalonFX(Constants.TurretConstants.TURRET_MOTOR_ID);
+        turretspinnyspinner = new TalonFX(Constants.TurretConstants.turretSpinnerID);
 
         // Configuring motor variables (The current limit is set to 5 amps for now)
 
-        TalonFXConfiguration turretshooterconfig = new TalonFXConfiguration();
+        turretshooterconfig = new TalonFXConfiguration();
         turretshooterconfig.CurrentLimits.StatorCurrentLimit = 80;
         turretshooterconfig.CurrentLimits.SupplyCurrentLimit = 60;
         turretshooterconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        turretshooterconfig.Slot0.kG = 0.0;
-        turretshooterconfig.Slot0.kS = 0.0;
-        // kV is is in V/rps. kV given is in RPM/V.
-        // (1 / (RPM/V)) gives us V/RPM, and multiplying by 60 gives us V/rps.
-        // 485.6 is kV of Kraken x60 in FOC. Use 500.0 for non-FOC.
-        // See https://www.reca.lc/motors
-        turretshooterconfig.Slot0.kV = 1.0 / 500.0 * 60.0;
-        turretshooterconfig.Slot0.kA = 0.19; // TODO: Tune, this value is from reca.lc
+        turretshooterconfig.Slot0.kS = 0.2;
+        turretshooterconfig.Slot0.kV = 0.115;
+        turretshooterconfig.Slot0.kP = 0.3;
 
-        turretshooterconfig.Slot0.kP = 0.4;
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
-        turretshooterconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
-        turretshooterconfig.MotionMagic.MotionMagicAcceleration = 2000;
+        
         turretshooterconfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-
-        turretshooterconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        turretshooterLeft.getConfigurator().apply(turretshooterconfig);
 
         turretshooterconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         turretshooterRight.getConfigurator().apply(turretshooterconfig);
 
-        TalonFXConfiguration turrethoodconfig = new TalonFXConfiguration();
+        turretshooterconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        turretshooterLeft.getConfigurator().apply(turretshooterconfig);
+
+        turrethoodconfig = new TalonFXConfiguration();
 
         turrethoodconfig.CurrentLimits.StatorCurrentLimit = 10;
         // turrethoodconfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.3;
         turrethoodconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        turrethoodconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        turrethoodconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         turrethoodconfig.Slot0.kG = 0.0;
         turrethoodconfig.Slot0.kS = 0.0;
         // turrethoodconfig.Slot0.kV = 1.0 / 620.0 * 60.0;
@@ -172,22 +141,20 @@ public class TurretSubsystem extends SubsystemBase {
 
         turrethood.getConfigurator().apply(turrethoodconfig);
 
+        TalonFXConfiguration turretAzimuthConfiguration = new TalonFXConfiguration();
+        turretAzimuthConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        turretAzimuthConfiguration.MotorOutput.PeakForwardDutyCycle = 0.2;
+        turretAzimuthConfiguration.MotorOutput.PeakReverseDutyCycle = 0.2;
+        turretAzimuthConfiguration.CurrentLimits.StatorCurrentLimit = 20;
+        turretAzimuthConfiguration.CurrentLimits.SupplyCurrentLimit = 40;
+        turretAzimuthConfiguration.Slot0.kP = 2.0;
+        turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        turretAzimuthConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 10;
+        turretAzimuthConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+        turretspinnyspinner.getConfigurator().apply(turretAzimuthConfiguration);
 
-        TalonFXConfiguration turretspinnerconfig = new TalonFXConfiguration();
-
-        turretspinnerconfig.CurrentLimits.StatorCurrentLimit = 10;
-        turretspinnerconfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        turretspinnerconfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        turretspinnerconfig.Slot0.kG = 0.0;
-        turretspinnerconfig.Slot0.kS = 0.0;
-        turretspinnerconfig.Slot0.kA = 0.0;
-        turretspinnerconfig.Slot0.kP = 3.0;
-        turretspinnerconfig.Slot0.kI = 0.0;
-        turretspinnerconfig.Slot0.kD = 0.0;
-        turretspinnerconfig.MotionMagic.MotionMagicCruiseVelocity = 0;
-        turretspinnerconfig.MotionMagic.MotionMagicAcceleration = 500;
-
-        turretspinnyspinner.getConfigurator().apply(turretspinnerconfig);
+        turretspinnyspinner.setPosition(0);
 
         // Make sure frequency is high enough for follower to follow
         turretshooterLeft.getMotorVoltage().setUpdateFrequency(100);
@@ -218,9 +185,9 @@ public class TurretSubsystem extends SubsystemBase {
             angularVelocity = RPM.of(5000);
         }
 
-        targetRPM = angularVelocity.in(RPM);
+        // targetRPM = angularVelocity.in(RPM);
 
-        turretshooterLeft.setControl(new MotionMagicVelocityVoltage(angularVelocity));
+        turretshooterLeft.setControl(new VelocityVoltage(angularVelocity));
     }
 
     // sets speed of the shooter
@@ -231,7 +198,7 @@ public class TurretSubsystem extends SubsystemBase {
     public void stopShooter() {
         // Should we do this or should we use stopMotor() on each motor?
         // Using the closed loop gives us smoother deceleration
-        setShooterSpeedRPM(0);
+        turretshooterLeft.setControl(new NeutralOut());
     }
 
     // Return the average RPM of the two shooter motors (should be the same, but
@@ -249,23 +216,23 @@ public class TurretSubsystem extends SubsystemBase {
         return Math.abs(currentRPM - targetRPM) < tolerance;
     }
 
-    // sets rotational speed of the turret
-    public void setHoodAngle(Angle angle) {
+    // sets position of the turret
+    public void setAzimuthAngle(Angle angle) {
         if (!turretEnabled) {
             return;
         }
 
-        // Clamp angle from ~0 degrees to ~355 degrees
-        if (angle.in(Degrees) < turretZeroAngle.minus(turretRangeOfMotion).in(Degrees)) {
-            angle = turretZeroAngle.minus(turretRangeOfMotion);
-        } else if (angle.in(Degrees) > turretZeroAngle.in(Degrees)) {
+        // Clamp angle to range of motion
+        if (angle.lt(turretZeroAngle)) {
             angle = turretZeroAngle;
+        } else if (angle.gt(turretZeroAngle.plus(turretRangeOfMotion))) {
+            angle = turretZeroAngle.plus(turretRangeOfMotion);
         }
 
-        // The turret is at position 0 at the bottom.
-        // So a target angle of 45 degrees would be turretMinAngle - 45
+        // The turret is at position 0 is facing forward (towards the front of the robot).
+        // A target angle of 90 degrees (left) would be 90 - turretMinAngle
         // where turretMinAngle is the angle of the turret when it's at position 0
-        turretspinnyspinner.setControl(new PositionVoltage(turretZeroAngle.minus(angle).times(turretGearRatio)));
+        turretspinnyspinner.setControl(new PositionVoltage(angle.minus(turretZeroAngle).times(turretGearRatio)));
 
         return;
 
@@ -280,7 +247,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void stopTurret() {
-        turretspinnyspinner.stopMotor();
+        turretspinnyspinner.setControl(new NeutralOut());
     }
 
     public Current getTurretSpinnerCurrent() {
@@ -318,8 +285,8 @@ public class TurretSubsystem extends SubsystemBase {
         return RPM.of(shooterSpeedMap.get(distanceFeet));
     }
 
-    // sets rotational speed of the hood
-    public void setTurretAngle(Angle angle) {
+    // sets position of the hood
+    public void setHoodAngle(Angle angle) {
         if (!turretEnabled) {
             return;
         }
@@ -349,7 +316,16 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void stopHood() {
-        turrethood.stopMotor();
+        turrethood.setControl(new NeutralOut());
+    }
+
+    public void dropHood() {
+        if (!turretEnabled) {
+            return;
+        }
+
+        // Drop the hood down to the zero position (lowest angle)
+        turrethood.setControl(new PositionVoltage(0));
     }
 
     public Current getTurretHoodCurrent() {

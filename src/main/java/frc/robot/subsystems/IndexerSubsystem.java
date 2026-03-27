@@ -30,8 +30,8 @@ public class IndexerSubsystem extends SubsystemBase {
         portalMotor = new TalonFX(Constants.IndexerConstants.PORTAL_MOTOR_ID);
 
         SparkMaxConfig indexerMotorConfig = new SparkMaxConfig();
-        indexerMotorConfig.inverted(false);
-        indexerMotorConfig.smartCurrentLimit(60);
+        indexerMotorConfig.inverted(true);
+        indexerMotorConfig.smartCurrentLimit(40);
         indexerMotorConfig.idleMode(IdleMode.kCoast);
 
         TalonFXConfiguration portalMotorConfig = new TalonFXConfiguration();
@@ -45,8 +45,8 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public void runIndexing() {
         if (enabled) {
-            indexerMotor.setVoltage(5.5);
-            portalMotor.setVoltage(5.5);
+            indexerMotor.setVoltage(10.0);
+            portalMotor.setVoltage(10.0);
         }
     }
 
