@@ -5,39 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "ToDepot"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "SpinUpTurret"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "DepotToShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub9"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
           }
         }
       ]

@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "BeMinorlyGreedy"
@@ -26,12 +20,6 @@
           "type": "path",
           "data": {
             "pathName": "StopBeingMinorlyGreedy"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub6"
           }
         }
       ]

@@ -11,33 +11,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "BeMajorlyGreedy"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "MajorGreedinessToShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub"
           }
         }
       ]

@@ -5,45 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "StartToNeutralZone"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "SpinUpTurret"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "NeutralZoneToShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub9"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
           }
         }
       ]

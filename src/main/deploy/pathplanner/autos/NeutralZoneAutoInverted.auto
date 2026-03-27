@@ -11,39 +11,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub3"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "ShootToNeutralZoneInverted"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "NeutralZoneToShootInverted"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub6"
           }
         }
       ]

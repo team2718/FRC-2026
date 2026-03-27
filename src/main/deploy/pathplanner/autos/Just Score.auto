@@ -9,24 +9,6 @@
           "data": {
             "pathName": "Do Little"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "TurretToHub3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
-          }
         }
       ]
     }
