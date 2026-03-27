@@ -22,8 +22,10 @@ import frc.robot.Strategy;
 import frc.robot.Robot.NoCameraMode;
 import frc.robot.Strategy.StrategyType;
 import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.LEDSubsystem;
 
@@ -44,6 +46,8 @@ public class TurretToHub extends Command {
     private final SwerveInputStream swerveInputFieldOriented;
     private final IndexerSubsystem indexer;
 
+    private final LEDSubsystem led;
+
     private ChassisSpeeds lastSwerveSpeeds = new ChassisSpeeds();
 
     private ProfiledPIDController turnController = new ProfiledPIDController(10, 0, 0,
@@ -52,11 +56,12 @@ public class TurretToHub extends Command {
     private boolean isSpunUp = false;
 
     public TurretToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,
-            SwerveInputStream swerveInputFieldOriented) {
+            SwerveInputStream swerveInputFieldOriented, LEDSubsystem led) {
         this.shooter = shooter;
         this.swerve = swerve;
         this.indexer = indexer;
         this.swerveInputFieldOriented = swerveInputFieldOriented;
+        this.led = led;
 
 
         turnController.enableContinuousInput(-Math.PI, Math.PI);
@@ -197,8 +202,13 @@ public class TurretToHub extends Command {
         if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed, MAX_RPM_ERROR))) {
             isSpunUp = true;
             indexer.runIndexing();
+            //LED blue = shooting
+            led.setLEDState(LEDState.BLUE);
         } else {
             indexer.stopIndexing();
+            //LED green = ready to shoot
+            led.setLEDState(LEDState.GREEN);
+
         }
     }
 }
