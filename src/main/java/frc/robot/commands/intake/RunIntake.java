@@ -1,38 +1,38 @@
-package frc.robot.commands.intake;
+// package frc.robot.commands.intake;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSubsystem;
+// import edu.wpi.first.wpilibj2.command.Command;
+// import frc.robot.subsystems.IntakeSubsystem;
 
-public class RunIntake extends Command {
-    private final IntakeSubsystem intake;
-    // private final LEDSubsystem LEDs;
-    private double speed;
+// public class RunIntake extends Command {
+//     private final IntakeSubsystem intake;
+//     // private final LEDSubsystem LEDs;
+//     private double speed;
 
-    public RunIntake(IntakeSubsystem intake, double speed) {
-        this.intake = intake;
-        this.speed = speed;
-        addRequirements(intake);
-    }
+//     public RunIntake(IntakeSubsystem intake, double speed) {
+//         this.intake = intake;
+//         this.speed = speed;
+//         addRequirements(intake);
+//     }
 
-    @Override
-    public void initialize() {
-    }
+//     @Override
+//     public void initialize() {
+//     }
 
-    @Override
-    public void execute() {
+//     @Override
+//     public void execute() {
 
-        // Sets the speed of the intake foreward
-        intake.setIntakeSpeed(speed);
+//         // Sets the speed of the intake foreward
+//         intake.setIntakeSpeed(speed);
 
-    }
+//     }
 
-    @Override
-    public void end(boolean interuppted) {
-        intake.setIntakeSpeed(0);
-    }
+//     @Override
+//     public void end(boolean interuppted) {
+//         intake.setIntakeSpeed(0);
+//     }
 
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-}
+//     @Override
+//     public boolean isFinished() {
+//         return false;
+//     }
+// }
