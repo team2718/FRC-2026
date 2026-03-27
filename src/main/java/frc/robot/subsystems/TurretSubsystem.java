@@ -161,18 +161,6 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterRight.setControl(new Follower(Constants.TurretConstants.LEFT_SHOOTER_MOTOR_ID, MotorAlignmentValue.Opposed));
     }
 
-    public static double getWrappedAngleDifference(double source, double target) {
-        double diff = (target - source) % 360;
-
-        if (diff >= 180) {
-            diff -= 360;
-        } else if (diff <= -180) {
-            diff += 360;
-        }
-
-        return diff;
-    }
-
     public void setShooterSpeed(AngularVelocity angularVelocity) {
         if (!turretEnabled) {
             return;

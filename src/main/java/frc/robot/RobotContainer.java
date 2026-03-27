@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -63,6 +64,9 @@ public class RobotContainer {
     // private final LEDSubsystem leds = new LEDSubsystem();
     @Logged(name = "Vision")
     private final VisionSubsystem vision = new VisionSubsystem();
+
+    @Logged(name = "PDH")
+    private final PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
     // ** Commands **
 

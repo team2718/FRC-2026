@@ -65,31 +65,6 @@ public class TurretToHub extends Command {
         
     }
 
-    // Gets the difference of 2 angles that registers between -180° and 180°
-    public static double getWrappedAngleDifference(double source, double target) {
-        double diff = (target - source) % 360;
-
-        if (diff >= 180) {
-            diff -= 360;
-        } else if (diff <= -180) {
-            diff += 360;
-        }
-
-        return diff;
-    }
-
-    // Returns an input value that cannot go above or below set limits
-    public double clamp(double min, double max, double value) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
-        return value;
-    }
-
-
     // Resets variables when the program starts
     @Override
     public void initialize() {
@@ -158,7 +133,7 @@ public class TurretToHub extends Command {
 
         SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
 
-        // double angleError = getWrappedAngleDifference(
+        // double angleError = PossumUtils.getWrappedAngleDifference(
         // turretPose.getRotation().getDegrees(),
         // locationTarget.minus(turretPose.getTranslation()).getAngle().getDegrees());
 

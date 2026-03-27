@@ -5,21 +5,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.utils.PossumUtils;
 
 public class AlignWithHubFront  extends Command{
-
-    public static double getWrappedAngleDifference(double source, double target) {
-        double diff = (target - source) % 360;
-
-        if (diff > 180) {
-            diff -= 360;
-        }
-        else if (diff <= -180) {
-            diff += 360;
-        }
-
-        return diff;
-    }
 
     SwerveSubsystem swerve;
     SwerveInputStream swerveInput;
@@ -33,24 +21,13 @@ public class AlignWithHubFront  extends Command{
 
     }
 
-    public double clamp(double min, double max, double value) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
-        return value;
-    }
-
-
     @Override
     public void execute() {
         double angleFromTag9 = hubCenterLocation.minus(swerve.getPose().getTranslation()).getAngle().getDegrees();
 
-        double turnSpeed = getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), angleFromTag9) * 0.05;
+        double turnSpeed = PossumUtils.getWrappedAngleDifference(swerve.getPose().getRotation().getDegrees(), angleFromTag9) * 0.05;
 
-        turnSpeed = clamp(-0.8, 0.8, turnSpeed);
+        turnSpeed = PossumUtils.clamp(-0.8, 0.8, turnSpeed);
 
         swerve.driveFieldOriented(new ChassisSpeeds(swerveInput.get().vxMetersPerSecond, swerveInput.get().vyMetersPerSecond, turnSpeed));
     }
