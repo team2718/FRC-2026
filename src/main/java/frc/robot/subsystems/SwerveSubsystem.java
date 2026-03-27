@@ -459,8 +459,7 @@ public class SwerveSubsystem extends SubsystemBase {
       return new ChassisSpeeds(
           current.vxMetersPerSecond + (dvx * scale),
           current.vyMetersPerSecond + (dvy * scale),
-          target.omegaRadiansPerSecond // Usually omega has its own separate limit
-      );
+          target.omegaRadiansPerSecond);
     }
     return target;
   }
@@ -476,5 +475,54 @@ public class SwerveSubsystem extends SubsystemBase {
           target.omegaRadiansPerSecond);
     }
     return target;
+  }
+
+  public static ChassisSpeeds applyAccelLimit(ChassisSpeeds current, ChassisSpeeds target, double accelLimit,
+      double angularAccelLimit) {
+    // Translation Acceleration
+    double dvx = target.vxMetersPerSecond - current.vxMetersPerSecond;
+    double dvy = target.vyMetersPerSecond - current.vyMetersPerSecond;
+    double dvMag = Math.hypot(dvx, dvy);
+
+    double nextVx = target.vxMetersPerSecond;
+    double nextVy = target.vyMetersPerSecond;
+
+    if (dvMag > accelLimit) {
+      double scale = accelLimit / dvMag;
+      nextVx = current.vxMetersPerSecond + (dvx * scale);
+      nextVy = current.vyMetersPerSecond + (dvy * scale);
+    }
+
+    // Rotation Acceleration
+    double dOmega = target.omegaRadiansPerSecond - current.omegaRadiansPerSecond;
+    double nextOmega = target.omegaRadiansPerSecond;
+
+    if (Math.abs(dOmega) > angularAccelLimit) {
+      nextOmega = current.omegaRadiansPerSecond + Math.copySign(angularAccelLimit, dOmega);
+    }
+
+    return new ChassisSpeeds(nextVx, nextVy, nextOmega);
+  }
+
+  public static ChassisSpeeds applyVelocityLimit(ChassisSpeeds target, double velocityLimit, double rotationLimit) {
+    // Translation Velocity Limit
+    double speed = Math.hypot(target.vxMetersPerSecond, target.vyMetersPerSecond);
+
+    double nextVx = target.vxMetersPerSecond;
+    double nextVy = target.vyMetersPerSecond;
+
+    if (speed > velocityLimit) {
+      double scale = velocityLimit / speed;
+      nextVx = target.vxMetersPerSecond * scale;
+      nextVy = target.vyMetersPerSecond * scale;
+    }
+
+    // Rotation Velocity Limit
+    double nextOmega = target.omegaRadiansPerSecond;
+    if (Math.abs(nextOmega) > rotationLimit) {
+      nextOmega = Math.copySign(rotationLimit, nextOmega);
+    }
+
+    return new ChassisSpeeds(nextVx, nextVy, nextOmega);
   }
 }
