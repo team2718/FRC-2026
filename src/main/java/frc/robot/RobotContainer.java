@@ -1,6 +1,6 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
+// import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -21,20 +21,20 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.RebuiltMatchPeriods;
 import frc.robot.Constants.RebuiltMatchPeriods.AutoWinner;
 import frc.robot.Constants.RebuiltMatchPeriods.MatchPeriod;
-import frc.robot.commands.climber.ExtendHook;
-import frc.robot.commands.climber.RetractHook;
-import frc.robot.commands.climber.ZeroClimber;
-import frc.robot.commands.indexer.SpinIndexerForeward;
-import frc.robot.commands.intake.AutoRunIntake;
-import frc.robot.commands.intake.RunIntake;
-import frc.robot.commands.turret.SpinUpTurret;
-import frc.robot.commands.turret.TurretToHub;
-import frc.robot.commands.turret.ZeroHood;
-import frc.robot.subsystems.ClimberSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
+// import frc.robot.commands.climber.ExtendHook;
+// import frc.robot.commands.climber.RetractHook;
+// import frc.robot.commands.climber.ZeroClimber;
+// import frc.robot.commands.indexer.SpinIndexerForeward;
+// import frc.robot.commands.intake.AutoRunIntake;
+// import frc.robot.commands.intake.RunIntake;
+// import frc.robot.commands.turret.SpinUpTurret;
+// import frc.robot.commands.turret.TurretToHub;
+// import frc.robot.commands.turret.ZeroHood;
+//import frc.robot.subsystems.ClimberSubsystem;
+//import frc.robot.subsystems.IndexerSubsystem;
+//import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
+//import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -51,14 +51,14 @@ public class RobotContainer {
     @NotLogged
     private final SwerveSubsystem swerve = new SwerveSubsystem();
 
-    @Logged(name = "Turret")
-    private final TurretSubsystem turret = new TurretSubsystem();
-    @Logged(name = "Indexer")
-    private final IndexerSubsystem indexer = new IndexerSubsystem();
-    @Logged(name = "Intake")
-    private final IntakeSubsystem intake = new IntakeSubsystem();
-    @Logged(name = "Climber")
-    private final ClimberSubsystem climber = new ClimberSubsystem();
+    // @Logged(name = "Turret")
+    // private final TurretSubsystem turret = new TurretSubsystem();
+    // @Logged(name = "Indexer")
+    // private final IndexerSubsystem indexer = new IndexerSubsystem();
+    // @Logged(name = "Intake")
+    // private final IntakeSubsystem intake = new IntakeSubsystem();
+    // @Logged(name = "Climber")
+    // private final ClimberSubsystem climber = new ClimberSubsystem();
 
     // private final LEDSubsystem leds = new LEDSubsystem();
     @Logged(name = "Vision")
@@ -68,18 +68,18 @@ public class RobotContainer {
 
     private Command pathPlannerAutoCommand; // This will hold the currently selected auto command from the chooser
 
-    private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
-    private final RunIntake runIntake = new RunIntake(intake, 0.75);
-    private final ExtendHook extendHook = new ExtendHook(climber);
-    private final RetractHook retractHook = new RetractHook(climber);
-    private final SpinUpTurret spinUpTurret = new SpinUpTurret(turret, 1800);
+    //private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
+    // private final RunIntake runIntake = new RunIntake(intake, 0.75);
+    // private final ExtendHook extendHook = new ExtendHook(climber);
+    // private final RetractHook retractHook = new RetractHook(climber);
+    // private final SpinUpTurret spinUpTurret = new SpinUpTurret(turret, 1800);
 
-    private final ZeroHood zeroHood = new ZeroHood(turret);
+    //private final ZeroHood zeroHood = new ZeroHood(turret);
 
     private final SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
     private final Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
-    private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
+    //private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput);
 
     private final SendableChooser<String> autoChooser = new SendableChooser<String>();
 
@@ -129,11 +129,11 @@ public class RobotContainer {
             matchTimer.start();
 
             // Run calibration in teleop in case it failed in auto
-            if (!hasRanCalibration) {
-                CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
-                CommandScheduler.getInstance().schedule(zeroHood);
-                hasRanCalibration = true;
-            }
+            // if (!hasRanCalibration) {
+            //     CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
+            //     CommandScheduler.getInstance().schedule(zeroHood);
+            //     hasRanCalibration = true;
+            // }
         }));
 
         // Stop match time on end of match
@@ -143,37 +143,37 @@ public class RobotContainer {
         }));
 
         // Buttons to manually zero stuff as needed
-        SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
-        SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
+        // SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
+        // SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
 
-        NamedCommands.registerCommand("RunIntake",
-                new AutoRunIntake(intake, 0.75));
+        // NamedCommands.registerCommand("RunIntake",
+        //         new AutoRunIntake(intake, 0.75));
 
-        NamedCommands.registerCommand("StopIntake", Commands.runOnce(() -> intake.setIntakeSpeed(0), intake));
+        // NamedCommands.registerCommand("StopIntake", Commands.runOnce(() -> intake.setIntakeSpeed(0), intake));
 
-        NamedCommands.registerCommand("SpinUpTurret", spinUpTurret);
+        // NamedCommands.registerCommand("SpinUpTurret", spinUpTurret);
 
-        NamedCommands.registerCommand("SpinIndexerForward",
-                new SpinIndexerForeward(indexer, .5));
+        // NamedCommands.registerCommand("SpinIndexerForward",
+        //         new SpinIndexerForeward(indexer, .5));
 
-        NamedCommands.registerCommand("ExtendHook",
-                new ExtendHook(climber));
+        // NamedCommands.registerCommand("ExtendHook",
+        //         new ExtendHook(climber));
 
-        NamedCommands.registerCommand("RetractHook",
-                new RetractHook(climber));
+        // NamedCommands.registerCommand("RetractHook",
+        //         new RetractHook(climber));
 
-        NamedCommands.registerCommand("TurretToHub",
-                new ParallelDeadlineGroup(
-                        new WaitCommand(5),
-                        new TurretToHub(turret, swerve, indexer, swerveInput)));
+        // NamedCommands.registerCommand("TurretToHub",
+        //         new ParallelDeadlineGroup(
+        //                 new WaitCommand(5),
+        //                 new TurretToHub(turret, swerve, indexer, swerveInput)));
 
         // Register turret to hub for 1 to 9 seconds
-        for (int i = 1; i <= 9; i++) {
-            NamedCommands.registerCommand(
-                    "TurretToHub" + i,
-                    new ParallelDeadlineGroup(new WaitCommand(i),
-                            new TurretToHub(turret, swerve, indexer, swerveInput)));
-        }
+        // for (int i = 1; i <= 9; i++) {
+        //     NamedCommands.registerCommand(
+        //             "TurretToHub" + i,
+        //             new ParallelDeadlineGroup(new WaitCommand(i),
+        //                     new TurretToHub(turret, swerve, indexer, swerveInput)));
+        // }
 
         // Configure button bindings
         configureBindings();
@@ -189,25 +189,25 @@ public class RobotContainer {
         driverController.a().onTrue(Commands.runOnce(() -> swerve.zeroGyro()));
 
         // Left Trigger: Spins the intake wheel & spindexer foreward
-        driverController.leftTrigger().whileTrue(runIntake);
+        //driverController.leftTrigger().whileTrue(runIntake);
         // driverController.leftTrigger().whileTrue(spindexerForeward);
 
         // Left Bumper: Spins the intake wheel & spindexer backward
         // driverController.leftBumper().whileTrue(runOuttake);
-        driverController.leftBumper().whileTrue(spindexerBackward);
+        //driverController.leftBumper().whileTrue(spindexerBackward);
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
         // driverController.rightTrigger().whileTrue(turretToHub);
-        driverController.rightTrigger().whileTrue(turretToHub);
+        //driverController.rightTrigger().whileTrue(turretToHub);
         // driverController.rightTrigger().onFalse(new WaitCommand(0.1).andThen(zeroHood));
         
         // driverController.rightTrigger().whileTrue(spindexerForeward);
 
-        driverController.povDown().whileTrue(retractHook);
-        driverController.povUp().whileTrue(extendHook);
+        //driverController.povDown().whileTrue(retractHook);
+        //driverController.povUp().whileTrue(extendHook);
 
-        driverController.x().onTrue(Commands.runOnce(() -> intake.setActive(), intake));
-        driverController.y().onTrue(Commands.runOnce(() -> intake.setStowed(), intake));
+        // driverController.x().onTrue(Commands.runOnce(() -> intake.setActive(), intake));
+        // driverController.y().onTrue(Commands.runOnce(() -> intake.setStowed(), intake));
 
         // Right Bumper: Sets the turret to face a specific direction (Pointing toward
         // the hub, or whatever specified) and setting the hood
@@ -266,7 +266,7 @@ public class RobotContainer {
             }
         }));
 
-        buttonBoxController.x().onTrue(zeroHood);
+        //buttonBoxController.x().onTrue(zeroHood);
     }
 
     private int stateToButtonBox() {
@@ -311,13 +311,13 @@ public class RobotContainer {
         SmartDashboard.putBoolean("Enabled/Climber", climberEnabled);
 
         swerve.setEnabled(swerveEnabled);
-        turret.setEnabled(turretEnabled);
-        indexer.setEnabled(indexerIntakeEnabled);
-        intake.setEnabled(indexerIntakeEnabled);
-        climber.setEnabled(climberEnabled);
+        //turret.setEnabled(turretEnabled);
+        //indexer.setEnabled(indexerIntakeEnabled);
+        //intake.setEnabled(indexerIntakeEnabled);
+        //climber.setEnabled(climberEnabled);
 
         SmartDashboard.putString("Robor Pos", swerve.getPose().toString());
-        SmartDashboard.putString("Turret Pose, ", turret.getTurretPoseFromRobotPose(swerve.getPose()).toString());
+        // SmartDashboard.putString("Turret Pose, ", turret.getTurretPoseFromRobotPose(swerve.getPose()).toString());
 
         updateShuffleboardTimers();
     }
@@ -371,15 +371,17 @@ public class RobotContainer {
             // path planner command after that
             CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
                     new ParallelDeadlineGroup(
-                            new WaitCommand(0.5),
-                            new ZeroHood(turret),
-                            new ZeroClimber(climber)),
+                            new WaitCommand(0.5)
+                            //new ZeroHood(turret),
+                            //new ZeroClimber(climber)
+                            ),
                     pathPlannerAutoCommand));
         } else {
             // if no path planner command is found, just run the zeroing commands
             CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
-                    new ZeroHood(turret),
-                    new ZeroClimber(climber)));
+                    //new ZeroHood(turret),
+                    //new ZeroClimber(climber)
+                    ));
         }
     }
 
@@ -389,10 +391,10 @@ public class RobotContainer {
         }
 
         // Stop all subsystems just in case
-        turret.stopHood();
-        turret.stopShooter();
-        indexer.stopIndexing();
-        intake.stop();
+        // turret.stopHood();
+        // turret.stopShooter();
+        // indexer.stopIndexing();
+        //intake.stop();
     }
 
 }
