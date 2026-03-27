@@ -22,9 +22,9 @@ public class VisionSubsystem extends SubsystemBase {
           Units.degreesToRadians(-22),
           Units.degreesToRadians(-170)),
       new Translation3d(
-          Units.inchesToMeters(-11.09),
-          Units.inchesToMeters(-13.03),
-          Units.inchesToMeters(15.87)));
+          Units.inchesToMeters(-12.61),
+          Units.inchesToMeters(-11.01),
+          Units.inchesToMeters(15.69)));
 
     private final Camera RightSideAprilCamera = new Camera("RightSideAprilCamera",
       new Rotation3d(
@@ -32,9 +32,9 @@ public class VisionSubsystem extends SubsystemBase {
           Units.degreesToRadians(-22),
           Units.degreesToRadians(-100)),
       new Translation3d(
-          Units.inchesToMeters(-12.88),
-          Units.inchesToMeters(-11.06),
-          Units.inchesToMeters(15.87)));
+          Units.inchesToMeters(-11.01),
+          Units.inchesToMeters(-12.61),
+          Units.inchesToMeters(15.69)));
 
   @Logged(name = "Last Estimated Pose")
   private Pose3d lastEstimatedPose = new Pose3d();
