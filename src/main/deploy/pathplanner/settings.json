@@ -3,15 +3,15 @@
   "robotLength": 0.865,
   "holonomicMode": true,
   "pathFolders": [
-    "ClimberPathsForLater",
+    "ClimberPathsForWorlds",
     "DepotPaths",
     "DoubleNeutralZonePaths",
     "JustShootPath",
     "MajorlyGreedyPaths",
     "MinorlyGreedyPaths",
+    "NeutralZoneAndDepotPaths",
     "NeutralZoneAndOutpostPaths",
     "NeutralZonePaths",
-    "NeutralZoneAndDepotPaths",
     "OutpostAndDepotPaths",
     "OutpostPaths"
   ],
