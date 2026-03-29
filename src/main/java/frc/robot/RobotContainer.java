@@ -5,7 +5,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,18 +21,16 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.RebuiltMatchPeriods;
 import frc.robot.Constants.RebuiltMatchPeriods.AutoWinner;
 import frc.robot.Constants.RebuiltMatchPeriods.MatchPeriod;
-import frc.robot.commands.climber.ExtendHook;
-import frc.robot.commands.climber.RetractHook;
-import frc.robot.commands.climber.ZeroClimber;
 import frc.robot.commands.indexer.SpinIndexerForeward;
 import frc.robot.commands.intake.AutoRunIntake;
+import frc.robot.commands.intake.OscillateIntake;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.SpinUpTurret;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.commands.turret.ZeroTurret;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -60,6 +57,9 @@ public class RobotContainer {
     private final IndexerSubsystem indexer = new IndexerSubsystem();
     @Logged(name = "Intake")
     private final IntakeSubsystem intake = new IntakeSubsystem();
+    @Logged(name = "IntakeArm")
+    private final IntakeArmSubsystem intakeArm = new IntakeArmSubsystem();
+
     // @Logged(name = "Climber")
     // private final ClimberSubsystem climber = new ClimberSubsystem();
 
@@ -68,19 +68,18 @@ public class RobotContainer {
     private final VisionSubsystem vision = new VisionSubsystem();
 
     // @Logged(name = "PDH")
-    // private final PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+    // private final PowerDistribution pdh = new PowerDistribution(1,
+    // PowerDistribution.ModuleType.kRev);
 
     // ** Commands **
 
     private Command pathPlannerAutoCommand; // This will hold the currently selected auto command from the chooser
 
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
-    private final RunIntake runIntake = new RunIntake(intake, 0.75);
+    private final RunIntake runIntake = new RunIntake(intake, indexer, 0.75);
     // private final ExtendHook extendHook = new ExtendHook(climber);
     // private final RetractHook retractHook = new RetractHook(climber);
     private final SpinUpTurret spinUpTurret = new SpinUpTurret(turret, 1800);
-
-    private final ZeroHood zeroHood = new ZeroHood(turret);
 
     private final LEDSubsystem led = new LEDSubsystem();
 
@@ -111,7 +110,7 @@ public class RobotContainer {
         autoChooser.addOption("DepotAuto", "DepotAuto");
         autoChooser.addOption("HumanOutpostAuto", "HumanOutpostAuto");
         autoChooser.addOption("NeutralZoneAuto", "NeutralZoneAuto");
-        autoChooser.addOption("NeutralZoneAndDepotAuto","NeutralZoneAndDepotAuto");
+        autoChooser.addOption("NeutralZoneAndDepotAuto", "NeutralZoneAndDepotAuto");
         autoChooser.addOption("NeutralZoneAndOutpostAuto", "NeutralZoneAndOutpostAuto");
         autoChooser.addOption("DoubleNeutralZoneAuto", "DoubleNeutralZoneAuto");
         autoChooser.addOption("OutpostAndDepotAuto", "OutpostAndDepotAuto");
@@ -139,7 +138,8 @@ public class RobotContainer {
             // Run calibration in teleop in case it failed in auto
             if (!hasRanCalibration) {
                 // CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
-                CommandScheduler.getInstance().schedule(zeroHood);
+                CommandScheduler.getInstance().schedule(new ZeroHood(turret));
+                CommandScheduler.getInstance().schedule(new ZeroTurret(turret));
                 hasRanCalibration = true;
             }
         }));
@@ -156,7 +156,7 @@ public class RobotContainer {
         // SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
 
         NamedCommands.registerCommand("RunIntake",
-                new AutoRunIntake(intake, 0.75));
+                new AutoRunIntake(intake, intakeArm, 0.75));
 
         NamedCommands.registerCommand("StopIntake", Commands.runOnce(() -> intake.setIntakeSpeed(0), intake));
 
@@ -166,10 +166,10 @@ public class RobotContainer {
                 new SpinIndexerForeward(indexer, .5));
 
         // NamedCommands.registerCommand("ExtendHook",
-        //         new ExtendHook(climber));
+        // new ExtendHook(climber));
 
         // NamedCommands.registerCommand("RetractHook",
-        //         new RetractHook(climber));
+        // new RetractHook(climber));
 
         NamedCommands.registerCommand("TurretToHub",
                 new ParallelDeadlineGroup(
@@ -191,73 +191,23 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        // It wouldn't be practical for the spindexer to be mapped to a unique input, so
-        // the thought is to spin it in the direction we want the fuel to go in. Subject
-        // to change.
-
+        // A Button: Zeroes the gyro when pressed, should only need if the camera
+        // explodes
         driverController.a().onTrue(Commands.runOnce(() -> swerve.zeroGyro()));
 
         // Left Trigger: Spins the intake wheel & spindexer foreward
-        driverController.leftTrigger().whileTrue(runIntake);
-        // driverController.leftTrigger().whileTrue(spindexerForeward);
+        // Only if the right trigger isn't being held down
+        driverController.leftTrigger().and(driverController.rightTrigger().negate()).whileTrue(runIntake);
 
         // Left Bumper: Spins the intake wheel & spindexer backward
-        // driverController.leftBumper().whileTrue(runOuttake);
         driverController.leftBumper().whileTrue(spindexerBackward);
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
-        // driverController.rightTrigger().whileTrue(turretToHub);
         driverController.rightTrigger().whileTrue(turretToHub);
-        // driverController.rightTrigger().onFalse(new WaitCommand(0.1).andThen(zeroHood));
 
-        // driverController.rightTrigger().whileTrue(spindexerForeward);
-
-        // driverController.povDown().whileTrue(retractHook);
-        // driverController.povUp().whileTrue(extendHook);
-
-        driverController.x().onTrue(Commands.runOnce(() -> intake.setActive(), intake));
-        driverController.y().onTrue(Commands.runOnce(() -> intake.setStowed(), intake));
-
-        // Right Bumper: Sets the turret to face a specific direction (Pointing toward
-        // the hub, or whatever specified) and setting the hood
-        // driverController.rightBumper().onTrue(turretToHub);
-        // (Concept) Left Trigger: Sets intake setup to intake position, or starting
-        // position depending on where it is
-
-        // D-Pad Controls Climbing
-        // driverController.povLeft().onTrue(climbToLevel1);
-
-        /*
-         * if (climbToLevel1.isFinished()) {
-         * driverController.povLeft().onTrue(climbToLevel1);
-         * }
-         * if (climbToLevel2.isFinished()) {
-         * driverController.povUp().onTrue(climbToLevel2);
-         * }
-         * if (climbToLevel3.isFinished()) {
-         * driverController.povRight().onTrue(climbToLevel3);
-         * }
-         * if (retractHook.isFinished()) {
-         * driverController.povDown().onTrue(retractHook);
-         * }
-         */
-
-        // placeholder button: If the intake is at the stowed position, pressing x will
-        // set it to the active position, and vise-versa
-        // driverController.leftTrigger().onTrue(
-        // Commands.runEnd(() -> {
-        // intake.setActive();
-        // intake.setIntakeVoltage(5);
-        // }, () -> {
-        // intake.setStowed();
-        // intake.setIntakeVoltage(0);
-        // }, intake));
-
-        // driverController.rightTrigger().onTrue(
-        // leds.setLEDState(LEDState.SHOOTER));
-
-        // driverController.rightTrigger().onFalse(
-        // leds.setLEDState(LEDState.RAINBOW));
+        // X and Y: Intake in and out
+        driverController.x().onTrue(Commands.runOnce(() -> intakeArm.setActive(), intakeArm));
+        driverController.y().onTrue(Commands.runOnce(() -> intakeArm.setStowed(), intakeArm));
 
         buttonBoxController.a().onTrue(Commands.runOnce(() -> {
             if (Robot.noCameraMode != Robot.NoCameraMode.CLOSE_SHOT) {
@@ -275,7 +225,14 @@ public class RobotContainer {
             }
         }));
 
-        buttonBoxController.x().onTrue(zeroHood);
+        buttonBoxController.x().onTrue(
+            new SequentialCommandGroup(
+                new ZeroHood(turret),
+                new ZeroTurret(turret)
+            )
+        );
+
+        buttonBoxController.y().whileTrue(new OscillateIntake(intakeArm));
     }
 
     private int stateToButtonBox() {
@@ -378,15 +335,17 @@ public class RobotContainer {
         if (pathPlannerAutoCommand != null) {
             // run zeroing at the start of auto with a deadline of 1 second, then run the
             // path planner command after that
+            hasRanCalibration = true; // Set this to true so that it doesn't run the calibration again in teleop
             CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
-                    new ParallelDeadlineGroup(
-                            new WaitCommand(0.5),
-                            new ZeroHood(turret)),
+                    new ZeroHood(turret),
+                    new ZeroTurret(turret),
                     pathPlannerAutoCommand));
         } else {
             // if no path planner command is found, just run the zeroing commands
+            hasRanCalibration = true; // Set this to true so that it doesn't run the calibration again in teleop
             CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
-                    new ZeroHood(turret)));
+                    new ZeroHood(turret),
+                    new ZeroTurret(turret)));
         }
     }
 

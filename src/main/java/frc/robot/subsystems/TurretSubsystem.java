@@ -35,7 +35,6 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utils.PossumUtils;
 
 @Logged
 public class TurretSubsystem extends SubsystemBase {

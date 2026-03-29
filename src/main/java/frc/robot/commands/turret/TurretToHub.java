@@ -7,17 +7,14 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.Strategy;
 import frc.robot.Robot.NoCameraMode;
@@ -29,7 +26,6 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
 import swervelib.SwerveInputStream;
-import frc.robot.subsystems.LEDSubsystem;
 
 public class TurretToHub extends Command {
 
@@ -45,7 +41,6 @@ public class TurretToHub extends Command {
 
     private static final double SPIN_LEAD_TIME_SECONDS = 0.02;
     
-    private static final double MAX_ANGLE_ERROR_RADIANS = Degrees.of(5).in(Radians);
     private static final double MAX_RPM_ERROR = 30;
 
     private final TurretSubsystem shooter;

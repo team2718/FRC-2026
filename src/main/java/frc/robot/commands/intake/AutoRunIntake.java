@@ -1,20 +1,23 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.IntakeArmSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class AutoRunIntake extends Command {
     private final IntakeSubsystem intake;
+    private final IntakeArmSubsystem intakeArm;
     private double speed;
 
-    public AutoRunIntake(IntakeSubsystem intake, double speed) {
+    public AutoRunIntake(IntakeSubsystem intake, IntakeArmSubsystem intakeArm, double speed) {
         this.intake = intake;
+        this.intakeArm = intakeArm;
         this.speed = speed;
     }
 
     @Override
     public void initialize() {
-        intake.setActive();
+        intakeArm.setActive();
         intake.setIntakeSpeed(speed);
     }
 
