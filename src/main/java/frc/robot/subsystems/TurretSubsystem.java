@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -16,7 +15,6 @@ import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -94,7 +92,7 @@ public class TurretSubsystem extends SubsystemBase {
     TalonFXConfiguration turrethoodconfig;
     TalonFXConfiguration turretAzimuthConfiguration;
 
-    private double currentTargetPosition = 0;
+    private double targetAngleDegrees = 0;
 
     public TurretSubsystem() {
 
@@ -117,12 +115,10 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterconfig.Slot0.kS = 0.2;
         turretshooterconfig.Slot0.kV = 0.115;
         turretshooterconfig.Slot0.kP = 0.3;
-
+        
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
         
-        turretshooterconfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-
         turretshooterconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         turretshooterRight.getConfigurator().apply(turretshooterconfig);
 
@@ -215,40 +211,36 @@ public class TurretSubsystem extends SubsystemBase {
         return Math.abs(currentRPM - (targetRPM)) < tolerance;
     }
 
-    // sets position of the turret
-    // return error in degrees
-    public double setAzimuthAngle(double angleRadians) {
+    // Sets position of the turret in degrees
+    // 0 is facing forward (towards the front of the robot)
+    // CW is positive, CCW is negative
+    public double setAzimuthAngle(Angle targetAngle) {
         if (!turretEnabled) {
-            return 180;
+            return 1000; // Return a large error so we don't shoot when the turret is disabled
         }
 
-        Angle angle = Radians.of(angleRadians);
+        targetAngleDegrees = targetAngle.in(Degrees);
 
-        currentTargetPosition = angle.in(Degrees);
+        // Convert target angle to the range [0, 360)
+        targetAngleDegrees = ((targetAngleDegrees % 360) + 360) % 360;
 
-        // Go from -180 to 180 to 0 to 360
-        if (currentTargetPosition < 0) {
-            currentTargetPosition += 360;
-        }
-
-        SmartDashboard.putNumber("Turret/Target Angle", currentTargetPosition);
+        SmartDashboard.putNumber("Turret/Target Angle", targetAngleDegrees);
         SmartDashboard.putNumber("Turret/Max Range", turretZeroAngleDegrees + turretRangeOfMotionDegrees);
 
         // If the target angle is outside the range of motion, clamp it to the nearest valid angle
         // Smallest value is turretZeroAngle, largest is turretZeroAngle + turretRangeOfMotion
-        if (currentTargetPosition < turretZeroAngleDegrees) {
-            return 1000;
-        } else if (currentTargetPosition > turretZeroAngleDegrees + turretRangeOfMotionDegrees) {
-            return 1000;
+        if (targetAngleDegrees < turretZeroAngleDegrees) {
+            return 1000; // Return a large error so we don't shoot when the target angle is out of bounds
+        } else if (targetAngleDegrees > turretZeroAngleDegrees + turretRangeOfMotionDegrees) {
+            return 1000; // Return a large error so we don't shoot when the target angle is out of bounds
         }
-        
 
-        // The turret is at position 0 is facing forward (towards the front of the robot).
-        // A target angle of 90 degrees (left) would be 90 - turretMinAngle
-        // where turretMinAngle is the angle of the turret when it's at position 0
-        turretspinnyspinner.setControl(new MotionMagicVoltage((currentTargetPosition - turretZeroAngleDegrees) * turretGearRatio / 360.0));
+        // Convert target angle in degrees to motor rotations and set the motor to that position using Motion Magic
+        // Subtract turretZeroAngleDegrees because the motor position is 0 at turretZeroAngleDegrees, not at 0 degrees
+        turretspinnyspinner.setControl(new MotionMagicVoltage((targetAngleDegrees - turretZeroAngleDegrees) * turretGearRatio / 360.0));
 
-        return turretspinnyspinner.getPosition().getValueAsDouble() / turretGearRatio - (currentTargetPosition - turretZeroAngleDegrees) / 360.0;
+        // Return the error in degrees (for use in commands)
+        return getTurretAngleDegrees() - targetAngleDegrees;
 
     }
 
@@ -396,7 +388,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public double getTargetPositionRotations() {
-        return currentTargetPosition;
+        return targetAngleDegrees;
     }
 
 }

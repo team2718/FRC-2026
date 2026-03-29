@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,7 +40,7 @@ public class TurretToHub extends Command {
 
     private static final double LEAD_TIME_LATENCY_SECONDS = 0.2;
 
-    private static final double SPIN_LEAD_TIME_SECONDS = 0.02;
+    private static final double HEADING_LEAD_TIME_SECONDS = 0.02;
     
     private static final double MAX_RPM_ERROR = 30;
 
@@ -54,6 +55,9 @@ public class TurretToHub extends Command {
     private ChassisSpeeds lastSwerveSpeeds = new ChassisSpeeds();
 
     private boolean isSpunUp = false;
+
+    private final double redTrenchX = 11.916;
+    private final double blueTrenchX = 4.626;
 
     public TurretToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,IntakeSubsystem intake,
             SwerveInputStream swerveInputFieldOriented, LEDSubsystem led) {
@@ -72,6 +76,9 @@ public class TurretToHub extends Command {
     public void initialize() {
         lastSwerveSpeeds = swerve.getFieldVelocity();
         isSpunUp = false;
+
+        // Run intake while shooting
+        intake.setIntakeSpeed(0.75);
     }
 
     // Spins the turret and the hood to their respective target positions when activated
@@ -81,6 +88,7 @@ public class TurretToHub extends Command {
         // Set properties for when the camera is disabled
         if (!(Robot.noCameraMode == NoCameraMode.DISABLED)) {
             runNoCameraShot();
+            swerve.lock();
             return;
         }
 
@@ -90,71 +98,35 @@ public class TurretToHub extends Command {
         swerveSpeeds = SwerveSubsystem.applyVelocityLimit(swerveSpeeds, VEL_LIMIT_WHILE_SHOOTING, ROT_VEL_LIMIT_WHILE_SHOOTING);
         lastSwerveSpeeds = swerveSpeeds;
 
-        // Variable for the turret's position relative to the field (Robor position + turret position relative to robor)
-        Pose2d turretPose = shooter.getTurretPoseFromRobotPose(swerve.getPose());
-
         // Variables for our target's location & robot velocity
         Strategy.StrategyConfig strategyConfig = Strategy.getLocationTarget(swerve.getPose().getTranslation());
-        Translation2d locationTarget = strategyConfig.targetLocation;
-        Translation2d commandedRobotVelocity = new Translation2d(swerveSpeeds.vxMetersPerSecond,
-                swerveSpeeds.vyMetersPerSecond);
 
-        // Calculate the lead time we need based on distance
-        // Adjust the constant based on system latency
-        Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
-        double leadTimeSeconds = LEAD_TIME_LATENCY_SECONDS + shooter.timeUntilHit(distanceToLocationTarget.in(Feet)).in(Seconds);
-
-        // Lead the target based on our current velocity
-        locationTarget = locationTarget.minus(commandedRobotVelocity.times(leadTimeSeconds));
-        distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
-
-        SmartDashboard.putNumber("TurretToHub/distanceToTarget", distanceToLocationTarget.in(Feet));
-
-        AngularVelocity targetShooterSpeed = shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet));
-        // AngularVelocity targetShooterSpeed = RPM.of(SmartDashboard.getNumber("Target RPM", 3300));
-        shooter.setShooterSpeed(targetShooterSpeed);
-        SmartDashboard.putNumber("TurretToHub/shooterSpeed", targetShooterSpeed.in(RPM));
-
-        // If we're aiming for the hub, turn our turret to face: a. the hub, b. the hub, c. the sad reality we're gonna take it apart next season, d. the hub
-        if (strategyConfig.strategyType == StrategyType.HUB_SHOT) {
-            // shooter.setHoodAngle(Degrees.of(70));
-            shooter.setHoodAngle(shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)));
-            SmartDashboard.putNumber("TurretToHub/hoodAngle", shooter.targetHoodAngle(distanceToLocationTarget.in(Feet)).in(Degrees));
+        if (strategyConfig.strategyType == StrategyType.DONT_SHOOT) {
+            // If we don't want to shoot, stop the indexer
+            indexer.stopIndexing();
         } else {
-            shooter.setHoodAngle(Degrees.of(45));
+            shootAtLocation(strategyConfig.targetLocation, swerveSpeeds, strategyConfig);
         }
-
-        Rotation2d predictedSwerveHeading = swerve.getPose().getRotation().plus(new Rotation2d(Radians.of(swerveSpeeds.omegaRadiansPerSecond).times(SPIN_LEAD_TIME_SECONDS)));
-
-        double azimuthError = shooter.setAzimuthAngle(locationTarget.minus(turretPose.getTranslation()).getAngle().minus(predictedSwerveHeading).getRadians());
-
-        SmartDashboard.putNumber("TurretToHub/Azimuth Error", azimuthError);
-
+    
+        // Command the swerve to drive, but if we're not trying to move, lock the wheels to prevent being pushed around
         Translation2d rawInputTranslation2d = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
         if (rawInputTranslation2d.getNorm() < 0.05 && Math.abs(swerveSpeeds.omegaRadiansPerSecond) < 0.05) {
             swerve.lock(); // if we're not trying to move, lock the wheels to prevent being pushed
         } else {
             swerve.driveFieldOriented(swerveSpeeds);
         }
-
-        if (azimuthError < 20 && (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR)))) {
-            isSpunUp = true;
-            indexer.runIndexing();
-            intake.setIntakeSpeed(0.75);
-        } else {
-            indexer.stopIndexing();
-            intake.setIntakeSpeed(0);
-        }
     }
 
     // When the program ends, stop everything
     @Override
     public void end(boolean interuppted) {
-        shooter.stopShooter();
+
+        intake.setIntakeSpeed(0);
         indexer.stopIndexing();
-        // shooter.setHoodAngle(Degrees.of(80));
+
         shooter.dropHood();
         shooter.setShooterSpeedRPM(2000);
+
         isSpunUp = false;
     }
 
@@ -164,6 +136,72 @@ public class TurretToHub extends Command {
         return false;
     }
 
+    // Lead the target based on our current velocity
+    // Iteratively solve the shoot-while-moving lead problem.
+    // Each iteration recomputes the flight time from the updated (led) distance,
+    // then re-applies the lead until the distance converges.
+    private Translation2d leadShot(Translation2d originalLocationTarget, Translation2d commandedRobotVelocity, Pose2d turretPose) {
+        Translation2d projectedLocationTarget = originalLocationTarget;
+        Distance distanceToLocationTarget = Meters.of(originalLocationTarget.getDistance(turretPose.getTranslation()));
+        
+        for (int i = 0; i < 4; i++) {
+            double leadTimeSeconds = LEAD_TIME_LATENCY_SECONDS + shooter.timeUntilHit(distanceToLocationTarget.in(Feet)).in(Seconds);            
+            projectedLocationTarget = originalLocationTarget.minus(commandedRobotVelocity.times(leadTimeSeconds));
+            distanceToLocationTarget = Meters.of(projectedLocationTarget.getDistance(turretPose.getTranslation()));
+        }
+
+        return projectedLocationTarget;
+    }
+
+    private void shootAtLocation(Translation2d locationTarget, ChassisSpeeds swerveSpeeds, Strategy.StrategyConfig strategyConfig) {
+        Translation2d commandedRobotVelocity = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
+        Pose2d turretPose = shooter.getTurretPoseFromRobotPose(swerve.getPose());
+
+        // Lead the target based on our current velocity
+        Translation2d ledLocationTarget = leadShot(locationTarget, commandedRobotVelocity, turretPose);
+
+        Distance distanceToLocationTarget = Meters.of(ledLocationTarget.getDistance(turretPose.getTranslation()));
+        SmartDashboard.putNumber("TurretToHub/Distance to Target Feet", distanceToLocationTarget.in(Feet));
+
+        AngularVelocity targetShooterSpeed = shooter.targetShooterSpeed(distanceToLocationTarget.in(Feet));
+        SmartDashboard.putNumber("TurretToHub/Target Shooter Speed RPM", targetShooterSpeed.in(RPM));
+
+        // If we're aiming for the hub, turn our turret to face: a. the hub, b. the hub, c. the sad reality we're gonna take it apart next season, d. the hub
+        Angle targetHoodAngle;
+
+        if (strategyConfig.strategyType == StrategyType.HUB_SHOT) {
+            shooter.setShooterSpeed(targetShooterSpeed);
+            targetHoodAngle = shooter.targetHoodAngle(distanceToLocationTarget.in(Feet));
+        } else {
+            shooter.setShooterSpeed(RPM.of(2000 + distanceToLocationTarget.in(Feet) * 50)); // low-ish passing speed
+            targetHoodAngle = Degrees.of(45);
+        }
+
+        // Check that we aren't near the trench so we don't accidentally hit the trench with the hood
+        // Put hood down if we are within 0.5 meters of the trench
+        if (Math.abs(swerve.getPose().getTranslation().getX() - redTrenchX) < 0.3 || Math.abs(swerve.getPose().getTranslation().getX() - blueTrenchX) < 0.3) {
+            shooter.dropHood();
+            indexer.stopIndexing();
+            return;
+        } else {
+            shooter.setHoodAngle(targetHoodAngle);
+        }
+
+        SmartDashboard.putNumber("TurretToHub/Target Hood Angle Degrees", targetHoodAngle.in(Degrees));
+
+        Rotation2d predictedSwerveHeading = swerve.getPose().getRotation().plus(new Rotation2d(Radians.of(swerveSpeeds.omegaRadiansPerSecond).times(HEADING_LEAD_TIME_SECONDS)));
+        double azimuthErrorDegrees = shooter.setAzimuthAngle(ledLocationTarget.minus(turretPose.getTranslation()).getAngle().minus(predictedSwerveHeading).getMeasure());
+
+        SmartDashboard.putNumber("TurretToHub/Azimuth Error Degrees", azimuthErrorDegrees);
+
+        if (Math.abs(azimuthErrorDegrees) < 2 && (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR)))) {
+            isSpunUp = true;
+            indexer.runIndexing();
+        } else {
+            indexer.stopIndexing();
+        }
+    }
+
     // Determines how the turret will work when the camera is disabled
     private void runNoCameraShot() {
         double targetShooterSpeed = 0;
@@ -171,10 +209,10 @@ public class TurretToHub extends Command {
         // Settings for if the robot is close to or far from the hub
         if (Robot.noCameraMode == NoCameraMode.CLOSE_SHOT) {
             shooter.setHoodAngle(Degrees.of(70));
-            targetShooterSpeed = 1965;
+            targetShooterSpeed = 3340;
         } else if (Robot.noCameraMode == NoCameraMode.FAR_SHOT) {
             shooter.setHoodAngle(Degrees.of(63));
-            targetShooterSpeed = 2234;
+            targetShooterSpeed = 3800;
         }
 
         shooter.setShooterSpeed(RPM.of(targetShooterSpeed));
