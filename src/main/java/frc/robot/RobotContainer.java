@@ -31,6 +31,7 @@ import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.SpinUpTurret;
 import frc.robot.commands.turret.TurretToHub;
 import frc.robot.commands.turret.ZeroHood;
+import frc.robot.commands.turret.ZeroTurret;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -66,8 +67,8 @@ public class RobotContainer {
     @Logged(name = "Vision")
     private final VisionSubsystem vision = new VisionSubsystem();
 
-    @Logged(name = "PDH")
-    private final PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+    // @Logged(name = "PDH")
+    // private final PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
 
     // ** Commands **
 
@@ -86,7 +87,7 @@ public class RobotContainer {
     private final SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
     private final Command swerveCommand = swerve.driveFieldOriented(swerveInput);
 
-    private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, swerveInput, led);
+    private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, intake, swerveInput, led);
 
     private final SendableChooser<String> autoChooser = new SendableChooser<String>();
 
@@ -151,6 +152,7 @@ public class RobotContainer {
 
         // Buttons to manually zero stuff as needed
         SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
+        SmartDashboard.putData("Commands/Zero Turret", new ZeroTurret(turret));
         // SmartDashboard.putData("Commands/Zero Climber", new ZeroClimber(climber));
 
         NamedCommands.registerCommand("RunIntake",
@@ -172,14 +174,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("TurretToHub",
                 new ParallelDeadlineGroup(
                         new WaitCommand(5),
-                        new TurretToHub(turret, swerve, indexer, swerveInput, led)));
+                        new TurretToHub(turret, swerve, indexer, intake, swerveInput, led)));
 
         // Register turret to hub for 1 to 9 seconds
         for (int i = 1; i <= 9; i++) {
             NamedCommands.registerCommand(
                     "TurretToHub" + i,
                     new ParallelDeadlineGroup(new WaitCommand(i),
-                            new TurretToHub(turret, swerve, indexer, swerveInput, led)));
+                            new TurretToHub(turret, swerve, indexer, intake, swerveInput, led)));
         }
 
         // Configure button bindings
