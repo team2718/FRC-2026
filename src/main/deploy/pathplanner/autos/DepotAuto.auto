@@ -17,27 +17,41 @@
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "SpinUpTurret"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartShooting"
+                }
+              },
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "OnDepot"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 5.0
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "DepotToShoot"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "TurretToHub9"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
+            "name": "StopShooting"
           }
         }
       ]

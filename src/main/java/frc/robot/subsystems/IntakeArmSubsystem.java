@@ -36,12 +36,13 @@ public class IntakeArmSubsystem extends SubsystemBase {
 
         SparkMaxConfig slapdownMotorConfig = new SparkMaxConfig();
         slapdownMotorConfig.inverted(true);
-        slapdownMotorConfig.smartCurrentLimit(40);
+        slapdownMotorConfig.smartCurrentLimit(45);
         slapdownMotorConfig.idleMode(IdleMode.kCoast);
         slapdownMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         slapdownMotorConfig.absoluteEncoder.zeroCentered(true);
+        slapdownMotorConfig.closedLoopRampRate(0.1);
         slapdownMotorConfig.absoluteEncoder.zeroOffset(0.412); // TODO: find the
-        slapdownMotorConfig.closedLoop.pid(2.5, 0.0, 0.0).outputRange(-0.2, 0.9); // TODO: tune the PID
+        slapdownMotorConfig.closedLoop.pid(4.5, 0.0, 0.0).outputRange(-0.2, 0.9); // TODO: tune the PID
         slapdownMotorConfig.closedLoop.maxMotion.cruiseVelocity(RotationsPerSecond.of(1).in(RPM));
         slapdownMotorConfig.closedLoop.maxMotion.maxAcceleration(RotationsPerSecondPerSecond.of(5).in(RPM.per(Second)));
         slapdownMotor.configure(slapdownMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

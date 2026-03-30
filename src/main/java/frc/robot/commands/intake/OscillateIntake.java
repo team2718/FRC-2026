@@ -23,7 +23,7 @@ public class OscillateIntake extends Command {
     public void execute() {
         // Follow a sine wave pattern to oscillate the intake's position
         // between 0 and 45 degrees at a frequency of 0.5 Hz (one full oscillation every 2 seconds)
-        double angle = 22.5 * (1 + Math.sin(2 * Math.PI * 0.5 * timer.get())); // Oscillates between 0 and 45 degrees
+        double angle = 30 * (1 + Math.sin(2 * Math.PI * 1.5 * timer.get())); // Oscillates between 0 and 45 degrees
         intakeArm.setSlapdownPosition(angle);
     }
 

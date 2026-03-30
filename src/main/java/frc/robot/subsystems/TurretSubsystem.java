@@ -60,15 +60,11 @@ public class TurretSubsystem extends SubsystemBase {
 
     private static final double[][] DISTANCE_TABLE = {
             // dist_ft hood_deg rpm flight_sec
-            { 4.0, 73.5, 1880.0, 0.88 },
-            { 6.0, 69.0, 2000.0, 0.92 },
-            { 8.0, 65.0, 2100.0, 0.96 },
-            { 10.0, 62.0, 2290.0, 1.00 },
-            { 12.0, 59.5, 2350.0, 1.04 },
-            { 14.0, 57.5, 2570.0, 1.08 },
-            { 16.0, 56.0, 2710.0, 1.12 },
-            { 18.0, 54.5, 2850.0, 1.16 },
-            { 20.0, 53.5, 2990.0, 1.20 },
+            { 4.0, 73.5, 3100.0, 0.88 },
+            { 7.0, 67.7, 3500.0, 0.94 },
+            { 10.0, 62.0, 3700.0, 1.00 },
+            { 14.5, 57.5, 4200.0, 1.08 },
+            { 20.0, 53.5, 5000.0, 1.20 },
     };
 
     // InterpolatingDoubleTreeMap performs linear interpolation to give us values
@@ -222,7 +218,11 @@ public class TurretSubsystem extends SubsystemBase {
         targetAngleDegrees = targetAngle.in(Degrees);
 
         // Convert target angle to the range [0, 360)
-        targetAngleDegrees = ((targetAngleDegrees % 360) + 360) % 360;
+        if (targetAngleDegrees < 0) {
+            targetAngleDegrees += 360;
+        } else if (targetAngleDegrees >= 360) {
+            targetAngleDegrees -= 360;
+        }
 
         SmartDashboard.putNumber("Turret/Target Angle", targetAngleDegrees);
         SmartDashboard.putNumber("Turret/Max Range", turretZeroAngleDegrees + turretRangeOfMotionDegrees);
@@ -237,10 +237,11 @@ public class TurretSubsystem extends SubsystemBase {
 
         // Convert target angle in degrees to motor rotations and set the motor to that position using Motion Magic
         // Subtract turretZeroAngleDegrees because the motor position is 0 at turretZeroAngleDegrees, not at 0 degrees
-        turretspinnyspinner.setControl(new MotionMagicVoltage((targetAngleDegrees - turretZeroAngleDegrees) * turretGearRatio / 360.0));
+        double targetPosition = (targetAngleDegrees - turretZeroAngleDegrees) * turretGearRatio / 360.0;
+        turretspinnyspinner.setControl(new MotionMagicVoltage(targetPosition));
 
         // Return the error in degrees (for use in commands)
-        return getTurretAngleDegrees() - targetAngleDegrees;
+        return (targetPosition - turretspinnyspinner.getPosition().getValueAsDouble()) / turretGearRatio * 360.0;
 
     }
 
@@ -278,9 +279,9 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     // returns the current position of the turret
+    // where 0 degrees is facing forward, positive is CW, negative is CCW
     public double getTurretAngleDegrees() {
-        return turretspinnyspinner.getPosition().getValueAsDouble() / turretGearRatio + turretZeroAngleDegrees;
-        // return turretZeroAngle.minus(Rotations.of(turretspinnyspinner.getPosition().getValueAsDouble() / turretGearRatio)).in(Degrees);
+        return turretZeroAngleDegrees + (turretspinnyspinner.getPosition().getValueAsDouble() / turretGearRatio) * 360.0;
     }
 
 
@@ -301,7 +302,7 @@ public class TurretSubsystem extends SubsystemBase {
     // Estimates the speed we want to shoot the fuel at based on the turret's
     // distance to the hub
     public AngularVelocity targetShooterSpeed(double distanceFeet) {
-        return RPM.of(shooterSpeedMap.get(distanceFeet) * 1.7);
+        return RPM.of(shooterSpeedMap.get(distanceFeet));
     }
 
     // sets position of the hood

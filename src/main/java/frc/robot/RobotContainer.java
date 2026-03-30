@@ -4,6 +4,10 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
@@ -27,6 +31,7 @@ import frc.robot.commands.intake.OscillateIntake;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.SpinUpTurret;
 import frc.robot.commands.turret.TurretToHub;
+import frc.robot.commands.turret.TurretToHubAuto;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.commands.turret.ZeroTurret;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -94,11 +99,18 @@ public class RobotContainer {
 
     private final Timer globalTimer = new Timer();
 
+    private final Command shootInAuto = new TurretToHubAuto(turret, swerve, indexer, intake, led);
+
     private boolean swerveEnabled = true;
     private boolean turretEnabled = true;
     private boolean indexerIntakeEnabled = true;
     private boolean climberEnabled = true;
     private boolean allEnabled = true;
+
+    StructPublisher<Pose2d> robotPosePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Misc/Robot Pose", Pose2d.struct).publish();
+    StructPublisher<Pose2d> turretPosePublisher = NetworkTableInstance.getDefault()
+            .getStructTopic("Misc/Turret Pose", Pose2d.struct).publish();
 
     private boolean hasRanCalibration = false; // Set to true for testing, but should be false for comp so that it runs
                                                // at the start of the match
@@ -165,6 +177,12 @@ public class RobotContainer {
         NamedCommands.registerCommand("SpinIndexerForward",
                 new SpinIndexerForeward(indexer, .5));
 
+        NamedCommands.registerCommand("StartShooting", shootInAuto);
+        NamedCommands.registerCommand("StopShooting", Commands.runOnce(() -> {
+            turret.stopShooter();
+            indexer.stopIndexing();
+        }, turret, indexer));
+
         // NamedCommands.registerCommand("ExtendHook",
         // new ExtendHook(climber));
 
@@ -226,11 +244,9 @@ public class RobotContainer {
         }));
 
         buttonBoxController.x().onTrue(
-            new SequentialCommandGroup(
-                new ZeroHood(turret),
-                new ZeroTurret(turret)
-            )
-        );
+                new SequentialCommandGroup(
+                        new ZeroHood(turret),
+                        new ZeroTurret(turret)));
 
         buttonBoxController.y().whileTrue(new OscillateIntake(intakeArm));
     }
@@ -282,8 +298,12 @@ public class RobotContainer {
         intake.setEnabled(indexerIntakeEnabled);
         // climber.setEnabled(climberEnabled);
 
-        SmartDashboard.putString("Robor Pos", swerve.getPose().toString());
-        SmartDashboard.putString("Turret Pose, ", turret.getTurretPoseFromRobotPose(swerve.getPose()).toString());
+        // SmartDashboard.putString("Robor Pos", swerve.getPose().toString());
+        // SmartDashboard.putString("Turret Pose, ",
+        // turret.getTurretPoseFromRobotPose(swerve.getPose()).toString());
+
+        robotPosePublisher.set(swerve.getPose());
+        turretPosePublisher.set(turret.getTurretPoseFromRobotPose(swerve.getPose()));
 
         updateShuffleboardTimers();
     }

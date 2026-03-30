@@ -11,8 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -30,7 +28,7 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
 import swervelib.SwerveInputStream;
 
-public class TurretToHub extends Command {
+public class TurretToHubAuto extends Command {
 
     // Setting variables for everything (constants, subsystems, motors)
 
@@ -48,7 +46,6 @@ public class TurretToHub extends Command {
 
     private final TurretSubsystem shooter;
     private final SwerveSubsystem swerve;
-    private final SwerveInputStream swerveInputFieldOriented;
     private final IndexerSubsystem indexer;
     private final IntakeSubsystem intake;
 
@@ -61,21 +58,14 @@ public class TurretToHub extends Command {
     private final double redTrenchX = 11.916;
     private final double blueTrenchX = 4.626;
 
-    StructPublisher<Translation2d> targetPublisher = NetworkTableInstance.getDefault()
-        .getStructTopic("TurretToHub/TargetTranslation", Translation2d.struct).publish();
-    StructPublisher<Translation2d> ledTargetPublisher = NetworkTableInstance.getDefault()
-        .getStructTopic("TurretToHub/LedTargetTranslation", Translation2d.struct).publish();
-
-    public TurretToHub(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer,IntakeSubsystem intake,
-            SwerveInputStream swerveInputFieldOriented, LEDSubsystem led) {
+    public TurretToHubAuto(TurretSubsystem shooter, SwerveSubsystem swerve, IndexerSubsystem indexer, IntakeSubsystem intake, LEDSubsystem led) {
         this.shooter = shooter;
         this.swerve = swerve;
         this.indexer = indexer;
         this.intake = intake;
-        this.swerveInputFieldOriented = swerveInputFieldOriented;
         this.led = led;
 
-        addRequirements(shooter, swerve, indexer, intake);
+        addRequirements(shooter, indexer, intake);
     }
 
     // Resets variables when the program starts
@@ -100,13 +90,15 @@ public class TurretToHub extends Command {
         }
 
         // Limit the velocity and acceleration of the robot to help out shoot while moving
-        ChassisSpeeds swerveSpeeds = swerveInputFieldOriented.get();
-        swerveSpeeds = SwerveSubsystem.applyAccelLimit(lastSwerveSpeeds, swerveSpeeds, ACCEL_LIMIT_WHILE_SHOOTING, ROT_ACCEL_LIMIT_WHILE_SHOOTING);
-        swerveSpeeds = SwerveSubsystem.applyVelocityLimit(swerveSpeeds, VEL_LIMIT_WHILE_SHOOTING, ROT_VEL_LIMIT_WHILE_SHOOTING);
+        ChassisSpeeds swerveSpeeds = swerve.getFieldVelocity();
+        // swerveSpeeds = SwerveSubsystem.applyAccelLimit(lastSwerveSpeeds, swerveSpeeds, ACCEL_LIMIT_WHILE_SHOOTING, ROT_ACCEL_LIMIT_WHILE_SHOOTING);
+        // swerveSpeeds = SwerveSubsystem.applyVelocityLimit(swerveSpeeds, VEL_LIMIT_WHILE_SHOOTING, ROT_VEL_LIMIT_WHILE_SHOOTING);
         lastSwerveSpeeds = swerveSpeeds;
 
         // Variables for our target's location & robot velocity
         Strategy.StrategyConfig strategyConfig = Strategy.getLocationTarget(swerve.getPose().getTranslation());
+
+        SmartDashboard.putString("TurretToHubAuto/Strategy", strategyConfig.strategyType.toString());
 
         if (strategyConfig.strategyType == StrategyType.DONT_SHOOT) {
             // If we don't want to shoot, stop the indexer
@@ -115,13 +107,13 @@ public class TurretToHub extends Command {
             shootAtLocation(strategyConfig.targetLocation, swerveSpeeds, strategyConfig);
         }
     
-        // Command the swerve to drive, but if we're not trying to move, lock the wheels to prevent being pushed around
-        Translation2d rawInputTranslation2d = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
-        if (rawInputTranslation2d.getNorm() < 0.05 && Math.abs(swerveSpeeds.omegaRadiansPerSecond) < 0.05) {
-            swerve.lock(); // if we're not trying to move, lock the wheels to prevent being pushed
-        } else {
-            swerve.driveFieldOriented(swerveSpeeds);
-        }
+        // // Command the swerve to drive, but if we're not trying to move, lock the wheels to prevent being pushed around
+        // Translation2d rawInputTranslation2d = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
+        // if (rawInputTranslation2d.getNorm() < 0.05 && Math.abs(swerveSpeeds.omegaRadiansPerSecond) < 0.05) {
+        //     swerve.lock(); // if we're not trying to move, lock the wheels to prevent being pushed
+        // } else {
+        //     swerve.driveFieldOriented(swerveSpeeds);
+        // }
     }
 
     // When the program ends, stop everything
@@ -167,10 +159,6 @@ public class TurretToHub extends Command {
         // Lead the target based on our current velocity
         Translation2d ledLocationTarget = leadShot(locationTarget, commandedRobotVelocity, turretPose);
 
-        // Publish the target and led target for debugging
-        targetPublisher.set(locationTarget);
-        ledTargetPublisher.set(ledLocationTarget);
-
         Distance distanceToLocationTarget = Meters.of(ledLocationTarget.getDistance(turretPose.getTranslation()));
         SmartDashboard.putNumber("TurretToHub/Distance to Target Feet", distanceToLocationTarget.in(Feet));
 
@@ -190,7 +178,7 @@ public class TurretToHub extends Command {
 
         // Check that we aren't near the trench so we don't accidentally hit the trench with the hood
         // Put hood down if we are within 0.5 meters of the trench
-        if (Math.abs(swerve.getPose().getTranslation().getX() - redTrenchX) < 0.35 || Math.abs(swerve.getPose().getTranslation().getX() - blueTrenchX) < 0.35) {
+        if (Math.abs(swerve.getPose().getTranslation().getX() - redTrenchX) < 0.3 || Math.abs(swerve.getPose().getTranslation().getX() - blueTrenchX) < 0.3) {
             shooter.dropHood();
             indexer.stopIndexing();
             return;
