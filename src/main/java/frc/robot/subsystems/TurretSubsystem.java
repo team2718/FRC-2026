@@ -10,11 +10,11 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -45,29 +45,25 @@ public class TurretSubsystem extends SubsystemBase {
     @Logged(name = "Turret Azimuth Motor")
     private final TalonFX turretspinnyspinner;
 
-    private final static Angle hoodZeroAngle = Degrees.of(80);
-    private final static Angle hoodRangeOfMotion = Degrees.of(15);
+    private final static Angle hoodZeroAngle = Degrees.of(70);
+    private final static Angle hoodRangeOfMotion = Degrees.of(30);
     private final static double hoodGearRatio = 286.0/22.0 * 30.0/12.0;
 
-    private final static Angle turretZeroAngle = Degrees.of(45);
-    private final static Angle turretRangeOfMotion = Degrees.of(200);
+    private final static double turretZeroAngleDegrees = 52;
+    private final static double turretRangeOfMotionDegrees = 350;
     private final static double turretGearRatio = 160.0/16.0 * 30.0/16.0;
 
     private final static Distance turretX = Inches.of(-5.75);
     private final static Distance turretY = Inches.of(-5);
-    private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretZeroAngle.in(Degrees)));
+    private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretZeroAngleDegrees));
 
     private static final double[][] DISTANCE_TABLE = {
             // dist_ft hood_deg rpm flight_sec
-            { 4.0, 73.5, 1880.0, 0.88 },
-            { 6.0, 69.0, 2000.0, 0.92 },
-            { 8.0, 65.0, 2150.0, 0.96 },
-            { 10.0, 62.0, 2290.0, 1.00 },
-            { 12.0, 59.5, 2430.0, 1.04 },
-            { 14.0, 57.5, 2570.0, 1.08 },
-            { 16.0, 56.0, 2710.0, 1.12 },
-            { 18.0, 54.5, 2850.0, 1.16 },
-            { 20.0, 53.5, 2990.0, 1.20 },
+            { 4.0, 73.5, 3100.0, 0.88 },
+            { 7.0, 67.7, 3600.0, 0.94 },
+            { 10.0, 62.0, 3900.0, 1.00 },
+            { 14.5, 57.5, 4300.0, 1.08 },
+            { 20.0, 53.5, 5000.0, 1.20 },
     };
 
     // InterpolatingDoubleTreeMap performs linear interpolation to give us values
@@ -89,6 +85,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     TalonFXConfiguration turretshooterconfig;
     TalonFXConfiguration turrethoodconfig;
+    TalonFXConfiguration turretAzimuthConfiguration;
+
+    private double targetAngleDegrees = 0;
 
     public TurretSubsystem() {
 
@@ -111,12 +110,10 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterconfig.Slot0.kS = 0.2;
         turretshooterconfig.Slot0.kV = 0.115;
         turretshooterconfig.Slot0.kP = 0.3;
-
+        
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
         
-        turretshooterconfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-
         turretshooterconfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         turretshooterRight.getConfigurator().apply(turretshooterconfig);
 
@@ -141,17 +138,22 @@ public class TurretSubsystem extends SubsystemBase {
 
         turrethood.getConfigurator().apply(turrethoodconfig);
 
-        TalonFXConfiguration turretAzimuthConfiguration = new TalonFXConfiguration();
+        turretAzimuthConfiguration = new TalonFXConfiguration();
         turretAzimuthConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        turretAzimuthConfiguration.MotorOutput.PeakForwardDutyCycle = 0.2;
-        turretAzimuthConfiguration.MotorOutput.PeakReverseDutyCycle = 0.2;
-        turretAzimuthConfiguration.CurrentLimits.StatorCurrentLimit = 20;
+        turretAzimuthConfiguration.MotorOutput.PeakForwardDutyCycle = 0.35;
+        turretAzimuthConfiguration.MotorOutput.PeakReverseDutyCycle = -0.35;
+        turretAzimuthConfiguration.CurrentLimits.StatorCurrentLimit = 30;
         turretAzimuthConfiguration.CurrentLimits.SupplyCurrentLimit = 40;
-        turretAzimuthConfiguration.Slot0.kP = 2.0;
-        turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        turretAzimuthConfiguration.Slot0.kP = 30.0;
+        turretAzimuthConfiguration.Slot0.kS = 0.45;
+        turretAzimuthConfiguration.Slot0.kV = 0.122;
+        turretAzimuthConfiguration.MotionMagic.MotionMagicCruiseVelocity = 25;
+        turretAzimuthConfiguration.MotionMagic.MotionMagicAcceleration = 150;
+        turretAzimuthConfiguration.MotionMagic.MotionMagicJerk = 1000;
+        // turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         turretAzimuthConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 10;
-        turretAzimuthConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+        // turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (225.0/360.0) * turretGearRatio - 0.1;
+        turretAzimuthConfiguration.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.1;
         turretspinnyspinner.getConfigurator().apply(turretAzimuthConfiguration);
 
         turretspinnyspinner.setPosition(0);
@@ -201,29 +203,36 @@ public class TurretSubsystem extends SubsystemBase {
         }
 
         double currentRPM = getShooterRPM();
-        return Math.abs(currentRPM - targetRPM) < tolerance;
+        return Math.abs(currentRPM - (targetRPM)) < tolerance;
     }
 
-    // sets position of the turret
-    public void setAzimuthAngle(Angle angle) {
+    // Sets position of the turret in degrees
+    // 0 is facing forward (towards the front of the robot)
+    // CW is positive, CCW is negative
+    public void setAzimuthAngle(Angle targetAngle) {
         if (!turretEnabled) {
-            return;
+            return; // Return early so we don't shoot when the turret is disabled
         }
 
-        // Clamp angle to range of motion
-        if (angle.lt(turretZeroAngle)) {
-            angle = turretZeroAngle;
-        } else if (angle.gt(turretZeroAngle.plus(turretRangeOfMotion))) {
-            angle = turretZeroAngle.plus(turretRangeOfMotion);
+        targetAngleDegrees = targetAngle.in(Degrees) - turretZeroAngleDegrees;
+
+        // Make sure the turret angle is [0 360)
+        if (targetAngleDegrees < 0) {
+            targetAngleDegrees += 360;
+        } else if (targetAngleDegrees >= 360) {
+            targetAngleDegrees -= 360;
         }
 
-        // The turret is at position 0 is facing forward (towards the front of the robot).
-        // A target angle of 90 degrees (left) would be 90 - turretMinAngle
-        // where turretMinAngle is the angle of the turret when it's at position 0
-        turretspinnyspinner.setControl(new PositionVoltage(angle.minus(turretZeroAngle).times(turretGearRatio)));
+        // If the target angle is outside the range of motion, clamp it to the nearest valid angle
+        if (targetAngleDegrees < 0) {
+            targetAngleDegrees = 0;
+        } else if (targetAngleDegrees > turretRangeOfMotionDegrees) {
+            targetAngleDegrees = turretRangeOfMotionDegrees;
+        }
 
-        return;
-
+        // Convert target angle in degrees to motor rotations and set the motor to that position using Motion Magic
+        // Subtract turretZeroAngleDegrees because the motor position is 0 at turretZeroAngleDegrees, not at 0 degrees
+        turretspinnyspinner.setControl(new MotionMagicVoltage(targetAngleDegrees * turretGearRatio / 360.0));
     }
 
     public void setTurretSpeedUnchecked(double power) {
@@ -238,18 +247,31 @@ public class TurretSubsystem extends SubsystemBase {
         turretspinnyspinner.setControl(new NeutralOut());
     }
 
+    public void setTurretNoLimits() {
+        // turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        turretAzimuthConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+        turretspinnyspinner.getConfigurator().apply(turretAzimuthConfiguration);
+    }
+
+    public void setTurretYesLimits() {
+        // turretAzimuthConfiguration.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        turretAzimuthConfiguration.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        turretspinnyspinner.getConfigurator().apply(turretAzimuthConfiguration);
+    }
+
     public Current getTurretSpinnerCurrent() {
         return turretspinnyspinner.getStatorCurrent().getValue();
     }
 
     public void resetTurretPosition() {
         turretspinnyspinner.setPosition(0);
-        System.out.println("Hood position reset!");
+        System.out.println("Turret position reset!");
     }
 
     // returns the current position of the turret
-    public double getTurretAngleDegrees() {
-        return turretZeroAngle.minus(Rotations.of(turretspinnyspinner.getPosition().getValueAsDouble() / turretGearRatio)).in(Degrees);
+    // where 0 degrees is facing forward, positive is CW, negative is CCW
+    public Angle getTurretAngle() {
+        return Degrees.of(turretZeroAngleDegrees + (turretspinnyspinner.getPosition().getValue().in(Degrees) / turretGearRatio));
     }
 
 
@@ -354,6 +376,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     public Pose2d getTurretPoseFromRobotPose(Pose2d robotPose) {
         return robotPose.plus(turretLocation);
+    }
+
+    public double getTargetPositionRotations() {
+        return targetAngleDegrees;
     }
 
 }

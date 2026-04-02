@@ -5,27 +5,40 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "SpinTo180"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Do Little"
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "RunIntake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartShooting"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "TurretToHub3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
+            "name": "StopShooting"
           }
         }
       ]

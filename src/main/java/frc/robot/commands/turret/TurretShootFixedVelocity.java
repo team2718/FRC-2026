@@ -92,10 +92,6 @@ public class TurretShootFixedVelocity extends Command {
         locationTarget = locationTarget.minus(robotVelocity.times(1.3));
 
         Distance distanceToLocationTarget = Meters.of(locationTarget.getDistance(turretPose.getTranslation()));
-        //I'm tryna to calculate the projected X and Y positions of the turret but idk how to get the velocities I need, there's probably 50 million better ways to program this <_<
-        double projectedDistance = locationTarget.getDistance(robotVelocity) /* - (turretPose + (turretPose.getVelocity() * shooter.timeUntilHit(MAX_SPEED_BETWEEN_UPDATES)))*/;
-        double projectedDistanceX = locationTarget.getX() - (turretPose.getX());
-
 
         SmartDashboard.putNumber("Distance For Testing", distanceToLocationTarget.in(Feet));
 

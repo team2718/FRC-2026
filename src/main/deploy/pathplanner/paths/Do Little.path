@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.8760085498692005,
-        "y": 3.921036128812112
+        "x": 3.816751623509886,
+        "y": 4.005049766061899
       },
       "isLocked": false,
       "linkedName": null
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 2.24058487874465,
-        "y": 4.028530670470756
+        "y": 4.029
       },
       "prevControl": {
-        "x": 2.1716437200014584,
-        "y": 4.268836967997779
+        "x": 2.511147914439571,
+        "y": 4.0593995714496245
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 15.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 3.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "JustShootPath",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.38394009160078
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
