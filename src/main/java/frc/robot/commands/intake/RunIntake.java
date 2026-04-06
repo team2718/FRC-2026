@@ -1,12 +1,14 @@
 package frc.robot.commands.intake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class RunIntake extends Command {
     private final IntakeSubsystem intake;
-    // private final LEDSubsystem LEDs;
     private double speed;
+
+    private Timer timer = new Timer();
 
     public RunIntake(IntakeSubsystem intake, double speed) {
         this.intake = intake;
@@ -16,14 +18,18 @@ public class RunIntake extends Command {
 
     @Override
     public void initialize() {
+        timer.reset();
+        timer.start();
     }
 
     @Override
     public void execute() {
-
-        // Sets the speed of the intake foreward
         intake.setIntakeSpeed(speed);
 
+        // Run indexer on sine wave to prevent jamming
+        // Go between 0.2 and -0.2 speed every 2.0 seconds
+        // double indexerSpeed = 0.2 * Math.sin(2 * Math.PI * timer.get() / 2.0);
+        // indexer.setIndexerSpeed(indexerSpeed);
     }
 
     @Override

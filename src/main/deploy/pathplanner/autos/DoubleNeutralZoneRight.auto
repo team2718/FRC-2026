@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ToDepot"
+            "pathName": "DoubleNeutralZoneRight"
           }
         },
         {
@@ -33,22 +33,46 @@
                 }
               },
               {
-                "type": "parallel",
+                "type": "wait",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "OnDepot"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 10.0
-                      }
-                    }
-                  ]
+                  "waitTime": 3.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RunIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DoubleNeutralZoneRight Second"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartShooting"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.0
                 }
               }
             ]

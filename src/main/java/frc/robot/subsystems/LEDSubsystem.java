@@ -8,15 +8,16 @@ import java.util.Map;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utils.SK6812RGBW;
 
 @Logged
 public class LEDSubsystem extends SubsystemBase {
@@ -32,11 +33,11 @@ public class LEDSubsystem extends SubsystemBase {
 
   private LEDState m_state = LEDState.RAINBOW;
 
-  private final SK6812RGBW m_led = new SK6812RGBW(Constants.LEDS.PWM_PORT);
+  private final AddressableLED m_led = new AddressableLED(Constants.LEDS.PWM_PORT);
   private final AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(Constants.LEDS.NUM_LEDS);
   private final Distance kLedSpacing = Meters.of(1 / 60.0);
 
-  private final LinearVelocity kScrollingSpeed = MetersPerSecond.of(0.1);
+  private final LinearVelocity kScrollingSpeed = MetersPerSecond.of(0.2);
 
   private final Map<Double, Color> maskSteps = Map.of(0.0, Color.kWhite, 0.5, Color.kBlack);
   private final LEDPattern mask = LEDPattern.steps(maskSteps).scrollAtAbsoluteSpeed(kScrollingSpeed, kLedSpacing);
@@ -71,7 +72,11 @@ public class LEDSubsystem extends SubsystemBase {
     m_led.start();
   }
 
-  public Command setLEDState(LEDState state) {
+  public void setLEDState(LEDState state) {
+    m_state = state;
+  }
+
+  public Command setLEDStateCommand(LEDState state) {
     return Commands.runOnce(() -> {
       m_state = state;
     });
@@ -79,33 +84,39 @@ public class LEDSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    switch (m_state) {
-      case RAINBOW:
-        m_scrollingRainbow.applyTo(m_ledBuffer);
-        break;
-      case BLUE:
-        m_scrollingBlue.applyTo(m_ledBuffer);
-        break;
-      case GREEN:
-        m_scrollingGreen.applyTo(m_ledBuffer);
-      case YELLOW:
-        m_scrollingYellow.applyTo(m_ledBuffer);
-      case ORANGE:
-        m_scrollingOrange.applyTo(m_ledBuffer);
-      case RED:
-        m_scrollingRed.applyTo(m_ledBuffer);
-      default:
-        m_scrollingRainbow.applyTo(m_ledBuffer);
-        break;
-    }
+    // switch (m_state) {
+    //   case RAINBOW:
+    //     m_scrollingRainbow.applyTo(m_ledBuffer);
+    //     break;
+    //   case BLUE:
+    //     m_scrollingBlue.applyTo(m_ledBuffer);
+    //     break;
+    //   case GREEN:
+    //     m_scrollingGreen.applyTo(m_ledBuffer);
+    //     break;
+    //   case YELLOW:
+    //     m_scrollingYellow.applyTo(m_ledBuffer);
+    //     break;
+    //   case ORANGE:
+    //     m_scrollingOrange.applyTo(m_ledBuffer);
+    //     break;
+    //   case RED:
+    //     m_scrollingRed.applyTo(m_ledBuffer);
+    //     break;
+    //   default:
+    //     m_scrollingRainbow.applyTo(m_ledBuffer);
+    //     break;
+    // }
 
-    // DriverStation State Overrides
-    if (DriverStation.isDisabled()) {
+    // // DriverStation State Overrides
+    // if (DriverStation.isDisabled()) {
+    //   m_scrollingRainbow.applyTo(m_ledBuffer);
+    // } else if (DriverStation.isTest()) {
+    //   m_scrollingRainbow.applyTo(m_ledBuffer);
+    // }
 
-    } else if (DriverStation.isTest()) {
-      m_scrollingRainbow.applyTo(m_ledBuffer);
-    }
+    // SmartDashboard.putString("LED State", m_state.name());
 
-    m_led.setData(m_ledBuffer);
+    // m_led.setData(m_ledBuffer);
   }
 }

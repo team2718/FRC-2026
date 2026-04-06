@@ -22,8 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class Camera {
-
-  private static final double maxAmbiguity = 0.25;
+  private static final double maxAmbiguity = 0.1;
   private static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
   private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
