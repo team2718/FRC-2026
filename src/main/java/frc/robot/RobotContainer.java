@@ -257,6 +257,10 @@ public class RobotContainer {
                         new ZeroTurret(turret)));
 
         buttonBoxController.y().whileTrue(new OscillateIntake(intakeArm));
+
+        buttonBoxController.leftBumper().onTrue(Commands.runOnce(() -> {turret.adjustLeft();}));
+        buttonBoxController.rightBumper().onTrue(Commands.runOnce(() -> {turret.adjustRight();}));
+        driverController.back().onTrue(Commands.runOnce(() -> {turret.adjustReset();}));
     }
 
     private int stateToButtonBox() {

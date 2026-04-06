@@ -22,7 +22,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class Camera {
-  private static final double maxAmbiguity = 0.1;
+  private static final double maxAmbiguity = 0.15;
+  private static final double maxSingleTagDistanceMeters = 4.0;
   private static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
   private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
 
@@ -77,7 +78,7 @@ public class Camera {
     List<PhotonPipelineResult> resultsList = camera.getAllUnreadResults();
 
     // Remove any results that have no targets or are high ambiguity
-    resultsList.removeIf(result -> (!result.hasTargets() || result.getBestTarget().getPoseAmbiguity() >= maxAmbiguity));
+    resultsList.removeIf(result -> (!result.hasTargets() || result.getBestTarget().getArea() < 0.10 || result.getBestTarget().getPoseAmbiguity() >= maxAmbiguity));
 
     Optional<EstimatedRobotPose> visionEst = Optional.empty();
     for (var result : resultsList) {
@@ -90,6 +91,13 @@ public class Camera {
         visionEst = poseEstimator.estimateLowestAmbiguityPose(result);
       } else {
         SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Coproc MultiTag Pose");
+      }
+
+      if (isFarSingleTagEstimate(visionEst, result.getTargets())) {
+        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Rejected Far Single Tag");
+        curStdDevs = singleTagStdDevs;
+        visionEst = Optional.empty();
+        continue;
       }
 
       updateEstimationStdDevs(visionEst, result.getTargets());
@@ -155,5 +163,34 @@ public class Camera {
         curStdDevs = estStdDevs;
       }
     }
+  }
+
+  private boolean isFarSingleTagEstimate(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
+    if (estimatedPose.isEmpty()) {
+      return false;
+    }
+
+    int numTags = 0;
+    double avgDist = 0;
+
+    for (var tgt : targets) {
+      var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+      if (tagPose.isEmpty())
+        continue;
+
+      numTags++;
+      avgDist += tagPose
+          .get()
+          .toPose2d()
+          .getTranslation()
+          .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+    }
+
+    if (numTags != 1) {
+      return false;
+    }
+
+    avgDist /= numTags;
+    return avgDist > maxSingleTagDistanceMeters;
   }
 }

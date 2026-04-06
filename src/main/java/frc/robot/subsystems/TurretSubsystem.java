@@ -30,6 +30,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -49,7 +50,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final static Angle hoodRangeOfMotion = Degrees.of(30);
     private final static double hoodGearRatio = 286.0/22.0 * 30.0/12.0;
 
-    private final static double turretZeroAngleDegrees = 52;
+    private final static double turretZeroAngleDegreesDefault = 55.3;
+    private static double turretZeroAngleDegrees = turretZeroAngleDegreesDefault;
     private final static double turretRangeOfMotionDegrees = 350;
     private final static double turretGearRatio = 160.0/16.0 * 30.0/16.0;
 
@@ -60,7 +62,7 @@ public class TurretSubsystem extends SubsystemBase {
     private static final double[][] DISTANCE_TABLE = {
             // dist_ft hood_deg rpm flight_sec
             { 4.0, 73.5, 3100.0, 0.88 },
-            { 7.0, 67.7, 3600.0, 0.94 },
+            { 7.0, 67.7, 3700.0, 0.94 },
             { 10.0, 62.0, 3900.0, 1.00 },
             { 14.5, 57.5, 4300.0, 1.08 },
             { 20.0, 53.5, 5000.0, 1.20 },
@@ -206,6 +208,18 @@ public class TurretSubsystem extends SubsystemBase {
         return Math.abs(currentRPM - (targetRPM)) < tolerance;
     }
 
+    public void adjustLeft() {
+        turretZeroAngleDegrees -= 2;
+    }
+
+    public void adjustRight() {
+        turretZeroAngleDegrees += 2;
+    }
+
+    public void adjustReset() {
+        turretZeroAngleDegrees = turretZeroAngleDegreesDefault;
+    }
+
     // Sets position of the turret in degrees
     // 0 is facing forward (towards the front of the robot)
     // CW is positive, CCW is negative
@@ -278,6 +292,10 @@ public class TurretSubsystem extends SubsystemBase {
     // where 0 degrees is facing forward, positive is CW, negative is CCW
     public Angle getTurretAngle() {
         return Degrees.of(turretZeroAngleDegrees + (turretspinnyspinner.getPosition().getValue().in(Degrees) / turretGearRatio));
+    }
+
+    public double getTurretAngleDegrees() {
+        return getTurretAngle().in(Degrees);
     }
 
 
@@ -374,6 +392,8 @@ public class TurretSubsystem extends SubsystemBase {
             turrethood.setControl(new NeutralOut());
             turretshooterLeft.setControl(new NeutralOut());
         }
+
+        SmartDashboard.putNumber("Turret Offset", turretZeroAngleDegrees);
     }
 
     public void setEnabled(boolean turretEnabled) {

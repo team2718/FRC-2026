@@ -209,6 +209,7 @@ public class TurretToHubAuto extends Command {
         SmartDashboard.putNumber("TurretToHub/Future Target Turret Angle Degrees", futureTargetTurretAngle.in(Degrees));
 
         shooter.setAzimuthAngle(futureTargetTurretAngle);
+        // shooter.setAzimuthAngle(Degrees.of(0));
 
         // Compute the current error by using the non-future-rotated target angle
         // We use the future prediction to compensate for latency only when we set the
