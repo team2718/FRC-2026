@@ -19,13 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "GoToNeutralZone"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NeutralZoneToShootDouble"
+            "pathName": "DoubleNeutralZoneLeft"
           }
         },
         {
@@ -57,18 +51,6 @@
           "type": "named",
           "data": {
             "name": "RunIntake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "GoBackToNeutralZone"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NeutralZoneToShootDouble2"
           }
         },
         {

@@ -7,11 +7,9 @@
     "DepotPaths",
     "DoubleNeutralZonePaths",
     "JustShootPath",
-    "MajorlyGreedyPaths",
-    "MinorlyGreedyPaths",
+    "NeutralZoneAndDepotPaths",
     "NeutralZoneAndOutpostPaths",
     "NeutralZonePaths",
-    "NeutralZoneAndDepotPaths",
     "OutpostAndDepotPaths",
     "OutpostPaths"
   ],
