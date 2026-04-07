@@ -91,7 +91,7 @@ public class TurretToHubAuto extends Command {
             // If we don't want to shoot, stop the indexer
             indexer.stopIndexing();
         } else {
-            shootAtLocation(strategyConfig, swerve.getFieldVelocity());
+            shootAtLocation(strategyConfig, swerve.getFilteredFieldVelocity());
         }
     
         // // Command the swerve to drive, but if we're not trying to move, lock the wheels to prevent being pushed around
