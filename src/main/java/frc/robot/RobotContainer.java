@@ -129,7 +129,7 @@ public class RobotContainer {
         // Set swerve to drive with the driver's controller input by default
         swerve.setDefaultCommand(swerveCommand);
 
-        // led.setDefaultCommand(Commands.run(() -> {led.setLEDState(LEDState.YELLOW);}, led));
+        led.setDefaultCommand(Commands.run(() -> {led.setLEDState(LEDState.YELLOW);}, led));
 
         // Setup timer
 

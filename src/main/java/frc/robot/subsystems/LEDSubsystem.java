@@ -84,39 +84,39 @@ public class LEDSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // switch (m_state) {
-    //   case RAINBOW:
-    //     m_scrollingRainbow.applyTo(m_ledBuffer);
-    //     break;
-    //   case BLUE:
-    //     m_scrollingBlue.applyTo(m_ledBuffer);
-    //     break;
-    //   case GREEN:
-    //     m_scrollingGreen.applyTo(m_ledBuffer);
-    //     break;
-    //   case YELLOW:
-    //     m_scrollingYellow.applyTo(m_ledBuffer);
-    //     break;
-    //   case ORANGE:
-    //     m_scrollingOrange.applyTo(m_ledBuffer);
-    //     break;
-    //   case RED:
-    //     m_scrollingRed.applyTo(m_ledBuffer);
-    //     break;
-    //   default:
-    //     m_scrollingRainbow.applyTo(m_ledBuffer);
-    //     break;
-    // }
+     switch (m_state) {
+       case RAINBOW:
+         m_scrollingRainbow.applyTo(m_ledBuffer);
+         break;
+       case BLUE:
+         m_scrollingBlue.applyTo(m_ledBuffer);
+         break;
+       case GREEN:
+         m_scrollingGreen.applyTo(m_ledBuffer);
+         break;
+       case YELLOW:
+         m_scrollingYellow.applyTo(m_ledBuffer);
+         break;
+       case ORANGE:
+         m_scrollingOrange.applyTo(m_ledBuffer);
+         break;
+       case RED:
+         m_scrollingRed.applyTo(m_ledBuffer);
+         break;
+       default:
+         m_scrollingRainbow.applyTo(m_ledBuffer);
+         break;
+     }
 
-    // // DriverStation State Overrides
-    // if (DriverStation.isDisabled()) {
-    //   m_scrollingRainbow.applyTo(m_ledBuffer);
-    // } else if (DriverStation.isTest()) {
-    //   m_scrollingRainbow.applyTo(m_ledBuffer);
-    // }
+     // DriverStation State Overrides
+     if (DriverStation.isDisabled()) {
+       m_scrollingRainbow.applyTo(m_ledBuffer);
+     } else if (DriverStation.isTest()) {
+       m_scrollingRainbow.applyTo(m_ledBuffer);
+     }
 
-    // SmartDashboard.putString("LED State", m_state.name());
+    SmartDashboard.putString("LED State", m_state.name());
 
-    // m_led.setData(m_ledBuffer);
+    m_led.setData(m_ledBuffer);
   }
 }
