@@ -129,7 +129,7 @@ public class RobotContainer {
         // Set swerve to drive with the driver's controller input by default
         swerve.setDefaultCommand(swerveCommand);
 
-        // led.setDefaultCommand(Commands.run(() -> {led.setLEDState(LEDState.YELLOW);}, led));
+        led.setDefaultCommand(Commands.run(() -> {led.setLEDState(LEDState.TEAL);}, led));
 
         // Setup timer
 
@@ -223,13 +223,19 @@ public class RobotContainer {
 
         // Left Trigger: Spins the intake wheel & spindexer foreward
         // Only if the right trigger isn't being held down
+        // Turns LEDs yellow
         driverController.leftTrigger().and(driverController.rightTrigger().negate()).whileTrue(runIntake);
+        driverController.leftTrigger().and(driverController.rightTrigger().negate()).whileTrue(Commands.run(() -> {led.setLEDState(LEDState.YELLOW);}, led));
 
         // Left Bumper: Spins the intake wheel & spindexer backward
+        // Turns LEDs red
         driverController.leftBumper().whileTrue(spindexerBackward.alongWith(runOutake));
+        driverController.leftBumper().whileTrue(Commands.run(() -> {led.setLEDState(LEDState.RED);}, led));
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
+        //Turns LEDs blue
         driverController.rightTrigger().whileTrue(turretToHub);
+        driverController.rightTrigger().whileTrue(Commands.run(() -> {led.setLEDState(LEDState.BLUE);}, led));
 
         // X and Y: Intake in and out
         driverController.x().onTrue(Commands.runOnce(() -> intakeArm.setActive(), intakeArm));
