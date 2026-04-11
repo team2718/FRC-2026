@@ -7,10 +7,11 @@
     "DepotPaths",
     "DoubleNeutralZonePaths",
     "JustShootPath",
+    "LeftRampNeutralZoneToDepot",
     "NeutralZoneAndDepotPaths",
     "NeutralZoneAndOutpostPaths",
     "NeutralZonePaths",
-    "LeftRampNeutralZoneToDepot",
+    "SwoopyNeutralZonePathLeft",
     "OutpostAndDepotPaths",
     "OutpostPaths"
   ],
