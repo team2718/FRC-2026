@@ -56,7 +56,7 @@ public class RobotContainer {
     // ** Subsystems **
 
     @NotLogged
-    private final SwerveSubsystem swerve = new SwerveSubsystem();
+    public final SwerveSubsystem swerve = new SwerveSubsystem();
 
     @Logged(name = "Turret")
     private final TurretSubsystem turret = new TurretSubsystem();
@@ -79,7 +79,7 @@ public class RobotContainer {
 
     // ** Commands **
 
-    private Command pathPlannerAutoCommand; // This will hold the currently selected auto command from the chooser
+    public Command pathPlannerAutoCommand; // This will hold the currently selected auto command from the chooser
 
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
     private final RunIntake runIntake = new RunIntake(intake, 0.75);
@@ -369,7 +369,6 @@ public class RobotContainer {
     }
 
     public void scheduleAutonomous() {
-        pathPlannerAutoCommand = swerve.getAutonomousCommand(autoChooser.getSelected());
         if (pathPlannerAutoCommand != null) {
             // run zeroing at the start of auto with a deadline of 1 second, then run the
             // path planner command after that
