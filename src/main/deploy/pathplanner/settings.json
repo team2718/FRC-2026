@@ -10,6 +10,7 @@
     "NeutralZoneAndDepotPaths",
     "NeutralZoneAndOutpostPaths",
     "NeutralZonePaths",
+    "LeftRampNeutralZoneToDepot",
     "OutpostAndDepotPaths",
     "OutpostPaths"
   ],
