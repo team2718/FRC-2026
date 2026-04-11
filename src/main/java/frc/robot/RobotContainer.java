@@ -95,7 +95,7 @@ public class RobotContainer {
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, intake, swerveInput, led);
 
-    private final SendableChooser<String> autoChooser = new SendableChooser<String>();
+    public final SendableChooser<String> autoChooser = new SendableChooser<String>();
 
     private final Timer matchTimer = new Timer();
 
@@ -372,7 +372,7 @@ public class RobotContainer {
             // run zeroing at the start of auto with a deadline of 1 second, then run the
             // path planner command after that
             hasRanCalibration = true; // Set this to true so that it doesn't run the calibration again in teleop
-            CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
+            CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
                     new ZeroHood(turret),
                     new ZeroTurret(turret),
                     pathPlannerAutoCommand));

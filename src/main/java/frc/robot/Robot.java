@@ -101,8 +101,14 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
   }
 
+  // Added a String field, so that we aren't instantiating new objects every frame
+  private String lastSelected; 
   @Override
   public void disabledPeriodic() {
+    if (m_robotContainer.autoChooser.getSelected() != lastSelected) {
+      lastSelected = m_robotContainer.autoChooser.getSelected();
+      m_robotContainer.scheduleAutonomous();
+    }
   }
 
   /**
@@ -111,7 +117,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_robotContainer.scheduleAutonomous();
   }
 
   /** This function is called periodically during autonomous. */
