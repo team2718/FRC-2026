@@ -124,6 +124,8 @@ public class RobotContainer {
         autoChooser.addOption("Double LEFT Neutral", "DoubleNeutralZoneLeft");
         autoChooser.addOption("Double RIGHT Neutral", "DoubleNeutralZoneRight");
         autoChooser.addOption("Depot Left", "DepotAuto");
+        autoChooser.addOption("Hairpin RIGHT", "HairpinAutoRight");
+        autoChooser.addOption("Hairpin LEFT", "HairpinAutoLeft");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
