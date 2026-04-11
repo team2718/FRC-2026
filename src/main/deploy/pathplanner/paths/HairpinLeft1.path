@@ -46,8 +46,12 @@
   ],
   "rotationTargets": [
     {
+      "waypointRelativePos": 0.3,
+      "rotationDegrees": 180.0
+    },
+    {
       "waypointRelativePos": 1,
-      "rotationDegrees": -88.74445481361987
+      "rotationDegrees": -90.0
     }
   ],
   "constraintZones": [],
@@ -66,10 +70,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "SwoopyNeutralZonePathLeft",
+  "folder": "HairpinPathsLeft",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

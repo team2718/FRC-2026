@@ -7,19 +7,19 @@
         {
           "type": "named",
           "data": {
-            "name": "RunIntake"
+            "name": "SpinTo90"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "SpinTo270"
+            "name": "RunIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SwoopyNeutralLeft1"
+            "pathName": "HairpinRight1"
           }
         },
         {
@@ -44,7 +44,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SwoopyNeutralLeft2"
+            "pathName": "HairpinRight2"
           }
         },
         {
@@ -60,7 +60,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 6.0
+                  "waitTime": 4.0
                 }
               }
             ]
