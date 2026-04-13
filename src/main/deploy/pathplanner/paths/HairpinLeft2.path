@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.38,
+        "x": 4.0,
         "y": 7.4
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.38,
+        "x": 5.0,
         "y": 7.4
       },
       "isLocked": false,
@@ -32,27 +32,27 @@
     },
     {
       "anchor": {
-        "x": 6.32,
-        "y": 5.3
+        "x": 5.90559829059829,
+        "y": 5.430384615384616
       },
       "prevControl": {
-        "x": 5.376512928904067,
-        "y": 2.824715542270986
+        "x": 5.49184411033549,
+        "y": 3.8754697121389325
       },
       "nextControl": {
-        "x": 7.418063661830412,
-        "y": 8.180823700709155
+        "x": 6.706652421652421,
+        "y": 8.44079772079772
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.38,
+        "x": 4.0,
         "y": 7.4
       },
       "prevControl": {
-        "x": 4.38,
+        "x": 4.0,
         "y": 7.15
       },
       "nextControl": null,
@@ -67,7 +67,7 @@
     },
     {
       "waypointRelativePos": 2,
-      "rotationDegrees": 115.07657174952168
+      "rotationDegrees": 69.14554196042164
     }
   ],
   "constraintZones": [],
@@ -89,7 +89,7 @@
   "folder": "HairpinPathsLeft",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
