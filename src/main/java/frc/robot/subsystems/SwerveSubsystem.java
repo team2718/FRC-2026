@@ -22,7 +22,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -42,6 +45,8 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase {
+  // Low-pass filter gain for smoothing field velocity estimates (used by turret lead compensation)
+  private static final double fieldVelocityFilterGain = 0.2;
 
   /**
    * Swerve drive object.
@@ -49,6 +54,8 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
 
   private boolean enabled = true;
+  private ChassisSpeeds filteredFieldVelocity = new ChassisSpeeds();
+  private boolean hasFilteredFieldVelocity = false;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -275,6 +282,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d initialHolonomicPose) {
     swerveDrive.resetOdometry(initialHolonomicPose);
+    resetFilteredFieldVelocity();
   }
 
   /**
@@ -293,6 +301,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void zeroGyro() {
     swerveDrive.zeroGyro();
+    resetFilteredFieldVelocity();
   }
 
   /**
@@ -366,6 +375,14 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive.getFieldVelocity();
   }
 
+  public ChassisSpeeds getFilteredFieldVelocity() {
+    if (!hasFilteredFieldVelocity) {
+      resetFilteredFieldVelocity();
+    }
+
+    return filteredFieldVelocity;
+  }
+
   /**
    * Gets the current velocity (x, y and omega) of the robot
    *
@@ -414,6 +431,15 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void addFakeVisionReading() {
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
+  }
+
+  public void addVisionMeasurement(Pose2d pose, double timestampSeconds, Matrix<N3, N1> stdDevs) {
+    swerveDrive.addVisionMeasurement(pose, timestampSeconds, stdDevs);
+  }
+
+  public void updateOdometry() {
+    swerveDrive.updateOdometry();
+    updateFilteredFieldVelocity();
   }
 
   /**
@@ -524,5 +550,29 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     return new ChassisSpeeds(nextVx, nextVy, nextOmega);
+  }
+
+  private void resetFilteredFieldVelocity() {
+    filteredFieldVelocity = swerveDrive.getFieldVelocity();
+    hasFilteredFieldVelocity = true;
+  }
+
+  private void updateFilteredFieldVelocity() {
+    ChassisSpeeds rawFieldVelocity = swerveDrive.getFieldVelocity();
+
+    if (!hasFilteredFieldVelocity) {
+      filteredFieldVelocity = rawFieldVelocity;
+      hasFilteredFieldVelocity = true;
+      return;
+    }
+
+    filteredFieldVelocity = new ChassisSpeeds(
+        blend(filteredFieldVelocity.vxMetersPerSecond, rawFieldVelocity.vxMetersPerSecond),
+        blend(filteredFieldVelocity.vyMetersPerSecond, rawFieldVelocity.vyMetersPerSecond),
+        blend(filteredFieldVelocity.omegaRadiansPerSecond, rawFieldVelocity.omegaRadiansPerSecond));
+  }
+
+  private double blend(double previousValue, double currentValue) {
+    return previousValue + (fieldVelocityFilterGain * (currentValue - previousValue));
   }
 }

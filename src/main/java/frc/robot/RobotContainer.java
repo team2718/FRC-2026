@@ -285,8 +285,8 @@ public class RobotContainer {
     }
 
     public void periodic() {
-        swerve.getSwerveDrive().updateOdometry();
-        vision.updateSwervePoseFromVision(swerve.getSwerveDrive());
+        swerve.updateOdometry();
+        vision.updateSwervePoseFromVision(swerve);
 
         buttonBoxController.setRumble(RumbleType.kBothRumble, stateToButtonBox() / 255.0);
 
