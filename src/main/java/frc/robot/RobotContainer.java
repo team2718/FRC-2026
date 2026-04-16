@@ -121,11 +121,6 @@ public class RobotContainer {
                                                // at the start of the match
 
     public RobotContainer() {
-        autoChooser.setDefaultOption("Just Score", "Just Score");
-        autoChooser.addOption("Double LEFT Neutral", "DoubleNeutralZoneLeft");
-        autoChooser.addOption("Double RIGHT Neutral", "DoubleNeutralZoneRight");
-        autoChooser.addOption("Depot Left", "DepotAuto");
-        SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
         swerve.setDefaultCommand(swerveCommand);
