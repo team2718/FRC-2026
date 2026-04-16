@@ -40,13 +40,12 @@ public final class Constants {
   public static class OperatorConstants {
     public static final double SPEED_MULTIPLIER = 0.7;
     public static final double ROTATION_MULTIPLIER = 0.6;
-    public static final double DEADBAND = 0.01;
+    public static final double DEADBAND = 0.02;
 
-    // Enable cubic scaling on the translation stick for finer low-speed control.
-    public static final boolean CUBE_TRANSLATION = true;
-
-    // Enable cubic scaling on the rotation stick for finer turning precision.
-    public static final boolean CUBE_ROTATION = true;
+    // Exponentiate joystick inputs to make fine control easier at low speeds.
+    // 1.0 for linear control
+    public static final double TRANSLATION_INPUT_EXPONENT = 3.0;
+    public static final double ROTATION_INPUT_EXPONENT = 2.0;
   }
 
   public static final class TurretConstants {

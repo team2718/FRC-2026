@@ -18,6 +18,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -452,16 +453,30 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveInputStream getDriverInputStream(CommandXboxController driverController) {
+    // Translation X and Y are shaped together using the joystick's polar magnitude so that
+    // diagonal inputs get the same response curve as cardinal inputs. Both suppliers read
+    // from the same controller fields per call, so they stay consistent within one loop tick.
     return SwerveInputStream.of(swerveDrive,
-        () -> driverController.getLeftY() * -1,
-        () -> driverController.getLeftX() * -1)
-        .withControllerRotationAxis(() -> driverController.getRightX() * -1)
-        .deadband(OperatorConstants.DEADBAND)
+        () -> {
+          double x = MathUtil.applyDeadband(-driverController.getLeftY(), OperatorConstants.DEADBAND);
+          double y = MathUtil.applyDeadband(-driverController.getLeftX(), OperatorConstants.DEADBAND);
+          double r = Math.hypot(x, y);
+          // Scale by r^(k-1) so the output magnitude equals r^k, preserving direction.
+          return r < 1e-6 ? 0.0 : x * Math.pow(r, OperatorConstants.TRANSLATION_INPUT_EXPONENT - 1);
+        },
+        () -> {
+          double x = MathUtil.applyDeadband(-driverController.getLeftY(), OperatorConstants.DEADBAND);
+          double y = MathUtil.applyDeadband(-driverController.getLeftX(), OperatorConstants.DEADBAND);
+          double r = Math.hypot(x, y);
+          return r < 1e-6 ? 0.0 : y * Math.pow(r, OperatorConstants.TRANSLATION_INPUT_EXPONENT - 1);
+        })
+        .withControllerRotationAxis(() -> {
+          double raw = MathUtil.applyDeadband(-driverController.getRightX(), OperatorConstants.DEADBAND);
+          return Math.copySign(Math.pow(Math.abs(raw), OperatorConstants.ROTATION_INPUT_EXPONENT), raw);
+        })
+        .deadband(1e-6)
         .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
         .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
-        // Cube translation magnitude (not individual axes) for finer low-speed control.
-        .cubeTranslationControllerAxis(OperatorConstants.CUBE_TRANSLATION)
-        .cubeRotationControllerAxis(OperatorConstants.CUBE_ROTATION)
         // In demo mode, drive robot-relative so field orientation isn't needed.
         .allianceRelativeControl(!Constants.DEMO_MODE)
         .robotRelative(Constants.DEMO_MODE);

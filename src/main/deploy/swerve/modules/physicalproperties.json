@@ -4,12 +4,12 @@
     "angle": 30
   },
   "rampRate": {
-    "drive": 0.2,
+    "drive": 0.3,
     "angle": 0.3
   },
   "conversionFactors": {
     "angle": {
-      "gearRatio": 26.09
+      "gearRatio": 26.091
     },
     "drive": {
       "gearRatio": 7.03,
