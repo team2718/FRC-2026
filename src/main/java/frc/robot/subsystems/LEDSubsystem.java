@@ -43,7 +43,7 @@ public class LEDSubsystem extends SubsystemBase {
   private final Map<Double, Color> maskSteps = Map.of(0.0, Color.kWhite, 0.5, Color.kBlack);
   private final LEDPattern mask = LEDPattern.steps(maskSteps).scrollAtAbsoluteSpeed(kScrollingSpeed, kLedSpacing);
 
-  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 128);
+  private final LEDPattern m_rainbow = LEDPattern.rainbow(255, 64);
   private final LEDPattern m_scrollingRainbow = m_rainbow.scrollAtAbsoluteSpeed(kScrollingSpeed, kLedSpacing);
 //the shooter is running
   private final LEDPattern m_blue = LEDPattern.solid(new Color(0, 0, 255));
