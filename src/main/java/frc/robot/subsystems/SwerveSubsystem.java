@@ -451,7 +451,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive;
   }
 
-  public SwerveInputStream getAngularVelocityRobotRelativeInputStream(CommandXboxController driverController) {
+  public SwerveInputStream getDriverInputStream(CommandXboxController driverController) {
     return SwerveInputStream.of(swerveDrive,
         () -> driverController.getLeftY() * -1,
         () -> driverController.getLeftX() * -1)
@@ -459,20 +459,12 @@ public class SwerveSubsystem extends SubsystemBase {
         .deadband(OperatorConstants.DEADBAND)
         .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
         .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
-        .allianceRelativeControl(false)
-        .robotRelative(false);
-  }
-
-  public SwerveInputStream getAngularVelocityFieldRelativeInputStream(CommandXboxController driverController) {
-    return getAngularVelocityRobotRelativeInputStream(driverController)
-        .allianceRelativeControl(true);
-  }
-
-  public SwerveInputStream getDirectAngleFieldRelativeInputStream(CommandXboxController driverController) {
-    return getAngularVelocityRobotRelativeInputStream(driverController)
-        .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
-        .headingWhile(true)
-        .allianceRelativeControl(true);
+        // Cube translation magnitude (not individual axes) for finer low-speed control.
+        .cubeTranslationControllerAxis(OperatorConstants.CUBE_TRANSLATION)
+        .cubeRotationControllerAxis(OperatorConstants.CUBE_ROTATION)
+        // In demo mode, drive robot-relative so field orientation isn't needed.
+        .allianceRelativeControl(!Constants.DEMO_MODE)
+        .robotRelative(Constants.DEMO_MODE);
   }
 
   public static ChassisSpeeds applyAccelLimit(ChassisSpeeds current, ChassisSpeeds target, double accelLimit) {

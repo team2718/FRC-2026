@@ -28,7 +28,7 @@ public class Camera {
   private static final double maxAmbiguity = 0.15;
   private static final double maxSingleTagDistanceMeters = 4.0;
   private static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
-  private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+  private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.8, 0.8, 1);
 
   private final PhotonCamera camera;
   private final Transform3d robotToCamTransform;
@@ -57,31 +57,26 @@ public class Camera {
     poseEstimator = new PhotonPoseEstimator(Constants.fieldLayout, robotToCamTransform);
   }
 
-  public List<VisionMeasurement> getVisionMeasurements(Pose2d referencePose) {
+  public List<VisionMeasurement> getVisionMeasurements() {
     if (!camera.isConnected()) {
       connectedAlert.set(true);
       return List.of();
     }
 
     connectedAlert.set(false);
-    return estimateGlobalPoses(referencePose);
+    return estimateGlobalPoses();
   }
 
-  private List<VisionMeasurement> estimateGlobalPoses(Pose2d referencePose) {
+  private List<VisionMeasurement> estimateGlobalPoses() {
     List<PhotonPipelineResult> resultsList = camera.getAllUnreadResults();
     List<VisionMeasurement> measurements = new ArrayList<>();
 
     // Remove any results that have no targets or are high ambiguity
-    resultsList.removeIf(result -> (!result.hasTargets() || result.getBestTarget().getArea() < 0.10 || result.getBestTarget().getPoseAmbiguity() >= maxAmbiguity));
+    resultsList.removeIf(result -> (!result.hasTargets() || result.getBestTarget().getArea() < 0.08 || result.getBestTarget().getPoseAmbiguity() >= maxAmbiguity));
 
     for (var result : resultsList) {
       Optional<EstimatedRobotPose> visionEst = poseEstimator.estimateCoprocMultiTagPose(result);
       String estimationStrategy = "Coproc MultiTag Pose";
-
-      if (visionEst.isEmpty()) {
-        visionEst = poseEstimator.estimateClosestToReferencePose(result, new Pose3d(referencePose));
-        estimationStrategy = "Closest To Reference Pose";
-      }
 
       if (visionEst.isEmpty()) {
         visionEst = poseEstimator.estimateLowestAmbiguityPose(result);

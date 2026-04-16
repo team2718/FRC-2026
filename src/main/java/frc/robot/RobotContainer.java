@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.RebuiltMatchPeriods;
 import frc.robot.Constants.RebuiltMatchPeriods.AutoWinner;
 import frc.robot.Constants.RebuiltMatchPeriods.MatchPeriod;
@@ -70,12 +69,14 @@ public class RobotContainer {
     // @Logged(name = "Climber")
     // private final ClimberSubsystem climber = new ClimberSubsystem();
 
-    // private final LEDSubsystem leds = new LEDSubsystem();
+    @Logged(name = "LEDs")
+    private final LEDSubsystem led = new LEDSubsystem();
+
     @Logged(name = "Vision")
     private final VisionSubsystem vision = new VisionSubsystem();
 
-    // @NotLogged
-    // private final PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
+    @NotLogged
+    private final PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
 
     // ** Commands **
 
@@ -88,18 +89,18 @@ public class RobotContainer {
     // private final RetractHook retractHook = new RetractHook(climber);
     // private final SpinUpTurret spinUpTurret = new SpinUpTurret(turret, 1800);
 
-    private final LEDSubsystem led = new LEDSubsystem();
-
-    private final SwerveInputStream swerveInput = swerve.getAngularVelocityFieldRelativeInputStream(driverController);
-    private final Command swerveCommand = swerve.driveFieldOriented(swerveInput);
+    private final SwerveInputStream swerveInput = swerve.getDriverInputStream(driverController);
+    // In demo mode the stream outputs robot-relative speeds; route to drive() accordingly.
+    // In normal mode the stream outputs field-relative speeds; route to driveFieldOriented().
+    private final Command swerveCommand = Constants.DEMO_MODE
+            ? swerve.drive(swerveInput)
+            : swerve.driveFieldOriented(swerveInput);
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, intake, swerveInput, led);
 
     private final SendableChooser<String> autoChooser = new SendableChooser<String>();
 
-    private final Timer matchTimer = new Timer();
-
-    private final Timer globalTimer = new Timer();
+    private double matchStartTimestampSeconds = 0.0;
 
     private final Command shootInAuto = new TurretToHubAuto(turret, swerve, indexer, intake, led);
 
@@ -118,8 +119,6 @@ public class RobotContainer {
                                                // at the start of the match
 
     public RobotContainer() {
-        swerve.setDefaultCommand(swerve.driveFieldOriented(swerveInput));
-
         autoChooser.setDefaultOption("Just Score", "Just Score");
         autoChooser.addOption("Double LEFT Neutral", "DoubleNeutralZoneLeft");
         autoChooser.addOption("Double RIGHT Neutral", "DoubleNeutralZoneRight");
@@ -130,37 +129,6 @@ public class RobotContainer {
         swerve.setDefaultCommand(swerveCommand);
 
         led.setDefaultCommand(Commands.run(() -> {led.setLEDState(LEDState.TEAL);}, led));
-
-        // Setup timer
-
-        matchTimer.reset();
-        globalTimer.start();
-
-        // Start match time on autonomous start
-        RobotModeTriggers.autonomous().onTrue(Commands.runOnce(() -> {
-            matchTimer.reset();
-            matchTimer.start();
-        }));
-
-        // Start match time on teleop start
-        RobotModeTriggers.teleop().onTrue(Commands.runOnce(() -> {
-            matchTimer.reset();
-            matchTimer.start();
-
-            // Run calibration in teleop in case it failed in auto
-            if (!hasRanCalibration) {
-                // CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
-                CommandScheduler.getInstance().schedule(new ZeroHood(turret));
-                CommandScheduler.getInstance().schedule(new ZeroTurret(turret));
-                hasRanCalibration = true;
-            }
-        }));
-
-        // Stop match time on end of match
-        RobotModeTriggers.disabled().onTrue(Commands.runOnce(() -> {
-            matchTimer.reset();
-            matchTimer.stop();
-        }));
 
         // Buttons to manually zero stuff as needed
         SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
@@ -271,13 +239,14 @@ public class RobotContainer {
 
     private int stateToButtonBox() {
         int[] buttonBoxLEDs = { 0, 0, 0, 0, 1, 1, 1, 1 };
+        double nowSeconds = Timer.getFPGATimestamp();
 
         if (Robot.noCameraMode == Robot.NoCameraMode.CLOSE_SHOT) {
-            buttonBoxLEDs[0] = globalTimer.get() % 0.5 < 0.25 ? 1 : 0;
+            buttonBoxLEDs[0] = nowSeconds % 0.5 < 0.25 ? 1 : 0;
         }
 
         if (Robot.noCameraMode == Robot.NoCameraMode.FAR_SHOT) {
-            buttonBoxLEDs[1] = globalTimer.get() % 0.5 < 0.25 ? 1 : 0;
+            buttonBoxLEDs[1] = nowSeconds % 0.5 < 0.25 ? 1 : 0;
         }
 
         return buttonBoxLEDs[0] * 1 + buttonBoxLEDs[1] * 2 + buttonBoxLEDs[2] * 4 + buttonBoxLEDs[3] * 8
@@ -331,6 +300,8 @@ public class RobotContainer {
     }
 
     private void updateShuffleboardTimers() {
+        double elapsedMatchSeconds = getElapsedMatchTimeSeconds();
+
         if (DriverStation.isDisabled()) {
             SmartDashboard.putNumber("Match Time", 0);
             SmartDashboard.putString("Match Period", "Disabled");
@@ -339,15 +310,15 @@ public class RobotContainer {
         }
 
         if (DriverStation.isAutonomous()) {
-            SmartDashboard.putNumber("Match Time", RebuiltMatchPeriods.AUTONOMOUS_DURATION - matchTimer.get());
+            SmartDashboard.putNumber("Match Time", RebuiltMatchPeriods.AUTONOMOUS_DURATION - elapsedMatchSeconds);
             SmartDashboard.putString("Match Period", "Autonomous");
-            SmartDashboard.putNumber("Time Left in Period", RebuiltMatchPeriods.AUTONOMOUS_DURATION - matchTimer.get());
+            SmartDashboard.putNumber("Time Left in Period", RebuiltMatchPeriods.AUTONOMOUS_DURATION - elapsedMatchSeconds);
         } else if (DriverStation.isTeleop()) {
-            SmartDashboard.putNumber("Match Time", (2 * 60 + 20) - matchTimer.get());
+            SmartDashboard.putNumber("Match Time", (2 * 60 + 20) - elapsedMatchSeconds);
             SmartDashboard.putNumber("Time Left in Period",
-                    RebuiltMatchPeriods.getTimeLeftInCurrentPeriod(matchTimer.get()));
+                    RebuiltMatchPeriods.getTimeLeftInCurrentPeriod(elapsedMatchSeconds));
             AutoWinner autoWinner = AutoWinner.fromGameData(DriverStation.getGameSpecificMessage());
-            MatchPeriod period = Constants.RebuiltMatchPeriods.getTeleopPeriodFromTime(matchTimer.get());
+            MatchPeriod period = Constants.RebuiltMatchPeriods.getTeleopPeriodFromTime(elapsedMatchSeconds);
 
             if (autoWinner == AutoWinner.UNKNOWN) {
                 SmartDashboard.putString("Match Period", period.toString());
@@ -401,6 +372,36 @@ public class RobotContainer {
         turret.stopShooter();
         indexer.stopIndexing();
         intake.stop();
+    }
+
+    public void onDisabledInit() {
+        matchStartTimestampSeconds = 0.0;
+    }
+
+    public void onAutonomousInit() {
+        matchStartTimestampSeconds = Timer.getFPGATimestamp();
+        scheduleAutonomous();
+    }
+
+    public void onTeleopInit() {
+        matchStartTimestampSeconds = Timer.getFPGATimestamp();
+        cancelAutonomous();
+
+        // Run calibration in teleop in case it failed in auto.
+        if (!hasRanCalibration) {
+            // CommandScheduler.getInstance().schedule(new ZeroClimber(climber));
+            CommandScheduler.getInstance().schedule(new ZeroHood(turret));
+            CommandScheduler.getInstance().schedule(new ZeroTurret(turret));
+            hasRanCalibration = true;
+        }
+    }
+
+    private double getElapsedMatchTimeSeconds() {
+        if (matchStartTimestampSeconds <= 0.0) {
+            return 0.0;
+        }
+
+        return Math.max(0.0, Timer.getFPGATimestamp() - matchStartTimestampSeconds);
     }
 
 }

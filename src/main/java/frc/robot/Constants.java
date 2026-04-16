@@ -29,14 +29,24 @@ public final class Constants {
   // telemetry except for critical errors and warnings.
   public static final boolean REDUCED_TELEMETRY = false;
 
+  // Demo mode: disables field-oriented drive for outreach events where the robot
+  // is not on an actual field. Robot will drive robot-relative instead.
+  public static final boolean DEMO_MODE = false;
+
   public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(14.0);
 
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
   public static class OperatorConstants {
-    public static final double SPEED_MULTIPLIER = 0.65;
-    public static final double ROTATION_MULTIPLIER = 0.5;
-    public static final double DEADBAND = 0.1;
+    public static final double SPEED_MULTIPLIER = 0.7;
+    public static final double ROTATION_MULTIPLIER = 0.6;
+    public static final double DEADBAND = 0.01;
+
+    // Enable cubic scaling on the translation stick for finer low-speed control.
+    public static final boolean CUBE_TRANSLATION = true;
+
+    // Enable cubic scaling on the rotation stick for finer turning precision.
+    public static final boolean CUBE_ROTATION = true;
   }
 
   public static final class TurretConstants {
