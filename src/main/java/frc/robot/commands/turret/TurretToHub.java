@@ -84,7 +84,7 @@ public class TurretToHub extends Command {
     // Resets variables when the program starts
     @Override
     public void initialize() {
-        lastSwerveSpeeds = swerve.getFieldVelocity();
+        lastSwerveSpeeds = swerve.getFilteredFieldVelocity();
         isSpunUp = false;
 
         // Run intake while shooting
@@ -112,7 +112,7 @@ public class TurretToHub extends Command {
             // If we don't want to shoot, stop the indexer
             indexer.stopIndexing();
         } else {
-            shootAtLocation(strategyConfig, swerve.getFieldVelocity());
+            shootAtLocation(strategyConfig, swerve.getFilteredFieldVelocity());
         }
 
         // Limit the velocity and acceleration of the robot to make shoot while move better

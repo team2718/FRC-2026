@@ -1,21 +1,20 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.Camera;
-import swervelib.SwerveDrive;
 
 @Logged
 public class VisionSubsystem extends SubsystemBase {
-
   private final Camera BackSideAprilCamera = new Camera("BackSideAprilCamera",
       new Rotation3d(
           Units.degreesToRadians(0),
@@ -36,30 +35,25 @@ public class VisionSubsystem extends SubsystemBase {
           Units.inchesToMeters(-12.61),
           Units.inchesToMeters(15.69)));
 
+  private final List<Camera> cameras = List.of(BackSideAprilCamera, RightSideAprilCamera);
+
   @Logged(name = "Last Estimated Pose")
   private Pose3d lastEstimatedPose = new Pose3d();
 
-  public void updateSwervePoseFromVision(SwerveDrive swerveDrive) {
-    Optional<EstimatedRobotPose> BackSideAprilCameraPose = BackSideAprilCamera.getEstimatedGlobalPose();
+  public void updateSwervePoseFromVision(SwerveSubsystem swerve) {
+    List<Camera.VisionMeasurement> measurements = new ArrayList<>();
 
-    if (BackSideAprilCameraPose.isPresent()) {
-      EstimatedRobotPose pose = BackSideAprilCameraPose.get();
-
-      lastEstimatedPose = pose.estimatedPose;
-
-      swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(), pose.timestampSeconds,
-          BackSideAprilCamera.getCurStdDevs());
+    for (Camera camera : cameras) {
+      measurements.addAll(camera.getVisionMeasurements());
     }
 
-    Optional<EstimatedRobotPose> RightSideAprilCameraPose = RightSideAprilCamera.getEstimatedGlobalPose();
+    measurements.sort(Comparator.comparingDouble(measurement -> measurement.estimatedPose().timestampSeconds));
 
-    if (RightSideAprilCameraPose.isPresent()) {
-      EstimatedRobotPose pose = RightSideAprilCameraPose.get();
+    for (Camera.VisionMeasurement measurement : measurements) {
+      Pose2d measurementPose = measurement.estimatedPose().estimatedPose.toPose2d();
 
-      lastEstimatedPose = pose.estimatedPose;
-
-      swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(), pose.timestampSeconds,
-          RightSideAprilCamera.getCurStdDevs());
+      lastEstimatedPose = measurement.estimatedPose().estimatedPose;
+      swerve.addVisionMeasurement(measurementPose, measurement.estimatedPose().timestampSeconds, measurement.stdDevs());
     }
   }
 }

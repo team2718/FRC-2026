@@ -1,5 +1,6 @@
 package frc.robot.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -25,13 +28,24 @@ public class Camera {
   private static final double maxAmbiguity = 0.15;
   private static final double maxSingleTagDistanceMeters = 4.0;
   private static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
-  private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+  private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.8, 0.8, 1);
 
   private final PhotonCamera camera;
   private final Transform3d robotToCamTransform;
   private final PhotonPoseEstimator poseEstimator;
   private final Alert connectedAlert;
-  private Matrix<N3, N1> curStdDevs = singleTagStdDevs;
+
+  public static record VisionMeasurement(
+      String cameraName,
+      EstimatedRobotPose estimatedPose,
+      Matrix<N3, N1> stdDevs,
+      int tagCount,
+      double averageTagDistanceMeters,
+      String strategy) {
+  }
+
+  private static record TagStatistics(int tagCount, double averageTagDistanceMeters) {
+  }
 
   public Camera(String name, Rotation3d robotToCamRotation, Translation3d robotToCamTranslation) {
     camera = new PhotonCamera(name);
@@ -43,133 +57,75 @@ public class Camera {
     poseEstimator = new PhotonPoseEstimator(Constants.fieldLayout, robotToCamTransform);
   }
 
-  /**
-   * Get the estimated robot pose. Updates the current robot pose estimation,
-   * standard deviations, and flushes the
-   * cache of results.
-   *
-   * @return Estimated pose.
-   */
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-    if (camera.isConnected()) {
-      return estimateGlobalPose();
-    } else {
+  public List<VisionMeasurement> getVisionMeasurements() {
+    if (!camera.isConnected()) {
       connectedAlert.set(true);
+      return List.of();
     }
 
-    return Optional.empty();
+    connectedAlert.set(false);
+    return estimateGlobalPoses();
   }
 
-  public Matrix<N3, N1> getCurStdDevs() {
-    return curStdDevs;
-  }
-
-  /**
-   * Attempts to produce a global robot pose estimate from the camera's unread
-   * vision results.
-   *
-   * @return an {@code Optional<EstimatedRobotPose>} containing the last
-   *         successful pose estimate
-   *         produced from the processed results, or {@code Optional.empty()} if
-   *         no valid estimate
-   *         could be produced.
-   */
-  private Optional<EstimatedRobotPose> estimateGlobalPose() {
+  private List<VisionMeasurement> estimateGlobalPoses() {
     List<PhotonPipelineResult> resultsList = camera.getAllUnreadResults();
+    List<VisionMeasurement> measurements = new ArrayList<>();
 
     // Remove any results that have no targets or are high ambiguity
-    resultsList.removeIf(result -> (!result.hasTargets() || result.getBestTarget().getArea() < 0.10 || result.getBestTarget().getPoseAmbiguity() >= maxAmbiguity));
+    resultsList.removeIf(result -> (!result.hasTargets() || result.getBestTarget().getArea() < 0.08 || result.getBestTarget().getPoseAmbiguity() >= maxAmbiguity));
 
-    Optional<EstimatedRobotPose> visionEst = Optional.empty();
     for (var result : resultsList) {
-      // Start with multi-tag estimation
-      visionEst = poseEstimator.estimateCoprocMultiTagPose(result);
+      Optional<EstimatedRobotPose> visionEst = poseEstimator.estimateCoprocMultiTagPose(result);
+      String estimationStrategy = "Coproc MultiTag Pose";
 
-      // Fallback to lowest-ambiguity single-tag estimation
       if (visionEst.isEmpty()) {
-        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Lowest Ambiguity Pose");
         visionEst = poseEstimator.estimateLowestAmbiguityPose(result);
-      } else {
-        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Coproc MultiTag Pose");
+        estimationStrategy = "Lowest Ambiguity Pose";
       }
 
-      if (isFarSingleTagEstimate(visionEst, result.getTargets())) {
-        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Rejected Far Single Tag");
-        curStdDevs = singleTagStdDevs;
-        visionEst = Optional.empty();
+      if (visionEst.isEmpty()) {
+        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "No Valid Pose");
         continue;
       }
 
-      updateEstimationStdDevs(visionEst, result.getTargets());
-    }
+      TagStatistics tagStatistics = getTagStatistics(visionEst.get().estimatedPose, result.getTargets());
 
-    resultsList.clear();
-
-    return visionEst;
-  }
-
-  /**
-   * Calculates new standard deviations This algorithm is a heuristic that creates
-   * dynamic standard
-   * deviations based on number of tags, estimation strategy, and distance from
-   * the tags.
-   * 
-   * From
-   * https://github.com/PhotonVision/photonvision/blob/77457219c72dfa1891e7fc35e22d7d908d0f05ae/photonlib-java-examples/poseest/src/main/java/frc/robot/Vision.java#L118C1-L165C6
-   *
-   * @param estimatedPose The estimated pose to guess standard deviations for.
-   * @param targets       All targets in this camera frame
-   */
-  private void updateEstimationStdDevs(
-      Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
-    if (estimatedPose.isEmpty()) {
-      // No pose input. Default to single-tag std devs
-      curStdDevs = singleTagStdDevs;
-
-    } else {
-      // Pose present. Start running Heuristic
-      var estStdDevs = singleTagStdDevs;
-      int numTags = 0;
-      double avgDist = 0;
-
-      // Precalculation - see how many tags we found, and calculate an
-      // average-distance metric
-      for (var tgt : targets) {
-        var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-        if (tagPose.isEmpty())
-          continue;
-        numTags++;
-        avgDist += tagPose
-            .get()
-            .toPose2d()
-            .getTranslation()
-            .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      if (isFarSingleTagEstimate(tagStatistics)) {
+        SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", "Rejected Far Single Tag");
+        continue;
       }
 
-      if (numTags == 0) {
-        // No tags visible. Default to single-tag std devs
-        curStdDevs = singleTagStdDevs;
-      } else {
-        // One or more tags visible, run the full heuristic.
-        avgDist /= numTags;
-        // Decrease std devs if multiple targets are visible
-        if (numTags > 1)
-          estStdDevs = multiTagStdDevs;
-        // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4)
-          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        else
-          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-        curStdDevs = estStdDevs;
-      }
+      Matrix<N3, N1> stdDevs = getEstimationStdDevs(tagStatistics);
+
+      SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", estimationStrategy);
+      measurements.add(new VisionMeasurement(
+          camera.getName(),
+          visionEst.get(),
+          stdDevs,
+          tagStatistics.tagCount(),
+          tagStatistics.averageTagDistanceMeters(),
+          estimationStrategy));
     }
+
+    return measurements;
   }
 
-  private boolean isFarSingleTagEstimate(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
-    if (estimatedPose.isEmpty()) {
-      return false;
+  private Matrix<N3, N1> getEstimationStdDevs(TagStatistics tagStatistics) {
+    if (tagStatistics.tagCount() == 0) {
+      return singleTagStdDevs;
     }
 
+    var estStdDevs = tagStatistics.tagCount() > 1 ? multiTagStdDevs : singleTagStdDevs;
+    double avgDist = tagStatistics.averageTagDistanceMeters();
+
+    if (tagStatistics.tagCount() == 1 && avgDist > maxSingleTagDistanceMeters) {
+      return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    }
+
+    return estStdDevs.times(1 + (avgDist * avgDist / 30));
+  }
+
+  private TagStatistics getTagStatistics(Pose3d estimatedPose, List<PhotonTrackedTarget> targets) {
     int numTags = 0;
     double avgDist = 0;
 
@@ -183,14 +139,19 @@ public class Camera {
           .get()
           .toPose2d()
           .getTranslation()
-          .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+          .getDistance(estimatedPose.toPose2d().getTranslation());
     }
 
-    if (numTags != 1) {
-      return false;
+    if (numTags == 0) {
+      return new TagStatistics(0, 0);
     }
 
     avgDist /= numTags;
-    return avgDist > maxSingleTagDistanceMeters;
+    return new TagStatistics(numTags, avgDist);
+  }
+
+  private boolean isFarSingleTagEstimate(TagStatistics tagStatistics) {
+    return tagStatistics.tagCount() == 1
+        && tagStatistics.averageTagDistanceMeters() > maxSingleTagDistanceMeters;
   }
 }

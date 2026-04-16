@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.revrobotics.util.StatusLogger;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
@@ -40,37 +41,34 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
-
     DataLogManager.start();
+
+    // Enable DriverStation logging (console output, joystick values, etc.)
     DriverStation.startDataLog(DataLogManager.getLog());
+
+    // Disable hoot and rev logging since we don't use it
+    SignalLogger.enableAutoLogging(false);
+    StatusLogger.disableAutoLogging();
 
     Epilogue.configure(config -> {
       // Change the root data path
       config.root = "Telemetry";
 
       if (Constants.REDUCED_TELEMETRY) {
-        // Log only to disk, instead of the default NetworkTables logging
-        // Note that this means data cannot be analyzed in realtime by a dashboard
         config.backend = new FileBackend(DataLogManager.getLog());
-
-        // Use in the future if needed, otherwise accept the default level of DEBUG
         // config.minimumImportance = Logged.Importance.CRITICAL;
       }
     });
 
-    // Disable hoot logging since we don't use it
-    SignalLogger.enableAutoLogging(false);
-
-    Epilogue.bind(this);
-    // CanBridge.runTCP();
-
     if (isSimulation()) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+
+    // Start the robot container last after our logging is configured
+    m_robotContainer = new RobotContainer();
+
+    // Bind Epilogue after robot container is created
+    Epilogue.bind(this);
   }
 
   /**
@@ -99,6 +97,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    m_robotContainer.onDisabledInit();
   }
 
   // Added a String field, so that we aren't instantiating new objects every frame
@@ -112,7 +111,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_robotContainer.scheduleAutonomous();
+    m_robotContainer.onAutonomousInit();
   }
 
   /** This function is called periodically during autonomous. */
@@ -122,7 +121,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.cancelAutonomous();
+    m_robotContainer.onTeleopInit();
   }
 
   /** This function is called periodically during operator control. */

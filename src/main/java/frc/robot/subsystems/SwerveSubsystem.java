@@ -18,11 +18,15 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -42,6 +46,8 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase {
+  // Low-pass filter gain for smoothing field velocity estimates (used by turret lead compensation)
+  private static final double fieldVelocityFilterGain = 0.2;
 
   /**
    * Swerve drive object.
@@ -49,6 +55,8 @@ public class SwerveSubsystem extends SubsystemBase {
   private final SwerveDrive swerveDrive;
 
   private boolean enabled = true;
+  private ChassisSpeeds filteredFieldVelocity = new ChassisSpeeds();
+  private boolean hasFilteredFieldVelocity = false;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -275,6 +283,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d initialHolonomicPose) {
     swerveDrive.resetOdometry(initialHolonomicPose);
+    resetFilteredFieldVelocity();
   }
 
   /**
@@ -293,6 +302,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void zeroGyro() {
     swerveDrive.zeroGyro();
+    resetFilteredFieldVelocity();
   }
 
   /**
@@ -366,6 +376,14 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive.getFieldVelocity();
   }
 
+  public ChassisSpeeds getFilteredFieldVelocity() {
+    if (!hasFilteredFieldVelocity) {
+      resetFilteredFieldVelocity();
+    }
+
+    return filteredFieldVelocity;
+  }
+
   /**
    * Gets the current velocity (x, y and omega) of the robot
    *
@@ -416,6 +434,15 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
 
+  public void addVisionMeasurement(Pose2d pose, double timestampSeconds, Matrix<N3, N1> stdDevs) {
+    swerveDrive.addVisionMeasurement(pose, timestampSeconds, stdDevs);
+  }
+
+  public void updateOdometry() {
+    swerveDrive.updateOdometry();
+    updateFilteredFieldVelocity();
+  }
+
   /**
    * Gets the swerve drive object.
    *
@@ -425,28 +452,34 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive;
   }
 
-  public SwerveInputStream getAngularVelocityRobotRelativeInputStream(CommandXboxController driverController) {
+  public SwerveInputStream getDriverInputStream(CommandXboxController driverController) {
+    // Translation X and Y are shaped together using the joystick's polar magnitude so that
+    // diagonal inputs get the same response curve as cardinal inputs. Both suppliers read
+    // from the same controller fields per call, so they stay consistent within one loop tick.
     return SwerveInputStream.of(swerveDrive,
-        () -> driverController.getLeftY() * -1,
-        () -> driverController.getLeftX() * -1)
-        .withControllerRotationAxis(() -> driverController.getRightX() * -1)
-        .deadband(OperatorConstants.DEADBAND)
+        () -> {
+          double x = MathUtil.applyDeadband(-driverController.getLeftY(), OperatorConstants.DEADBAND);
+          double y = MathUtil.applyDeadband(-driverController.getLeftX(), OperatorConstants.DEADBAND);
+          double r = Math.hypot(x, y);
+          // Scale by r^(k-1) so the output magnitude equals r^k, preserving direction.
+          return r < 1e-6 ? 0.0 : x * Math.pow(r, OperatorConstants.TRANSLATION_INPUT_EXPONENT - 1);
+        },
+        () -> {
+          double x = MathUtil.applyDeadband(-driverController.getLeftY(), OperatorConstants.DEADBAND);
+          double y = MathUtil.applyDeadband(-driverController.getLeftX(), OperatorConstants.DEADBAND);
+          double r = Math.hypot(x, y);
+          return r < 1e-6 ? 0.0 : y * Math.pow(r, OperatorConstants.TRANSLATION_INPUT_EXPONENT - 1);
+        })
+        .withControllerRotationAxis(() -> {
+          double raw = MathUtil.applyDeadband(-driverController.getRightX(), OperatorConstants.DEADBAND);
+          return Math.copySign(Math.pow(Math.abs(raw), OperatorConstants.ROTATION_INPUT_EXPONENT), raw);
+        })
+        .deadband(1e-6)
         .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
         .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
-        .allianceRelativeControl(false)
-        .robotRelative(false);
-  }
-
-  public SwerveInputStream getAngularVelocityFieldRelativeInputStream(CommandXboxController driverController) {
-    return getAngularVelocityRobotRelativeInputStream(driverController)
-        .allianceRelativeControl(true);
-  }
-
-  public SwerveInputStream getDirectAngleFieldRelativeInputStream(CommandXboxController driverController) {
-    return getAngularVelocityRobotRelativeInputStream(driverController)
-        .withControllerHeadingAxis(driverController::getRightX, driverController::getRightY)
-        .headingWhile(true)
-        .allianceRelativeControl(true);
+        // In demo mode, drive robot-relative so field orientation isn't needed.
+        .allianceRelativeControl(!Constants.DEMO_MODE)
+        .robotRelative(Constants.DEMO_MODE);
   }
 
   public static ChassisSpeeds applyAccelLimit(ChassisSpeeds current, ChassisSpeeds target, double accelLimit) {
@@ -524,5 +557,29 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     return new ChassisSpeeds(nextVx, nextVy, nextOmega);
+  }
+
+  private void resetFilteredFieldVelocity() {
+    filteredFieldVelocity = swerveDrive.getFieldVelocity();
+    hasFilteredFieldVelocity = true;
+  }
+
+  private void updateFilteredFieldVelocity() {
+    ChassisSpeeds rawFieldVelocity = swerveDrive.getFieldVelocity();
+
+    if (!hasFilteredFieldVelocity) {
+      filteredFieldVelocity = rawFieldVelocity;
+      hasFilteredFieldVelocity = true;
+      return;
+    }
+
+    filteredFieldVelocity = new ChassisSpeeds(
+        blend(filteredFieldVelocity.vxMetersPerSecond, rawFieldVelocity.vxMetersPerSecond),
+        blend(filteredFieldVelocity.vyMetersPerSecond, rawFieldVelocity.vyMetersPerSecond),
+        blend(filteredFieldVelocity.omegaRadiansPerSecond, rawFieldVelocity.omegaRadiansPerSecond));
+  }
+
+  private double blend(double previousValue, double currentValue) {
+    return previousValue + (fieldVelocityFilterGain * (currentValue - previousValue));
   }
 }
