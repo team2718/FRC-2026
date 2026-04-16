@@ -42,6 +42,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
+import frc.robot.utils.BetterAutoChooser;
 import swervelib.SwerveInputStream;
 
 @Logged
@@ -55,7 +56,7 @@ public class RobotContainer {
     // ** Subsystems **
 
     @NotLogged
-    private final SwerveSubsystem swerve = new SwerveSubsystem();
+    public final SwerveSubsystem swerve = new SwerveSubsystem();
 
     @Logged(name = "Turret")
     private final TurretSubsystem turret = new TurretSubsystem();
@@ -98,7 +99,8 @@ public class RobotContainer {
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, intake, swerveInput, led);
 
-    private final SendableChooser<String> autoChooser = new SendableChooser<String>();
+    @NotLogged
+    private final SendableChooser<Command> autoChooser = BetterAutoChooser.buildAutoChooser();
 
     private double matchStartTimestampSeconds = 0.0;
 
@@ -119,11 +121,6 @@ public class RobotContainer {
                                                // at the start of the match
 
     public RobotContainer() {
-        autoChooser.setDefaultOption("Just Score", "Just Score");
-        autoChooser.addOption("Double LEFT Neutral", "DoubleNeutralZoneLeft");
-        autoChooser.addOption("Double RIGHT Neutral", "DoubleNeutralZoneRight");
-        autoChooser.addOption("Depot Left", "DepotAuto");
-        SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
         swerve.setDefaultCommand(swerveCommand);
@@ -344,12 +341,12 @@ public class RobotContainer {
     }
 
     public void scheduleAutonomous() {
-        pathPlannerAutoCommand = swerve.getAutonomousCommand(autoChooser.getSelected());
+        pathPlannerAutoCommand = autoChooser.getSelected();
         if (pathPlannerAutoCommand != null) {
             // run zeroing at the start of auto with a deadline of 1 second, then run the
             // path planner command after that
             hasRanCalibration = true; // Set this to true so that it doesn't run the calibration again in teleop
-            CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
+            CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
                     new ZeroHood(turret),
                     new ZeroTurret(turret),
                     pathPlannerAutoCommand));

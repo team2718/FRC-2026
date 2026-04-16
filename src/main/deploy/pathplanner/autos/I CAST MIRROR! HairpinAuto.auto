@@ -7,19 +7,19 @@
         {
           "type": "named",
           "data": {
-            "name": "SpinTo270"
+            "name": "RunIntake"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "RunIntake"
+            "name": "SpinTo270"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DoubleNeutralZoneRight"
+            "pathName": "HairpinLeft1"
           }
         },
         {
@@ -35,7 +35,7 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 3.0
+                  "waitTime": 4.0
                 }
               }
             ]
@@ -48,15 +48,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "RunIntake"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "DoubleNeutralZoneRight Second"
+            "pathName": "HairpinLeft2"
           }
         },
         {
@@ -76,12 +70,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopShooting"
           }
         }
       ]

@@ -100,6 +100,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.onDisabledInit();
   }
 
+  // Added a String field, so that we aren't instantiating new objects every frame
   @Override
   public void disabledPeriodic() {
   }
