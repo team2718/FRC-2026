@@ -96,6 +96,7 @@ public class RobotContainer {
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, intake, swerveInput, led);
 
+    @NotLogged
     private final SendableChooser<Command> autoChooser = BetterAutoChooser.buildAutoChooser();
 
     private final Timer matchTimer = new Timer();
