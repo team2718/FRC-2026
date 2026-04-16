@@ -102,13 +102,8 @@ public class Robot extends TimedRobot {
   }
 
   // Added a String field, so that we aren't instantiating new objects every frame
-  private String lastSelected; 
   @Override
   public void disabledPeriodic() {
-    if (m_robotContainer.autoChooser.getSelected() != lastSelected) {
-      lastSelected = m_robotContainer.autoChooser.getSelected();
-      m_robotContainer.pathPlannerAutoCommand = m_robotContainer.swerve.getAutonomousCommand(lastSelected);
-    }
   }
 
   /**

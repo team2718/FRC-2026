@@ -43,6 +43,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
+import frc.robot.utils.BetterAutoChooser;
 import swervelib.SwerveInputStream;
 
 @Logged
@@ -79,7 +80,7 @@ public class RobotContainer {
 
     // ** Commands **
 
-    public Command pathPlannerAutoCommand; // This will hold the currently selected auto command from the chooser
+    private Command pathPlannerAutoCommand; // This will hold the currently selected auto command from the chooser
 
     private final SpinIndexerForeward spindexerBackward = new SpinIndexerForeward(indexer, -8);
     private final RunIntake runIntake = new RunIntake(intake, 0.75);
@@ -95,7 +96,7 @@ public class RobotContainer {
 
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, intake, swerveInput, led);
 
-    public final SendableChooser<String> autoChooser = new SendableChooser<String>();
+    private final SendableChooser<Command> autoChooser = BetterAutoChooser.buildAutoChooser();
 
     private final Timer matchTimer = new Timer();
 
@@ -120,12 +121,6 @@ public class RobotContainer {
     public RobotContainer() {
         swerve.setDefaultCommand(swerve.driveFieldOriented(swerveInput));
 
-        autoChooser.setDefaultOption("Just Score", "Just Score");
-        autoChooser.addOption("Double LEFT Neutral", "DoubleNeutralZoneLeft");
-        autoChooser.addOption("Double RIGHT Neutral", "DoubleNeutralZoneRight");
-        autoChooser.addOption("Depot Left", "DepotAuto");
-        autoChooser.addOption("Hairpin RIGHT", "HairpinAutoRight");
-        autoChooser.addOption("Hairpin LEFT", "HairpinAutoLeft");
         SmartDashboard.putData("Auto Chooser", autoChooser);
 
         // Set swerve to drive with the driver's controller input by default
@@ -369,6 +364,7 @@ public class RobotContainer {
     }
 
     public void scheduleAutonomous() {
+        pathPlannerAutoCommand = autoChooser.getSelected();
         if (pathPlannerAutoCommand != null) {
             // run zeroing at the start of auto with a deadline of 1 second, then run the
             // path planner command after that
