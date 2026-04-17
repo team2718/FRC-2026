@@ -80,7 +80,20 @@
   ],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "SpinTo270",
+      "waypointRelativePos": 2.4387096774192667,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "TurretToHub9",
+      "waypointRelativePos": 2.539950372208418,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 15.0,
     "maxAcceleration": 3.5,

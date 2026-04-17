@@ -14,7 +14,9 @@
     "OutpostAndDepotPaths",
     "OutpostPaths"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "OutpostAutos"
+  ],
   "defaultMaxVel": 15.0,
   "defaultMaxAccel": 3.5,
   "defaultMaxAngVel": 540.0,
