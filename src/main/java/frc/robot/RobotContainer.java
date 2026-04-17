@@ -100,7 +100,7 @@ public class RobotContainer {
     private final TurretToHub turretToHub = new TurretToHub(turret, swerve, indexer, intake, swerveInput, led);
 
     @NotLogged
-    private final SendableChooser<Command> autoChooser = BetterAutoChooser.buildAutoChooser();
+    private final SendableChooser<Command> autoChooser;
 
     private double matchStartTimestampSeconds = 0.0;
 
@@ -174,6 +174,9 @@ public class RobotContainer {
                     new ParallelDeadlineGroup(new WaitCommand(i),
                             new TurretToHub(turret, swerve, indexer, intake, swerveInput, led)));
         }
+
+        // After we register all the commands, now we can make the Autos
+        autoChooser = BetterAutoChooser.buildAutoChooser();
 
         // Configure button bindings
         configureBindings();
@@ -346,14 +349,14 @@ public class RobotContainer {
             // run zeroing at the start of auto with a deadline of 1 second, then run the
             // path planner command after that
             hasRanCalibration = true; // Set this to true so that it doesn't run the calibration again in teleop
-            CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
+            CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
                     new ZeroHood(turret),
                     new ZeroTurret(turret),
                     pathPlannerAutoCommand));
         } else {
             // if no path planner command is found, just run the zeroing commands
             hasRanCalibration = true; // Set this to true so that it doesn't run the calibration again in teleop
-            CommandScheduler.getInstance().schedule(new ParallelCommandGroup(
+            CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
                     new ZeroHood(turret),
                     new ZeroTurret(turret)));
         }
