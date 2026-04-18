@@ -5,33 +5,45 @@
     "data": {
       "commands": [
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "RunIntake"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "RampDepot1"
+            "waitTime": 1.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StartShooting"
+            "name": "SpinUpTurret"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RampDepot2"
+            "pathName": "ToOutpost"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretToHub6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "OutpostToDepot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "TurretToHub6"
           }
         }
       ]
