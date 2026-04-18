@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DoubleNeutralZoneLeft"
+            "pathName": "DoubleNeutralZone1"
           }
         },
         {
@@ -45,6 +45,12 @@
           "type": "named",
           "data": {
             "name": "StopShooting"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DoubleNeutralZone2"
           }
         },
         {
