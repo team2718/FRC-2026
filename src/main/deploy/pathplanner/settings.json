@@ -1,34 +1,23 @@
 {
-  "robotWidth": 0.865,
-  "robotLength": 0.865,
+  "robotWidth": 0.9,
+  "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "ClimberPathsForLater",
     "DepotPaths",
     "DoubleNeutralZonePaths",
-    "HairpinPathsLeft",
-    "HairpinPathsRight",
-    "JustShootPath",
-    "LeftRampNeutralZoneToDepot",
-    "NeutralZoneAndDepotPaths",
-    "NeutralZoneAndOutpostPaths",
+    "HairpinPaths",
     "NeutralZonePaths",
-<<<<<<< HEAD
+    "JustScorePaths",
     "RampDepotPaths",
-=======
->>>>>>> origin/Auto
-    "OutpostAndDepotPaths",
-    "OutpostPaths"
+    "TrenchDepotPaths"
   ],
-  "autoFolders": [
-    "OutpostAutos"
-  ],
-  "defaultMaxVel": 15.0,
-  "defaultMaxAccel": 3.5,
+  "autoFolders": [],
+  "defaultMaxVel": 3.0,
+  "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "defaultNominalVoltage": 12.0,
-  "robotMass": 50.0,
+  "robotMass": 74.088,
   "robotMOI": 6.883,
   "robotTrackwidth": 0.546,
   "driveWheelRadius": 0.048,
@@ -47,8 +36,5 @@
   "brModuleY": -0.273,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": [
-    "{\"name\":\"Circle\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":-0.325,\"y\":-0.325},\"radius\":0.1,\"strokeWidth\":0.02,\"filled\":true}}",
-    "{\"name\":\"Line\",\"type\":\"line\",\"data\":{\"start\":{\"x\":0.5645,\"y\":-0.4},\"end\":{\"x\":0.5645,\"y\":0.4},\"strokeWidth\":0.02}}"
-  ]
+  "robotFeatures": []
 }
