@@ -6,8 +6,9 @@
     "DepotPaths",
     "DoubleNeutralZonePaths",
     "HairpinPaths",
-    "NeutralZonePaths",
     "JustScorePaths",
+    "NeutralZonePaths",
+    "DepotThenRampPaths",
     "RampDepotPaths",
     "TrenchDepotPaths"
   ],
