@@ -145,9 +145,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("StartShooting", shootInAuto);
 
         NamedCommands.registerCommand("StopShooting", Commands.runOnce(() -> {
-            turret.stopShooter();
-            indexer.stopIndexing();
             intakeArm.setActive();
+            indexer.stopIndexing();
+            turret.stopShooter();
         }, turret, indexer, intakeArm));
 
         NamedCommands.registerCommand("OscillateIntake", new OscillateIntake(intakeArm));
@@ -201,8 +201,14 @@ public class RobotContainer {
         // driverController.leftBumper().whileTrue(Commands.run(() -> {led.setLEDState(LEDState.RED);}, led));
 
         // Right Trigger: Spins the shooter wheel & spindexer while holding down
+        // Letting go of Right Trigger: Waits half a second before stopping the shooter and resetting the hood (Hopefully)
         //Turns LEDs blue
-        driverController.rightTrigger().whileTrue(turretToHub);
+        driverController.rightTrigger().whileTrue(turretToHub).onFalse(
+            Commands.waitSeconds(0.5).andThen(() -> {
+                turret.dropHood();
+                turret.setShooterSpeedRPM(2000);
+            }));
+        
         // driverController.rightTrigger().whileTrue(Commands.run(() -> {led.setLEDState(LEDState.BLUE);}, led));
 
         // X and Y: Intake in and out

@@ -147,9 +147,9 @@ public class SwerveToHub extends Command {
     // When the program ends, stop everything
     @Override
     public void end(boolean interuppted) {
-        shooter.stopShooter();
+        //shooter.stopShooter();
         indexer.stopIndexing();
-        shooter.setHoodAngle(Degrees.of(80));
+        //shooter.setHoodAngle(Degrees.of(80));
         isSpunUp = false;
     }
 
