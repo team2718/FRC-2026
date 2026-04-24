@@ -19,20 +19,20 @@ public class VisionSubsystem extends SubsystemBase {
       new Rotation3d(
           Units.degreesToRadians(0),
           Units.degreesToRadians(-22),
-          Units.degreesToRadians(-170)),
+          Units.degreesToRadians(-180)),
       new Translation3d(
-          Units.inchesToMeters(-12.61),
-          Units.inchesToMeters(-11.01),
+          Units.inchesToMeters(-12.315),
+          Units.inchesToMeters(-10.672),
           Units.inchesToMeters(15.69)));
 
     private final Camera RightSideAprilCamera = new Camera("RightSideAprilCamera",
       new Rotation3d(
           Units.degreesToRadians(0),
           Units.degreesToRadians(-22),
-          Units.degreesToRadians(-100)),
+          Units.degreesToRadians(-90)),
       new Translation3d(
-          Units.inchesToMeters(-11.01),
-          Units.inchesToMeters(-12.61),
+          Units.inchesToMeters(-10.672),
+          Units.inchesToMeters(-12.315),
           Units.inchesToMeters(15.69)));
 
   private final List<Camera> cameras = List.of(BackSideAprilCamera, RightSideAprilCamera);

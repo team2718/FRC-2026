@@ -5,10 +5,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class Strategy {
 
-    public static enum StrategyType {
+    public enum StrategyType {
         DONT_SHOOT,
         HUB_SHOT,
-        PASS;
+        PASS
     }
 
     public static class StrategyConfig {
@@ -33,9 +33,15 @@ public class Strategy {
             Constants.fieldLayout.getTagPose(18).get().getTranslation().getX(),
             Constants.fieldLayout.getTagPose(20).get().getTranslation().getY());
 
+    // Triangular DONT_SHOOT zone centered on the hub
+    private static final double DONT_SHOOT_TIP_DIST  = 3.40; // X depth (meters) at which the zone closes to a point
+    private static final double DONT_SHOOT_HUB_WIDTH = 1.32; // Y half-width (meters) of the zone at the hub's X boundary
+
+    private static final double PASS_X_OFFSET = 3.00; // how deep into alliance zone to pass (meters)
+    private static final double PASS_Y_OFFSET = 2.25; // how far from hub laterally to pass (meters)
+
     public static StrategyConfig getLocationTarget(Translation2d robotLocation) {
         if (robotLocation == null) {
-            // If we don't have a robot location, default to red hub location
             return new StrategyConfig(StrategyType.HUB_SHOT, redHubLocation);
         }
 
@@ -43,37 +49,39 @@ public class Strategy {
         try {
             alliance = DriverStation.getAlliance().get();
         } catch (Exception e) {
-            // If we can't get the alliance, default to red hub location
             return new StrategyConfig(StrategyType.HUB_SHOT, redHubLocation);
         }
-        
-        if (alliance == DriverStation.Alliance.Red) {
-            if (robotLocation.getX() > redHubLocation.getX()) { // Are we left of the hub?
-                return new StrategyConfig(StrategyType.HUB_SHOT, redHubLocation);
-            } else {
-                if (robotLocation.getY() < redHubLocation.getY() - 0.5) { // Shoot a bit past the nearest ramp
-                    return new StrategyConfig(StrategyType.PASS, redHubLocation.plus(new Translation2d(3, -2)));
-                } else if (robotLocation.getY() > redHubLocation.getY() + 0.5) {
-                    return new StrategyConfig(StrategyType.PASS, redHubLocation.plus(new Translation2d(3, 2)));
-                } else {
-                    // If we're in the middle of the field, don't shoot so we don't hit the hub
-                    return new StrategyConfig(StrategyType.DONT_SHOOT);
-                }
-            }
-        } else {
-            if (robotLocation.getX() < blueHubLocation.getX()) { // Are we right of the hub?
-                return new StrategyConfig(StrategyType.HUB_SHOT, blueHubLocation);
-            } else {
-                if (robotLocation.getY() < blueHubLocation.getY() - 0.5) { // Shoot a bit past the nearest ramp
-                    return new StrategyConfig(StrategyType.PASS, blueHubLocation.plus(new Translation2d(-3, -2)));
-                } else if (robotLocation.getY() > blueHubLocation.getY() + 0.5) {
-                    return new StrategyConfig(StrategyType.PASS, blueHubLocation.plus(new Translation2d(-3, 2)));
-                } else {
-                    // If we're in the middle of the field, don't shoot so we don't hit the hub
-                    return new StrategyConfig(StrategyType.DONT_SHOOT);
-                }
-            }
+
+        return alliance == DriverStation.Alliance.Red
+                ? getStrategyForHub(robotLocation, redHubLocation, 1)
+                : getStrategyForHub(robotLocation, blueHubLocation, -1);
+    }
+
+    // hubSideSign: +1 for Red (hub-shot side is at greater X), -1 for Blue
+    // (hub-shot side is at lesser X)
+    private static StrategyConfig getStrategyForHub(
+            Translation2d robot, Translation2d hub, int hubSideSign) {
+
+        // Coordinate where hub is at the origin and +X is towards our alliance side
+        double xOffset = (robot.getX() - hub.getX()) * hubSideSign;
+        double yOffset = robot.getY() - hub.getY();
+
+        // If we're in our alliance zone, let's score
+        if (xOffset > 0) {
+            return new StrategyConfig(StrategyType.HUB_SHOT, hub);
         }
+
+        // Pass if we are beyond our alliance zone unless we are within a triangle
+        // around the hub where we can't get a good shot
+        double dontShootThreshold = Math.max(0, DONT_SHOOT_HUB_WIDTH + xOffset * (DONT_SHOOT_HUB_WIDTH / DONT_SHOOT_TIP_DIST));
+
+        if (Math.abs(yOffset) < dontShootThreshold) {
+            return new StrategyConfig(StrategyType.DONT_SHOOT);
+        }
+
+        return new StrategyConfig(StrategyType.PASS, new Translation2d(
+                hub.getX() + hubSideSign * PASS_X_OFFSET,
+                hub.getY() + Math.copySign(PASS_Y_OFFSET, yOffset)));
     }
 
 }

@@ -19,6 +19,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,12 +30,14 @@ public class Camera {
   private static final double maxAmbiguity = 0.15;
   private static final double maxSingleTagDistanceMeters = 4.0;
   private static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
-  private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.8, 0.8, 1);
+  private static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 1);
 
   private final PhotonCamera camera;
   private final Transform3d robotToCamTransform;
   private final PhotonPoseEstimator poseEstimator;
   private final Alert connectedAlert;
+
+  StructPublisher<Pose2d> robotPosePublisher;
 
   public static record VisionMeasurement(
       String cameraName,
@@ -55,6 +59,9 @@ public class Camera {
     robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
     poseEstimator = new PhotonPoseEstimator(Constants.fieldLayout, robotToCamTransform);
+
+    // Create pose publisher for this camera with the camera name
+    robotPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Vision/" + name + "/Estimated Pose", Pose2d.struct).publish();
   }
 
   public List<VisionMeasurement> getVisionMeasurements() {
@@ -96,6 +103,8 @@ public class Camera {
       }
 
       Matrix<N3, N1> stdDevs = getEstimationStdDevs(tagStatistics);
+
+      robotPosePublisher.set(visionEst.get().estimatedPose.toPose2d());
 
       SmartDashboard.putString("Vision/" + camera.getName() + "/Pose Estimation Strategy", estimationStrategy);
       measurements.add(new VisionMeasurement(

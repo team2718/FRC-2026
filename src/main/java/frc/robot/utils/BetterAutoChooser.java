@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public class BetterAutoChooser {
 
-private static final boolean RIGHT_IS_FLIPPED = false;
+  private static final boolean RIGHT_IS_FLIPPED = true;
   private static final String DEFAULT_NAME = "None";
   private static final String PREFIX = "I CAST MIRROR! ";
 

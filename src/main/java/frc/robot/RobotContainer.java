@@ -31,7 +31,7 @@ import frc.robot.commands.intake.OscillateIntake;
 import frc.robot.commands.intake.RunIntake;
 import frc.robot.commands.turret.AimAndPrespinTurret;
 import frc.robot.commands.turret.TurretToHub;
-import frc.robot.commands.turret.TurretToHubAuto;
+import frc.robot.commands.turret.TurretToHubCalibration;
 import frc.robot.commands.turret.ZeroHood;
 import frc.robot.commands.turret.ZeroTurret;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -104,7 +104,7 @@ public class RobotContainer {
 
     private double matchStartTimestampSeconds = 0.0;
 
-    private final Command shootInAuto = new TurretToHubAuto(turret, swerve, indexer, intake, led);
+    private final Command shootInAuto = TurretToHub.inAuto(turret, swerve, indexer, intake, led);
 
     private boolean swerveEnabled = true;
     private boolean turretEnabled = true;
@@ -125,7 +125,7 @@ public class RobotContainer {
         // Set swerve to drive with the driver's controller input by default
         swerve.setDefaultCommand(swerveCommand);
 
-        led.setDefaultCommand(Commands.run(() -> {led.setLEDState(LEDState.TEAL);}, led));
+        led.setDefaultCommand(Commands.runOnce(() -> led.setLEDState(LEDState.TEAL), led));
 
         // Buttons to manually zero stuff as needed
         SmartDashboard.putData("Commands/Zero Hood", new ZeroHood(turret));
@@ -208,7 +208,7 @@ public class RobotContainer {
                 turret.dropHood();
                 turret.setShooterSpeedRPM(2000);
             }));
-        
+        // driverController.rightTrigger().whileTrue(new TurretToHubCalibration(turret, swerve, indexer, intake, swerveInput, led));
         // driverController.rightTrigger().whileTrue(Commands.run(() -> {led.setLEDState(LEDState.BLUE);}, led));
 
         // X and Y: Intake in and out

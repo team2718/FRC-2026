@@ -30,6 +30,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,7 +48,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase {
   // Low-pass filter gain for smoothing field velocity estimates (used by turret lead compensation)
-  private static final double fieldVelocityFilterGain = 0.2;
+  private static final double fieldVelocityFilterGain = 0.3;
 
   /**
    * Swerve drive object.
@@ -577,6 +578,10 @@ public class SwerveSubsystem extends SubsystemBase {
         blend(filteredFieldVelocity.vxMetersPerSecond, rawFieldVelocity.vxMetersPerSecond),
         blend(filteredFieldVelocity.vyMetersPerSecond, rawFieldVelocity.vyMetersPerSecond),
         blend(filteredFieldVelocity.omegaRadiansPerSecond, rawFieldVelocity.omegaRadiansPerSecond));
+
+    SmartDashboard.putNumber("Filtered Velocity x", filteredFieldVelocity.vxMetersPerSecond);
+    SmartDashboard.putNumber("Filtered Velocity y", filteredFieldVelocity.vyMetersPerSecond);
+    SmartDashboard.putNumber("Filtered Velocity theta", filteredFieldVelocity.omegaRadiansPerSecond);
   }
 
   private double blend(double previousValue, double currentValue) {

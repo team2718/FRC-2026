@@ -46,26 +46,30 @@ public class TurretSubsystem extends SubsystemBase {
     @Logged(name = "Turret Azimuth Motor")
     private final TalonFX turretspinnyspinner;
 
+    private final static AngularVelocity MAX_FLYWHEEL_SPEED = RPM.of(5200); // KrakenX60 Efficiency tanks after this
+
     private final static Angle hoodZeroAngle = Degrees.of(70);
     private final static Angle hoodRangeOfMotion = Degrees.of(30);
     private final static double hoodGearRatio = 286.0/22.0 * 30.0/12.0;
 
-    private final static double turretZeroAngleDegreesDefault = 55.3;
+    private final static double turretZeroAngleDegreesDefault = 41.5;
     private static double turretZeroAngleDegrees = turretZeroAngleDegreesDefault;
-    private final static double turretRangeOfMotionDegrees = 350;
+    private final static double turretRangeOfMotionDegrees = 350; // should be 350 :)
     private final static double turretGearRatio = 160.0/16.0 * 30.0/16.0;
 
-    private final static Distance turretX = Inches.of(-5.75);
+    private final static Distance turretX = Inches.of(-5.692);
     private final static Distance turretY = Inches.of(-5);
     private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretZeroAngleDegrees));
 
     private static final double[][] DISTANCE_TABLE = {
             // dist_ft hood_deg rpm flight_sec
-            { 4.0, 73.5, 3100.0, 0.88 },
-            { 7.0, 67.7, 3700.0, 0.94 },
-            { 10.0, 62.0, 3900.0, 1.00 },
-            { 14.5, 57.5, 4300.0, 1.08 },
-            { 20.0, 53.5, 5000.0, 1.20 },
+            { 5.0, 70.0, 3300.0, 1.00 }, // measured
+            { 7.0, 63.5, 3450.0, 0.90 }, // measured
+            { 9.0, 61.0, 3700.0, 0.90 }, // measured
+            { 11.0, 59.0, 3900.0, 0.95 }, // measured
+            { 13.0, 55.0, 4150.0, 0.98 }, // measured
+            { 15.0, 52.0, 4350.0, 1.05 }, // measured
+            { 17.0, 50.0, 4650.0, 1.10 }, // measured
     };
 
     // InterpolatingDoubleTreeMap performs linear interpolation to give us values
@@ -109,9 +113,9 @@ public class TurretSubsystem extends SubsystemBase {
         turretshooterconfig.CurrentLimits.SupplyCurrentLimit = 60;
         turretshooterconfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        turretshooterconfig.Slot0.kS = 0.2;
+        turretshooterconfig.Slot0.kS = 0.1;
         turretshooterconfig.Slot0.kV = 0.115;
-        turretshooterconfig.Slot0.kP = 0.3;
+        turretshooterconfig.Slot0.kP = 0.10;
         
         turretshooterconfig.Slot0.kI = 0.0;
         turretshooterconfig.Slot0.kD = 0.0;
@@ -142,11 +146,12 @@ public class TurretSubsystem extends SubsystemBase {
 
         turretAzimuthConfiguration = new TalonFXConfiguration();
         turretAzimuthConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        turretAzimuthConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         turretAzimuthConfiguration.MotorOutput.PeakForwardDutyCycle = 0.35;
         turretAzimuthConfiguration.MotorOutput.PeakReverseDutyCycle = -0.35;
         turretAzimuthConfiguration.CurrentLimits.StatorCurrentLimit = 30;
         turretAzimuthConfiguration.CurrentLimits.SupplyCurrentLimit = 40;
-        turretAzimuthConfiguration.Slot0.kP = 30.0;
+        turretAzimuthConfiguration.Slot0.kP = 28.0;
         turretAzimuthConfiguration.Slot0.kS = 0.45;
         turretAzimuthConfiguration.Slot0.kV = 0.122;
         turretAzimuthConfiguration.MotionMagic.MotionMagicCruiseVelocity = 25;
@@ -170,14 +175,7 @@ public class TurretSubsystem extends SubsystemBase {
             return;
         }
 
-        // Clamp from 0 to 5000 RPM
-        if (angularVelocity.in(RPM) < 0) {
-            angularVelocity = RPM.of(0);
-        } else if (angularVelocity.in(RPM) > 5000) {
-            angularVelocity = RPM.of(5000);
-        }
-
-        // targetRPM = angularVelocity.in(RPM);
+        angularVelocity = applyFlywheelSpeedBounds(angularVelocity);
 
         turretshooterLeft.setControl(new VelocityVoltage(angularVelocity));
     }
@@ -406,6 +404,16 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getTargetPositionRotations() {
         return targetAngleDegrees;
+    }
+
+    public AngularVelocity applyFlywheelSpeedBounds(AngularVelocity targetShooterSpeed) {
+        if (targetShooterSpeed.lt(RPM.zero())) {
+            return RPM.zero();
+        } else if (targetShooterSpeed.gt(MAX_FLYWHEEL_SPEED)) {
+            return MAX_FLYWHEEL_SPEED;
+        } else {
+            return targetShooterSpeed;
+        }
     }
 
 }

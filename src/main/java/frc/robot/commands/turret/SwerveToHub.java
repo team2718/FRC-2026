@@ -138,7 +138,7 @@ public class SwerveToHub extends Command {
         // If the robot is spun up, spin indexer
         if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR) && Math.abs(turnController.getPositionError()) < MAX_ANGLE_ERROR_RADIANS)) {
             isSpunUp = true;
-            indexer.runIndexing();
+            indexer.runIndexing(targetShooterSpeed);
         } else {
             indexer.stopIndexing();
         }
@@ -178,7 +178,7 @@ public class SwerveToHub extends Command {
         // If the shooter is spun up, run the indexer
         if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed, MAX_RPM_ERROR))) {
             isSpunUp = true;
-            indexer.runIndexing();
+            indexer.runIndexing(RPM.of(targetShooterSpeed));
         } else {
             indexer.stopIndexing();
         }

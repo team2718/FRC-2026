@@ -52,8 +52,8 @@ public final class ClimbToLevel extends Command {
         (climber.getDesiredLevel() > 2 && climber.getRobotElevation() < Constants.ClimberConstants.BAR2_ELEVATION)) {
             if (climber.getHookElevation() < Constants.ClimberConstants.BAR2_ELEVATION) {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * Constants.ClimberConstants.EXTEND_P);
-                //orange LEDs = second level
-                led.setLEDState(LEDState.ORANGE);
+                //yellow LEDs = second level
+                led.setLEDState(LEDState.YELLOW);
             }
             else {
                 climber.setClimbMotor((Constants.ClimberConstants.BAR2_ELEVATION - climber.getHookElevation()) * -1 * Constants.ClimberConstants.RETRACT_P);

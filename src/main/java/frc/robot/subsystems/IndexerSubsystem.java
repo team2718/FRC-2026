@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -12,6 +13,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -23,6 +25,8 @@ public class IndexerSubsystem extends SubsystemBase {
     @Logged(name = "Portal Motor")
     private final TalonFX portalMotor;
 
+    private final VelocityVoltage portalVelocityRequest = new VelocityVoltage(0);
+
     private boolean enabled = true;
 
     public IndexerSubsystem() {
@@ -31,8 +35,9 @@ public class IndexerSubsystem extends SubsystemBase {
 
         SparkMaxConfig indexerMotorConfig = new SparkMaxConfig();
         indexerMotorConfig.inverted(true);
-        indexerMotorConfig.smartCurrentLimit(40);
+        indexerMotorConfig.smartCurrentLimit(60);
         indexerMotorConfig.idleMode(IdleMode.kCoast);
+        indexerMotorConfig.voltageCompensation(12);
         indexerMotorConfig.openLoopRampRate(0.1);
 
         TalonFXConfiguration portalMotorConfig = new TalonFXConfiguration();
@@ -40,14 +45,20 @@ public class IndexerSubsystem extends SubsystemBase {
         portalMotorConfig.CurrentLimits.StatorCurrentLimit = 40;
         portalMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
+        portalMotorConfig.Slot0.kS = 0.1;
+        portalMotorConfig.Slot0.kV = 0.115;
+        portalMotorConfig.Slot0.kP = 0.10;
+        portalMotorConfig.Slot0.kI = 0.0;
+        portalMotorConfig.Slot0.kD = 0.0;
+
         indexerMotor.configure(indexerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         portalMotor.getConfigurator().apply(portalMotorConfig);
     }
 
-    public void runIndexing() {
+    public void runIndexing(AngularVelocity portalAngularVelocity) {
         if (enabled) {
-            indexerMotor.setVoltage(8.0);
-            portalMotor.setVoltage(10.0);
+            indexerMotor.setVoltage(6.0);
+            portalMotor.setControl(portalVelocityRequest.withVelocity(portalAngularVelocity));
         }
     }
 

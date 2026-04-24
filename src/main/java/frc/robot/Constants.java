@@ -38,13 +38,13 @@ public final class Constants {
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
   public static class OperatorConstants {
-    public static final double SPEED_MULTIPLIER = 0.7;
-    public static final double ROTATION_MULTIPLIER = 0.6;
+    public static final double SPEED_MULTIPLIER = 0.55;
+    public static final double ROTATION_MULTIPLIER = 0.45;
     public static final double DEADBAND = 0.02;
 
     // Exponentiate joystick inputs to make fine control easier at low speeds.
     // 1.0 for linear control
-    public static final double TRANSLATION_INPUT_EXPONENT = 3.0;
+    public static final double TRANSLATION_INPUT_EXPONENT = 2.0;
     public static final double ROTATION_INPUT_EXPONENT = 2.0;
   }
 

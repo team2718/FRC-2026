@@ -8,6 +8,9 @@ public class OscillateIntake extends Command {
     private final IntakeArmSubsystem intakeArm;
     private final Timer timer = new Timer();
 
+    private final static double OSCILLATION_FREQUENCY = 1.0;
+    private final static double OSCILLATION_AMPLITUDE = 20.0;
+
     public OscillateIntake(IntakeArmSubsystem intakeArm) {
         this.intakeArm = intakeArm;
         addRequirements(intakeArm);
@@ -22,8 +25,7 @@ public class OscillateIntake extends Command {
     @Override
     public void execute() {
         // Follow a sine wave pattern to oscillate the intake's position
-        // between 0 and 45 degrees at a frequency of 0.5 Hz (one full oscillation every 2 seconds)
-        double angle = 25 * (1 + Math.sin(2 * Math.PI * 1.5 * timer.get())); // Oscillates between 0 and 45 degrees
+        double angle = OSCILLATION_AMPLITUDE * (1 + Math.sin(2 * Math.PI * OSCILLATION_FREQUENCY * timer.get()));
         intakeArm.setSlapdownPosition(angle);
     }
 
