@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 7.4947863247863244,
-        "y": 6.011794871794873
+        "x": 8.075111111111111,
+        "y": 5.9643999999999995
       },
       "prevControl": {
-        "x": 7.998675213675213,
-        "y": 5.301182336182337
+        "x": 8.578999999999999,
+        "y": 5.253787464387464
       },
       "nextControl": {
-        "x": 6.877017800948408,
-        "y": 6.8830068925919345
+        "x": 7.457342587273195,
+        "y": 6.835612020797061
       },
       "isLocked": false,
       "linkedName": null
@@ -62,16 +62,16 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.38,
-      "rotationDegrees": 135.0
+      "waypointRelativePos": 0.8987551867219807,
+      "rotationDegrees": 180.0
     },
     {
-      "waypointRelativePos": 1.3,
-      "rotationDegrees": 20.0
+      "waypointRelativePos": 1.4863070539419037,
+      "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 2.87,
-      "rotationDegrees": 45.0
+      "waypointRelativePos": 2.571784232365119,
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [
@@ -114,7 +114,7 @@
   },
   "goalEndState": {
     "velocity": 3.0,
-    "rotation": 45.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "RampDepotPaths",

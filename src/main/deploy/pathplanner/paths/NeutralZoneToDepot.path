@@ -48,28 +48,44 @@
     },
     {
       "anchor": {
-        "x": 2.8618333333333332,
-        "y": 7.173
+        "x": 2.8910666666666662,
+        "y": 7.318877777777777
       },
       "prevControl": {
-        "x": 3.5938151841404835,
-        "y": 7.190400359464328
+        "x": 3.6230485174738165,
+        "y": 7.336278137242105
       },
       "nextControl": {
-        "x": 2.6119039393667975,
-        "y": 7.167058785349768
+        "x": 2.6411372727001305,
+        "y": 7.312936563127545
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.5913777777777778,
-        "y": 6.013122222222222
+        "x": 0.6108666666666667,
+        "y": 5.0191888888888885
       },
       "prevControl": {
-        "x": 0.380204961911504,
-        "y": 5.879308763111754
+        "x": 1.0650301955643027,
+        "y": 4.826513452386861
+      },
+      "nextControl": {
+        "x": 0.2893000000000001,
+        "y": 5.155611111111111
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.6108666666666667,
+        "y": 6.977822222222221
+      },
+      "prevControl": {
+        "x": 0.3996938508003929,
+        "y": 6.844008763111753
       },
       "nextControl": null,
       "isLocked": false,
@@ -80,20 +96,42 @@
     {
       "waypointRelativePos": 1.5966804979253229,
       "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 2.5103734439834047,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 4.004149377593343,
+      "rotationDegrees": 90.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 2.640198511166227,
+      "maxWaypointRelativePos": 4.95,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "SpinUpTurret",
-      "waypointRelativePos": 1.5999999999999845,
+      "name": "SpinTo270",
+      "waypointRelativePos": 2.298759305210919,
       "endWaypointRelativePos": null,
       "command": null
     },
     {
-      "name": "TurretToHub9",
-      "waypointRelativePos": 2.8228287841190993,
+      "name": "StartShooting",
+      "waypointRelativePos": 2.719602977667494,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -108,7 +146,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "TrenchDepotPaths",

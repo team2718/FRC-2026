@@ -7,13 +7,13 @@
         {
           "type": "named",
           "data": {
-            "name": "RunIntake"
+            "name": "SpinTo270"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 1.0
+            "name": "RunIntake"
           }
         },
         {
@@ -23,27 +23,40 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "SpinUpTurret"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "NeutralZoneToShoot"
           }
         },
         {
-          "type": "named",
+          "type": "race",
           "data": {
-            "name": "TurretToHub9"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartShooting"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 6.0
+                }
+              }
+            ]
           }
         },
         {
           "type": "named",
           "data": {
             "name": "StopIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
           }
         }
       ]
