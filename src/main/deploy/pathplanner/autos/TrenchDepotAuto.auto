@@ -31,14 +31,14 @@
                 "data": {
                   "name": "StartShooting"
                 }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 5.0
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
           }
         },
         {
