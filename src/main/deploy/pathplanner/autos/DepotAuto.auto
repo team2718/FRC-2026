@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "SpinTo270"
+            "name": "SpinTo180"
           }
         },
         {
@@ -27,9 +27,22 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "StartShooting"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "StartShooting"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -45,7 +58,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 10.0
+                        "waitTime": 14.0
                       }
                     }
                   ]

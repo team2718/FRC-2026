@@ -193,8 +193,10 @@ public class TurretToHub extends Command {
         intake.setIntakeSpeed(0);
         indexer.stopIndexing();
 
-        // shooter.dropHood();
-        // shooter.setShooterSpeedRPM(2000);
+        if (isAuto) {
+            shooter.dropHood();
+            shooter.setShooterSpeedRPM(2000);
+        }
 
         isSpunUp = false;
     }

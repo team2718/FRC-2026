@@ -351,6 +351,14 @@ public class RobotContainer {
 
     public void scheduleAutonomous() {
         pathPlannerAutoCommand = autoChooser.getSelected();
+
+        if (pathPlannerAutoCommand != null && hasRanCalibration) {
+            // If we have already ran calibration, we can just run the auto command without it
+            CommandScheduler.getInstance().clearComposedCommands();
+            CommandScheduler.getInstance().schedule(pathPlannerAutoCommand);
+            return;
+        }
+
         if (pathPlannerAutoCommand != null) {
             // run zeroing at the start of auto with a deadline of 1 second, then run the
             // path planner command after that
