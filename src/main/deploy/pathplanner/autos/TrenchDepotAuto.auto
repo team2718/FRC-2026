@@ -13,19 +13,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DepotStartToNeutralZone"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NeutralZoneToDepot"
+            "pathName": "NeutralZoneToDepot1"
           }
         },
         {
           "type": "race",
           "data": {
             "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "NeutralZoneToDepot2"
+                }
+              },
               {
                 "type": "named",
                 "data": {
@@ -45,6 +45,12 @@
           "type": "named",
           "data": {
             "name": "StopIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooting"
           }
         }
       ]
