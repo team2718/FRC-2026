@@ -8,36 +8,68 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1716524216524213,
-        "y": 4.900655270655271
+        "x": 2.405297807166262,
+        "y": 5.698241816832126
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.47910256410256413,
-        "y": 5.016937321937323
+        "x": 0.43546666666666667,
+        "y": 5.642833333333333
       },
       "prevControl": {
-        "x": 0.7040663552173283,
-        "y": 4.897068585375384
+        "x": 0.8414765999184268,
+        "y": 5.587720243555193
       },
       "nextControl": {
-        "x": 0.258468754821915,
-        "y": 5.1344988896468005
+        "x": 0.18773859439003,
+        "y": 5.676460735940455
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.5824643874643876,
-        "y": 7.01957264957265
+        "x": 1.1370666666666667,
+        "y": 5.642833333333333
       },
       "prevControl": {
-        "x": 0.6541792022562821,
-        "y": 6.713433904679998
+        "x": 0.8360834558579249,
+        "y": 5.578192549064981
+      },
+      "nextControl": {
+        "x": 1.3814932221880116,
+        "y": 5.69532770404078
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.1370666666666667,
+        "y": 6.1495444444444445
+      },
+      "prevControl": {
+        "x": 1.2684888310895983,
+        "y": 5.936875183152663
+      },
+      "nextControl": {
+        "x": 1.0056445022437348,
+        "y": 6.362213705736226
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.5426555555555554,
+        "y": 6.3152
+      },
+      "prevControl": {
+        "x": 0.7817942375883268,
+        "y": 6.147711897166469
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,14 +79,14 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.9,
-      "rotationDegrees": 90.0
+      "rotationDegrees": 179.73617381592447
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0.0,
-      "maxWaypointRelativePos": 2.0,
+      "maxWaypointRelativePos": 4.0,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.5,
@@ -77,7 +109,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -179.4195472939444
   },
   "reversed": false,
   "folder": "RampDepotPaths",
