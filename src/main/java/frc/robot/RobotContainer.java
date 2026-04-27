@@ -204,7 +204,7 @@ public class RobotContainer {
         // Letting go of Right Trigger: Waits half a second before stopping the shooter and resetting the hood (Hopefully)
         //Turns LEDs blue
         driverController.rightTrigger().whileTrue(turretToHub).onFalse(
-            Commands.waitSeconds(0.5).andThen(() -> {
+            Commands.waitSeconds(0.2).andThen(() -> {
                 turret.dropHood();
                 turret.setShooterSpeedRPM(2000);
             }));
