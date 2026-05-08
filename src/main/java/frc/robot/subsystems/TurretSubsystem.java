@@ -57,19 +57,21 @@ public class TurretSubsystem extends SubsystemBase {
     private final static double turretRangeOfMotionDegrees = 350; // should be 350 :)
     private final static double turretGearRatio = 160.0/16.0 * 30.0/16.0;
 
+    private double rpmOffset = 50;
+
     private final static Distance turretX = Inches.of(-5.692);
     private final static Distance turretY = Inches.of(-5);
     private final static Transform2d turretLocation = new Transform2d(new Translation2d(turretX.in(Meters), turretY.in(Meters)), Rotation2d.fromDegrees(turretZeroAngleDegrees));
 
     private static final double[][] DISTANCE_TABLE = {
             // dist_ft hood_deg rpm flight_sec
-            { 5.0, 70.0, 3300.0, 1.00 }, // measured
-            { 7.0, 63.5, 3450.0, 0.90 }, // measured
-            { 9.0, 61.0, 3700.0, 0.90 }, // measured
-            { 11.0, 59.0, 3900.0, 0.95 }, // measured
-            { 13.0, 55.0, 4150.0, 0.98 }, // measured
-            { 15.0, 52.0, 4350.0, 1.05 }, // measured
-            { 17.0, 50.0, 4650.0, 1.10 }, // measured
+            { 5.0, 70.0, 3350.0, 1.00 }, // measured
+            { 7.0, 63.5, 3500.0, 0.90 }, // measured
+            { 9.0, 61.0, 3750.0, 0.90 }, // measured
+            { 11.0, 59.0, 3950.0, 0.95 }, // measured
+            { 13.0, 55.0, 4200.0, 0.98 }, // measured
+            { 15.0, 52.0, 4400.0, 1.05 }, // measured
+            { 17.0, 50.0, 4700.0, 1.10 }, // measured
     };
 
     // InterpolatingDoubleTreeMap performs linear interpolation to give us values
@@ -314,7 +316,7 @@ public class TurretSubsystem extends SubsystemBase {
     // Estimates the speed we want to shoot the fuel at based on the turret's
     // distance to the hub
     public AngularVelocity targetShooterSpeed(double distanceFeet) {
-        return RPM.of(shooterSpeedMap.get(distanceFeet));
+        return RPM.of(shooterSpeedMap.get(distanceFeet) + rpmOffset);
     }
 
     // sets position of the hood
@@ -404,6 +406,14 @@ public class TurretSubsystem extends SubsystemBase {
 
     public double getTargetPositionRotations() {
         return targetAngleDegrees;
+    }
+
+    public void adjustRPMOffset(double adjust) {
+        rpmOffset += adjust;
+    }
+
+    public double getRPMOffset() {
+        return rpmOffset;
     }
 
     public AngularVelocity applyFlywheelSpeedBounds(AngularVelocity targetShooterSpeed) {

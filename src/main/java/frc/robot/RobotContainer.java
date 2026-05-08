@@ -238,8 +238,12 @@ public class RobotContainer {
 
         buttonBoxController.y().whileTrue(new OscillateIntake(intakeArm));
 
-        buttonBoxController.leftBumper().onTrue(Commands.runOnce(() -> {turret.adjustLeft();}));
-        buttonBoxController.rightBumper().onTrue(Commands.runOnce(() -> {turret.adjustRight();}));
+        // buttonBoxController.leftBumper().onTrue(Commands.runOnce(() -> {turret.adjustLeft();}));
+        // buttonBoxController.rightBumper().onTrue(Commands.runOnce(() -> {turret.adjustRight();}));
+
+        buttonBoxController.leftBumper().onTrue(Commands.runOnce(() -> {turret.adjustRPMOffset(-50);}));
+        buttonBoxController.rightBumper().onTrue(Commands.runOnce(() -> {turret.adjustRPMOffset(50);}));
+
         driverController.back().onTrue(Commands.runOnce(() -> {turret.adjustReset();}));
     }
 
