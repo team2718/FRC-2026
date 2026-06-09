@@ -478,9 +478,11 @@ public class SwerveSubsystem extends SubsystemBase {
         .deadband(1e-6)
         .scaleTranslation(OperatorConstants.SPEED_MULTIPLIER)
         .scaleRotation(OperatorConstants.ROTATION_MULTIPLIER)
-        // In demo mode, drive robot-relative so field orientation isn't needed.
-        .allianceRelativeControl(!Constants.DEMO_MODE)
-        .robotRelative(Constants.DEMO_MODE);
+        // In demo mode, disable alliance-relative control so the stream outputs raw
+        // joystick values; swerve.drive() then applies them robot-relative.
+        // Do NOT set robotRelative(true): in YAGSL that converts the output TO
+        // field-relative (via fromRobotRelativeSpeeds), which is the opposite of what we want.
+        .allianceRelativeControl(!Constants.DEMO_MODE);
   }
 
   public static ChassisSpeeds applyAccelLimit(ChassisSpeeds current, ChassisSpeeds target, double accelLimit) {

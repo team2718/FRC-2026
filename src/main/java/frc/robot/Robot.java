@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
     FAR_SHOT
   }
 
-  public static NoCameraMode noCameraMode = NoCameraMode.DISABLED;
+  public static NoCameraMode noCameraMode = NoCameraMode.CLOSE_SHOT;
 
   /**
    * This function is run when the robot is first started up and should be used

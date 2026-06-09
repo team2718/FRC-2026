@@ -55,7 +55,7 @@ public class TurretToHub extends Command {
     private static final AngularVelocity FIXED_LONG_SHOT_SHOOTER_SPEED = RPM.of(4000);
     private static final Angle FIXED_LONG_SHOT_HOOD_ANGLE = Degrees.of(63);
 
-    private static final Angle FIXED_SHOT_AZIMUTH_ANGLE = Degrees.of(10);
+    private static final Angle FIXED_SHOT_AZIMUTH_ANGLE = Degrees.of(0);
 
     private final TurretSubsystem shooter;
     private final SwerveSubsystem swerve;
@@ -343,7 +343,7 @@ public class TurretToHub extends Command {
 
     // Determines how the turret will work when the camera is disabled
     private void runNoCameraShot() {
-        AngularVelocity targetShooterSpeed = RPM.of(3500); // default value that gets overridden by the settings below
+        AngularVelocity targetShooterSpeed = RPM.of(4000); // default value that gets overridden by the settings below
 
         // Settings for if the robot is close to or far from the hub
         if (Robot.noCameraMode == NoCameraMode.CLOSE_SHOT) {
@@ -357,8 +357,12 @@ public class TurretToHub extends Command {
         shooter.setAzimuthAngle(FIXED_SHOT_AZIMUTH_ANGLE);
         shooter.setShooterSpeed(targetShooterSpeed);
 
-        // If the shooter is spun up, run the indexer
-        if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR))) {
+        Angle currentTurretAngle = shooter.getTurretAngle();
+        double azimuthErrorDegrees = FIXED_SHOT_AZIMUTH_ANGLE.minus(currentTurretAngle).in(Degrees);
+
+        // If the shooter is spun up and azimuth is on target, run the indexer
+        if ((Math.abs(azimuthErrorDegrees) < 10 || Math.abs(azimuthErrorDegrees) > 350)
+                && (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR)))) {
             isSpunUp = true;
             indexer.runIndexing(targetShooterSpeed);
             // LED blue = shooting

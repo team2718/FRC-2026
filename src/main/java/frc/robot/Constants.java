@@ -31,15 +31,15 @@ public final class Constants {
 
   // Demo mode: disables field-oriented drive for outreach events where the robot
   // is not on an actual field. Robot will drive robot-relative instead.
-  public static final boolean DEMO_MODE = false;
+  public static final boolean DEMO_MODE = true;
 
   public static final LinearVelocity MAX_SPEED = FeetPerSecond.of(14.0);
 
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
   public static class OperatorConstants {
-    public static final double SPEED_MULTIPLIER = 0.60;
-    public static final double ROTATION_MULTIPLIER = 0.55;
+    public static final double SPEED_MULTIPLIER = 0.35;
+    public static final double ROTATION_MULTIPLIER = 0.35;
     public static final double DEADBAND = 0.02;
 
     // Exponentiate joystick inputs to make fine control easier at low speeds.
