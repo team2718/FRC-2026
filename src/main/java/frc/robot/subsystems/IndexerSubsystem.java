@@ -57,8 +57,10 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public void runIndexing(AngularVelocity portalAngularVelocity) {
         if (enabled) {
-            indexerMotor.setVoltage(6.0);
-            portalMotor.setControl(portalVelocityRequest.withVelocity(portalAngularVelocity));
+            // indexerMotor.setVoltage(6.0);
+            // portalMotor.setControl(portalVelocityRequest.withVelocity(portalAngularVelocity));
+            indexerMotor.setVoltage(1.5);
+            portalMotor.setControl(portalVelocityRequest.withVelocity(portalAngularVelocity.div(1.5)));
         }
     }
 
