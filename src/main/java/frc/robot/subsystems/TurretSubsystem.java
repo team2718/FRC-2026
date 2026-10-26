@@ -20,6 +20,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -95,7 +96,7 @@ public class TurretSubsystem extends SubsystemBase {
     TalonFXConfiguration turrethoodconfig;
     TalonFXConfiguration turretAzimuthConfiguration;
 
-    private double targetAngleDegrees = 0;
+    private double targetTurretPositionDegrees = turretZeroAngleDegrees;
 
     public TurretSubsystem() {
 
@@ -220,38 +221,43 @@ public class TurretSubsystem extends SubsystemBase {
         turretZeroAngleDegrees = turretZeroAngleDegreesDefault;
     }
 
-    // Sets position of the turret in degrees
-    // 0 is facing forward (towards the front of the robot)
-    // CW is positive, CCW is negative
-    // return true if possible to go to this angle
-    public boolean setAzimuthAngle(Angle targetAngle) {
+    // Sets the desired robot-relative azimuth. Internally, the turret position remains
+    // unwrapped so its physical limits can span more than one representation of an angle.
+    // Returns false when the requested azimuth is in the physical dead zone.
+    public boolean setAzimuthAngle(Rotation2d targetAzimuth) {
         if (!turretEnabled) {
             return false; // Return early so we don't shoot when the turret is disabled
         }
 
-        targetAngleDegrees = targetAngle.in(Degrees) - turretZeroAngleDegrees;
+        // Convert the target azimuth to an unwrapped robot-relative turret position in degrees.
+        double targetTurretPositionDegrees = MathUtil.inputModulus(targetAzimuth.getDegrees(), 0, 360);
 
-        // Make sure the turret angle is [0 360)
-        if (targetAngleDegrees < 0) {
-            targetAngleDegrees += 360;
-        } else if (targetAngleDegrees >= 360) {
-            targetAngleDegrees -= 360;
+        // Choose the equivalent unwrapped angle that is in or nearest to the turret's
+        // physical travel interval. For example, a request for 20 degrees maps to 380
+        // degrees instead of 20 degrees.
+        if (targetTurretPositionDegrees < turretZeroAngleDegrees) {
+            targetTurretPositionDegrees += 360;
         }
 
-        // If the target angle is outside the range of motion, clamp it to the nearest valid angle
-        if (targetAngleDegrees < 0) {
-            targetAngleDegrees = 0;
-            turretspinnyspinner.setControl(new MotionMagicVoltage(targetAngleDegrees * turretGearRatio / 360.0));
-            return false;
-        } else if (targetAngleDegrees > turretRangeOfMotionDegrees) {
-            targetAngleDegrees = turretRangeOfMotionDegrees;
-            turretspinnyspinner.setControl(new MotionMagicVoltage(targetAngleDegrees * turretGearRatio / 360.0));
+        double minimumTurretPositionDegrees = turretZeroAngleDegrees;
+        double maximumTurretPositionDegrees = turretZeroAngleDegrees + turretRangeOfMotionDegrees;
+        boolean isReachable = targetTurretPositionDegrees >= minimumTurretPositionDegrees
+                && targetTurretPositionDegrees <= maximumTurretPositionDegrees;
+
+        // Clamp the target position to the physical limits of the turret.
+        targetTurretPositionDegrees = Math.max(minimumTurretPositionDegrees,
+                Math.min(targetTurretPositionDegrees, maximumTurretPositionDegrees));
+        this.targetTurretPositionDegrees = targetTurretPositionDegrees;
+
+        // Convert the unwrapped robot-relative position to motor rotations. The encoder is
+        // zeroed when the turret is at turretZeroAngleDegrees.
+        double motorRotations = (targetTurretPositionDegrees - turretZeroAngleDegrees) * turretGearRatio / 360.0;
+        turretspinnyspinner.setControl(new MotionMagicVoltage(motorRotations));
+
+        if (!isReachable) {
             return false;
         }
 
-        // Convert target angle in degrees to motor rotations and set the motor to that position using Motion Magic
-        // Subtract turretZeroAngleDegrees because the motor position is 0 at turretZeroAngleDegrees, not at 0 degrees
-        turretspinnyspinner.setControl(new MotionMagicVoltage(targetAngleDegrees * turretGearRatio / 360.0));
         return true;
     }
 
@@ -288,14 +294,16 @@ public class TurretSubsystem extends SubsystemBase {
         System.out.println("Turret position reset!");
     }
 
-    // returns the current position of the turret
-    // where 0 degrees is facing forward, positive is CW, negative is CCW
-    public Angle getTurretAngle() {
+    // Returns the physical, unwrapped robot-relative position. This is intentionally
+    // internal because callers should use the wrapped azimuth returned by getAzimuth().
+    private Angle getTurretPosition() {
         return Degrees.of(turretZeroAngleDegrees + (turretspinnyspinner.getPosition().getValue().in(Degrees) / turretGearRatio));
     }
 
-    public double getTurretAngleDegrees() {
-        return getTurretAngle().in(Degrees);
+    // Returns the continuous robot-relative turret azimuth. Rotation2d.minus()
+    // produces the shortest-path error when comparing this with a target.
+    public Rotation2d getAzimuth() {
+        return Rotation2d.fromDegrees(getTurretPosition().in(Degrees));
     }
 
 
@@ -404,8 +412,8 @@ public class TurretSubsystem extends SubsystemBase {
         return robotPose.plus(turretLocation);
     }
 
-    public double getTargetPositionRotations() {
-        return targetAngleDegrees;
+    public double getTargetTurretPositionDegrees() {
+        return targetTurretPositionDegrees;
     }
 
     public void adjustRPMOffset(double adjust) {

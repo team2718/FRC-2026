@@ -28,7 +28,6 @@ import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
-import frc.robot.utils.PossumUtils;
 import swervelib.SwerveInputStream;
 
 public class TurretToHub extends Command {
@@ -55,7 +54,7 @@ public class TurretToHub extends Command {
     private static final AngularVelocity FIXED_LONG_SHOT_SHOOTER_SPEED = RPM.of(4000);
     private static final Angle FIXED_LONG_SHOT_HOOD_ANGLE = Degrees.of(63);
 
-    private static final Angle FIXED_SHOT_AZIMUTH_ANGLE = Degrees.of(10);
+    private static final Rotation2d FIXED_SHOT_AZIMUTH = Rotation2d.fromDegrees(10);
 
     private final TurretSubsystem shooter;
     private final SwerveSubsystem swerve;
@@ -132,7 +131,7 @@ public class TurretToHub extends Command {
         // Set properties for when the camera is disabled
         if (!(Robot.noCameraMode == NoCameraMode.DISABLED)) {
             if (!isAuto) {
-                shooter.setAzimuthAngle(Degrees.of(10));
+                shooter.setAzimuthAngle(Rotation2d.fromDegrees(10));
                 runNoCameraShot();
                 swerve.lock();
             }
@@ -289,18 +288,15 @@ public class TurretToHub extends Command {
                 .plus(new Rotation2d(Radians.of(swerveSpeeds.omegaRadiansPerSecond).times(HEADING_LEAD_TIME_SECONDS)));
         Rotation2d rotation2dToTarget = ledLocationTarget.minus(turretPose.getTranslation()).getAngle();
 
-        Rotation2d targetTurretRotation = rotation2dToTarget.minus(currentSwerveHeading);
-        Rotation2d futureTargetTurretRotation = rotation2dToTarget.minus(futureSwerveHeading);
+        Rotation2d targetTurretAzimuth = rotation2dToTarget.minus(currentSwerveHeading);
+        Rotation2d futureTargetTurretAzimuth = rotation2dToTarget.minus(futureSwerveHeading);
 
-        Angle targetTurretAngle = PossumUtils.Rotation2dToAngle360(targetTurretRotation);
-        Angle futureTargetTurretAngle = PossumUtils.Rotation2dToAngle360(futureTargetTurretRotation);
-
-        SmartDashboard.putNumber("TurretToHub/Target Turret Angle Degrees", targetTurretAngle.in(Degrees));
-        SmartDashboard.putNumber("TurretToHub/Future Target Turret Angle Degrees", futureTargetTurretAngle.in(Degrees));
+        SmartDashboard.putNumber("TurretToHub/Target Turret Angle Degrees", targetTurretAzimuth.getDegrees());
+        SmartDashboard.putNumber("TurretToHub/Future Target Turret Angle Degrees", futureTargetTurretAzimuth.getDegrees());
 
         // Check if we can actually achieve the angle we want
         // This is not true if it is in our dead zone
-        boolean canGoToAngle = shooter.setAzimuthAngle(futureTargetTurretAngle);
+        boolean canGoToAngle = shooter.setAzimuthAngle(futureTargetTurretAzimuth);
         if (!canGoToAngle) {
             led.setLEDState(LEDState.RED);
             indexer.stopIndexing();
@@ -311,8 +307,7 @@ public class TurretToHub extends Command {
         // Compute the current error by using the non-future-rotated target angle
         // We use the future prediction to compensate for latency only when we set the
         // target
-        Angle currentTurretAngle = shooter.getTurretAngle();
-        double azimuthErrorDegrees = targetTurretAngle.minus(currentTurretAngle).in(Degrees);
+        double azimuthErrorDegrees = targetTurretAzimuth.minus(shooter.getAzimuth()).getDegrees();
 
         SmartDashboard.putNumber("TurretToHub/Azimuth Error Degrees", azimuthErrorDegrees);
 
@@ -354,11 +349,14 @@ public class TurretToHub extends Command {
             targetShooterSpeed = FIXED_LONG_SHOT_SHOOTER_SPEED;
         }
 
-        shooter.setAzimuthAngle(FIXED_SHOT_AZIMUTH_ANGLE);
+        shooter.setAzimuthAngle(FIXED_SHOT_AZIMUTH);
         shooter.setShooterSpeed(targetShooterSpeed);
 
-        // If the shooter is spun up, run the indexer
-        if (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR))) {
+        double azimuthErrorDegrees = FIXED_SHOT_AZIMUTH.minus(shooter.getAzimuth()).getDegrees();
+
+        // If the shooter is spun up and azimuth is on target, run the indexer
+        if (Math.abs(azimuthErrorDegrees) < 10
+                && (isSpunUp || (shooter.shooterAtSpeed(targetShooterSpeed.in(RPM), MAX_RPM_ERROR)))) {
             isSpunUp = true;
             indexer.runIndexing(targetShooterSpeed);
             // LED blue = shooting
@@ -370,4 +368,5 @@ public class TurretToHub extends Command {
 
         }
     }
+
 }
